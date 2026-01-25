@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PhamCongTra_SE1885NET_A01_BE")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+40fca10faecd22aba975c88d6a631a01187a49cd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+36b1da2ce7f18a75146561bb33c058aa725248f2")]
 [assembly: System.Reflection.AssemblyProductAttribute("PhamCongTra_SE1885NET_A01_BE")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PhamCongTra_SE1885NET_A01_BE")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

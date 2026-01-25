@@ -1,0 +1,126 @@
+﻿@page
+@model PhamCongTra_SE1885NET_A01_FE.Pages.SystemAccounts.DetailsModel
+@{
+}
+@{
+    ViewData["Title"] = "Account Details";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-circle"></i> Account Details
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <dl class="row">
+                                <dt class="col-sm-4">
+                                    <i class="bi bi-hash"></i> Account ID:
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-secondary fs-6">@Model.SystemAccount.AccountId</span>
+                                </dd>
+
+                                <dt class="col-sm-4">
+                                    <i class="bi bi-person"></i> Account Name:
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <strong>@Html.DisplayFor(model => model.SystemAccount.AccountName)</strong>
+                                </dd>
+
+                                <dt class="col-sm-4">
+                                    <i class="bi bi-envelope"></i> Email Address:
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <a href="mailto:@Model.SystemAccount.AccountEmail" class="text-primary">
+                                        @Html.DisplayFor(model => model.SystemAccount.AccountEmail)
+                                    </a>
+                                </dd>
+
+                                <dt class="col-sm-4">
+                                    <i class="bi bi-shield"></i> Account Role:
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @switch (Model.SystemAccount.AccountRole)
+                                    {
+                                        case 1:
+                                            <span class="badge bg-danger fs-6">
+                                                <i class="bi bi-shield-fill-check"></i> ADMIN
+                                            </span>
+                                            <br />
+                                            <small class="text-muted">Full system access and management privileges</small>
+                                            break;
+                                        case 2:
+                                            <span class="badge bg-primary fs-6">
+                                                <i class="bi bi-person-check"></i> USER
+                                            </span>
+                                            <br />
+                                            <small class="text-muted">Standard user with limited access</small>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary fs-6">
+                                                <i class="bi bi-question-circle"></i> UNKNOWN
+                                            </span>
+                                            <br />
+                                            <small class="text-muted">Role not defined</small>
+                                            break;
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">
+                                    <i class="bi bi-key"></i> Password Status:
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.SystemAccount.AccountPassword))
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Password Set
+                                        </span>
+                                        <br />
+                                        <small class="text-muted">Password: ••••••••</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-exclamation-triangle"></i> No Password
+                                        </span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">
+                                    <i class="bi bi-calendar"></i> Account Status:
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Active
+                                    </span>
+                                    <br />
+                                    <small class="text-muted">Last seen: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</small>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <a asp-page="./Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                        <div>
+                            <a asp-page="./Edit" asp-route-id="@Model.SystemAccount.AccountId" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Edit Account
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

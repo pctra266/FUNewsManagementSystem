@@ -3,6 +3,9 @@
   "WorkspaceRootPath": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\PhamCongTra_SE1885NET_A01_BE\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{F19D0959-6A53-4243-AD9C-588D7A8896E0}|..\\DataAccess\\DataAccess.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\be\\dataaccess\\repositories\\categoryrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{F19D0959-6A53-4243-AD9C-588D7A8896E0}|..\\DataAccess\\DataAccess.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\be\\dataaccess\\models\\category.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -35,6 +38,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "CategoryRepository.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\DataAccess\\Repositories\\CategoryRepository.cs",
+              "RelativeDocumentMoniker": "..\\DataAccess\\Repositories\\CategoryRepository.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\DataAccess\\Repositories\\CategoryRepository.cs",
+              "RelativeToolTip": "..\\DataAccess\\Repositories\\CategoryRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-24T13:26:22.206Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Category.cs",
               "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\DataAccess\\Models\\Category.cs",
               "RelativeDocumentMoniker": "..\\DataAccess\\Models\\Category.cs",
@@ -42,12 +58,11 @@
               "RelativeToolTip": "..\\DataAccess\\Models\\Category.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-24T12:59:49.11Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T12:59:49.11Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "NewsArticle.cs",
               "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\DataAccess\\Models\\NewsArticle.cs",
               "RelativeDocumentMoniker": "..\\DataAccess\\Models\\NewsArticle.cs",
@@ -55,12 +70,11 @@
               "RelativeToolTip": "..\\DataAccess\\Models\\NewsArticle.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-24T12:59:40.358Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T12:59:40.358Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Tag.cs",
               "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\DataAccess\\Models\\Tag.cs",
               "RelativeDocumentMoniker": "..\\DataAccess\\Models\\Tag.cs",
@@ -68,12 +82,11 @@
               "RelativeToolTip": "..\\DataAccess\\Models\\Tag.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-24T12:59:30.174Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T12:59:30.174Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "SystemAccount.cs",
               "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\DataAccess\\Models\\SystemAccount.cs",
               "RelativeDocumentMoniker": "..\\DataAccess\\Models\\SystemAccount.cs",
@@ -81,12 +94,11 @@
               "RelativeToolTip": "..\\DataAccess\\Models\\SystemAccount.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-24T12:58:33.955Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T12:58:33.955Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\PhamCongTra_SE1885NET_A01_BE\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -94,12 +106,11 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-24T12:56:08.144Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T12:56:08.144Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\BE\\PhamCongTra_SE1885NET_A01_BE\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -107,8 +118,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAGEAAAAAAAAAAAAcwG4AAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-24T12:53:28.215Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-24T12:53:28.215Z"
             }
           ]
         }

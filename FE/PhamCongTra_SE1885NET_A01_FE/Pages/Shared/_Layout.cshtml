@@ -1,18 +1,20 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PhamCongTra_SE1885NET_A01_FE</title>
+    <title>@ViewData["Title"] - FU News Management</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PhamCongTra_SE1885NET_A01_FE.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">PhamCongTra_SE1885NET_A01_FE</a>
+                <a class="navbar-brand" asp-page="/Index">FU News Management</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -20,16 +22,76 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link text-light" asp-page="/Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link text-light" asp-page="/NewsArticles/Index">News</a>
                         </li>
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+
+                            // ADMIN MENU
+                            if (roleClaim == "ADMIN")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/Categories/Index">Categories</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/Tags/Index">Tags</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/SystemAccounts/Index">Accounts</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/Reports/NewsStatistics">
+                                        Reports
+                                    </a>
+                                </li>
+                            }
+
+                            // STAFF MENU
+                            if (roleClaim == "STAFF")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/Categories/Index">Categories</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/NewsArticles/Index">My News</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/Profile/Index">Profile</a>
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var userName = User.Identity.Name ?? User.FindFirst(ClaimTypes.Email)?.Value;
+                            <li class="nav-item">
+                                <span class="nav-link text-light">Hello, @userName</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-page="/Index" asp-page-handler="Logout">
+                                    Logout
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-page="/Account/Login">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -37,8 +99,8 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - PhamCongTra_SE1885NET_A01_FE - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        <div class="container text-center">
+            &copy; 2026 - FU News Management System - <a asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
 

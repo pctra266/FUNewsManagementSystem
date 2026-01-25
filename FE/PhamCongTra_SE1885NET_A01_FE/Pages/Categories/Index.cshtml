@@ -1,0 +1,180 @@
+﻿@page
+@model PhamCongTra_SE1885NET_A01_FE.Pages.Categories.IndexModel
+@{
+}
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<style>
+    /* ===== Header ===== */
+    h1 {
+        text-align: center;
+        font-weight: 700;
+        color: #0d6efd;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+
+    p a {
+        display: inline-block;
+        background-color: #0d6efd;
+        color: #fff !important;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+        p a:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-2px);
+        }
+
+    /* ===== Table ===== */
+    .table {
+        width: 100%;
+        background-color: #fff;
+        border-collapse: separate;
+        border-spacing: 0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 15px;
+    }
+
+        .table thead {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+            .table thead th {
+                font-weight: 600;
+                text-align: left;
+                padding: 12px;
+                font-size: 0.95rem;
+                white-space: nowrap;
+            }
+
+        .table tbody tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.15s ease;
+        }
+
+            .table tbody tr:hover {
+                background-color: #f8f9fa;
+            }
+
+        .table td {
+            padding: 10px 12px;
+            vertical-align: middle;
+            font-size: 0.93rem;
+            color: #333;
+        }
+
+    /* ===== Badge ===== */
+    .badge-status {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .badge-active {
+        background-color: #28a745;
+    }
+
+    .badge-inactive {
+        background-color: #6c757d;
+    }
+
+    /* ===== Action Buttons ===== */
+    td.actions {
+        text-align: center;
+    }
+
+    td a {
+        text-decoration: none;
+        margin: 2px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        display: inline-block;
+    }
+
+        td a.edit {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        td a.details {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        td a.delete {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        td a:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        td a i {
+            margin-right: 4px;
+        }
+</style>
+
+<h1>Category Management</h1>
+
+<p>
+    <a asp-page="Create"><i class="bi bi-plus-circle"></i> Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Category[0].CategoryName)</th>
+            <th>@Html.DisplayNameFor(model => model.Category[0].CategoryDesciption)</th>
+            <th>@Html.DisplayNameFor(model => model.Category[0].IsActive)</th>
+            <th style="text-align:center;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Category)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
+                <td>@Html.DisplayFor(modelItem => item.CategoryDesciption)</td>
+                <td>
+                    @if (item.IsActive == true)
+                    {
+                        <span class="badge-status badge-active">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge-status badge-inactive">Inactive</span>
+                    }
+                </td>
+                <td class="actions">
+                    <a asp-page="./Edit" asp-route-id="@item.CategoryId" class="edit">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <a asp-page="./Details" asp-route-id="@item.CategoryId" class="details">
+                        <i class="bi bi-info-circle"></i> Details
+                    </a>
+                    <a asp-page="./Delete" asp-route-id="@item.CategoryId" class="delete">
+                        <i class="bi bi-trash"></i> Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

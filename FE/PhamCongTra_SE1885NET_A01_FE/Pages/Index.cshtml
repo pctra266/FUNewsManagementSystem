@@ -4,7 +4,152 @@
     ViewData["Title"] = "Home page";
 }
 
+<style>
+    /* ===== General Page Style ===== */
+    body {
+        background: linear-gradient(135deg, #eef3ff 0%, #f9fafc 100%);
+    }
+
+    .text-center h1.display-4 {
+        font-weight: 700;
+        color: #0d6efd;
+        margin-top: 40px;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+    }
+
+    /* ===== Card Styling ===== */
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+
+    .card-header {
+        background: #0d6efd;
+        color: #fff;
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        padding: 1rem 1.25rem;
+    }
+
+    .card-body {
+        padding: 1.8rem;
+    }
+
+    /* ===== Form Elements ===== */
+    .form-label {
+        font-weight: 500;
+        color: #444;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 10px 12px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+        }
+
+    /* ===== Buttons ===== */
+    .btn-success {
+        background: #198754;
+        border: none;
+        border-radius: 10px;
+        padding: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+        .btn-success:hover {
+            background: #157347;
+            transform: translateY(-2px);
+        }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 18px;
+        font-weight: 600;
+        transition: background-color 0.2s ease, transform 0.15s ease;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+
+    /* ===== Alert Styling ===== */
+    .alert-danger {
+        border-radius: 10px;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+</style>
+
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to News Management</h1>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <p>Welcome, <strong>@User.Identity.Name</strong>!</p>
+        <a asp-page="/Index" asp-page-handler="Logout" class="btn btn-warning mt-3">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Sign In</h4>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                        {
+                            <div class="alert alert-danger">
+                                @Model.ErrorMessage
+                            </div>
+                        }
+
+                        <form method="post" asp-page-handler="Login">
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label">Email:</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="Enter your email" required />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">Password:</label>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" required />
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-person-check"></i> Login
+                                </button>
+                            </div>
+                        </form>
+
+                        <hr />
+                        <p class="text-muted text-center mt-3">Manage your news effectively</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+

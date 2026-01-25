@@ -1,0 +1,113 @@
+﻿@page
+@model PhamCongTra_SE1885NET_A01_FE.Pages.Tags.IndexModel
+@{
+    ViewData["Title"] = "Tags";
+}
+
+<style>
+    h1 {
+        text-align: center;
+        font-weight: 700;
+        color: #0d6efd;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+
+    p a {
+        display: inline-block;
+        background-color: #0d6efd;
+        color: #fff !important;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+        p a:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-2px);
+        }
+
+    .table {
+        width: 100%;
+        background-color: #fff;
+        border-collapse: separate;
+        border-spacing: 0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .table thead {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+            .table thead th {
+                font-weight: 600;
+                text-align: left;
+                padding: 12px;
+                font-size: 0.95rem;
+                white-space: nowrap;
+            }
+
+        .table tbody tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.15s ease;
+        }
+
+            .table tbody tr:hover {
+                background-color: #f8f9fa;
+            }
+
+        .table td {
+            padding: 10px 12px;
+            vertical-align: middle;
+            font-size: 0.93rem;
+            color: #333;
+        }
+
+    td a {
+        text-decoration: none;
+        margin-right: 6px;
+        font-weight: 500;
+        color: #0d6efd;
+        transition: color 0.2s ease;
+    }
+
+        td a:hover {
+            color: #0a58ca;
+            text-decoration: underline;
+        }
+</style>
+
+<h1>Tags</h1>
+
+<p>
+    <a asp-page="Create"><i class="bi bi-plus-circle"></i> Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Tag[0].TagName)</th>
+            <th>@Html.DisplayNameFor(model => model.Tag[0].Note)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Tag)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.TagName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Note)</td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.TagId">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.TagId">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.TagId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
