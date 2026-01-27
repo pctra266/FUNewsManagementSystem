@@ -255,3 +255,11 @@ D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCo
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\obj\Debug\net8.0\PhamCongTra_SE1885NET_A01_FE.pdb
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\obj\Debug\net8.0\PhamCongTra_SE1885NET_A01_FE.genruntimeconfig.cache
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\obj\Debug\net8.0\ref\PhamCongTra_SE1885NET_A01_FE.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\PhamCongTra_SE1885NET_A01_FE\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

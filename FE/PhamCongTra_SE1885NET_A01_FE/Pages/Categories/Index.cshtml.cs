@@ -1,41 +1,75 @@
 ﻿using BusinessLogic.Services;
 using DataAccess.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PhamCongTra_SE1885NET_A01_FE.Pages.Categories
 {
-    [Authorize(Roles = "ADMIN")]
     public class IndexModel : PageModel
     {
-        // 3. Khai báo Service thay vì HttpClient
         private readonly ICategoryService _categoryService;
 
-        // 4. Inject Service qua Constructor
         public IndexModel(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }
 
-        public IList<Category> Category { get; set; } = default!;
+        public List<Category> Categories { get; set; } = new();
+
+        [BindProperty(SupportsGet = true)]
+        public string? SearchKeyword { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public bool? FilterActive { get; set; }
 
         public async Task OnGetAsync()
         {
+            if (!string.IsNullOrEmpty(SearchKeyword) || FilterActive.HasValue)
+            {
+                Categories = await _categoryService.SearchAsync(SearchKeyword, FilterActive);
+            }
+            else
+            {
+                var categoriesWithCount = await _categoryService.GetAllAsync();
+                Categories = categoriesWithCount.Select(c => new Category
+                {
+                    CategoryId = c.CategoryId,
+                    CategoryName = c.CategoryName,
+                    CategoryDesciption = c.CategoryDesciption,
+                    ParentCategoryId = c.ParentCategoryId,
+                    IsActive = c.IsActive,
+                    ParentCategoryName = c.ParentCategoryName,
+                    ArticleCount = c.ArticleCount
+                }).ToList();
+            }
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(short id)
+        {
             try
             {
-                // 5. Gọi Service để lấy toàn bộ danh sách
-                // Hàm này sẽ gọi xuống Repository -> Repository gọi API
-                var list = await _categoryService.GetAllCategoriesAsync();
-
-                Category = list;
+                await _categoryService.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Category deleted successfully!";
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi
-                Category = new List<Category>();
-                ModelState.AddModelError(string.Empty, "Error retrieving categories: " + ex.Message);
+                TempData["ErrorMessage"] = $"Cannot delete category: {ex.Message}";
             }
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostToggleStatusAsync(short id)
+        {
+            try
+            {
+                await _categoryService.ToggleStatusAsync(id);
+                TempData["SuccessMessage"] = "Category status updated!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+            }
+            return RedirectToPage();
         }
     }
 }

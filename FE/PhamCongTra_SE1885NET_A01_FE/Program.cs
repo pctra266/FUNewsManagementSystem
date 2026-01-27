@@ -1,48 +1,39 @@
-using BusinessLogic.Services;
-using DataAccess.Repositories;
+﻿using BusinessLogic.Services;
+using DataAccess.Models;
+using PhamCongTra_SE1885NET_A01_FE.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Add services
 builder.Services.AddRazorPages();
 
-// Session configuration
+// Register HttpClient & ApiClient
+builder.Services.AddHttpClient<IApiClient, DataAccess.Models.ApiClient>();
+
+// Register Business Services
+builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<INewsTagService, NewsTagService>();
+
+// Session for authentication
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddHttpContextAccessor();
-
-// HttpClient configuration
-//builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
-//{
-//    var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"];
-//    client.BaseAddress = new Uri(apiBaseUrl ?? "https://localhost:7001/api/");
-//    client.Timeout = TimeSpan.FromSeconds(30);
-//});
-
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<INewsRepository, NewsRepository>();
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<INewsService, NewsService>();
-
-builder.Services.AddScoped<ITagRepository, TagRepository>();
-builder.Services.AddScoped<ITagService, TagService>();
-// Dependency Injection - Services
-
-//builder.Services.AddScoped<IAuthService, AuthService>();
-//builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
-
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+// Add Antiforgery
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN";
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -51,12 +42,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseSession();
-app.UseAuthorization();
 
+// Use custom authentication middleware
+app.UseAuthenticationMiddleware();
+
+app.UseAuthorization();
 app.MapRazorPages();
 
 app.Run();

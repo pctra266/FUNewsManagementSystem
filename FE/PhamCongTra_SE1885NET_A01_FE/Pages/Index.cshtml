@@ -1,155 +1,184 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "News Articles";
 }
 
-<style>
-    /* ===== General Page Style ===== */
-    body {
-        background: linear-gradient(135deg, #eef3ff 0%, #f9fafc 100%);
-    }
-
-    .text-center h1.display-4 {
-        font-weight: 700;
-        color: #0d6efd;
-        margin-top: 40px;
-        margin-bottom: 30px;
-        letter-spacing: 1px;
-    }
-
-    /* ===== Card Styling ===== */
-    .card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-        background: #ffffff;
-        overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-        }
-
-    .card-header {
-        background: #0d6efd;
-        color: #fff;
-        text-align: center;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        padding: 1rem 1.25rem;
-    }
-
-    .card-body {
-        padding: 1.8rem;
-    }
-
-    /* ===== Form Elements ===== */
-    .form-label {
-        font-weight: 500;
-        color: #444;
-    }
-
-    .form-control {
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        padding: 10px 12px;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-        .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
-        }
-
-    /* ===== Buttons ===== */
-    .btn-success {
-        background: #198754;
-        border: none;
-        border-radius: 10px;
-        padding: 10px;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        transition: background 0.2s ease, transform 0.15s ease;
-    }
-
-        .btn-success:hover {
-            background: #157347;
-            transform: translateY(-2px);
-        }
-
-    .btn-warning {
-        background-color: #ffc107;
-        border: none;
-        border-radius: 10px;
-        padding: 8px 18px;
-        font-weight: 600;
-        transition: background-color 0.2s ease, transform 0.15s ease;
-    }
-
-        .btn-warning:hover {
-            background-color: #e0a800;
-            transform: translateY(-2px);
-        }
-
-    /* ===== Alert Styling ===== */
-    .alert-danger {
-        border-radius: 10px;
-        font-weight: 500;
-        margin-bottom: 1rem;
-    }
-</style>
-
-<div class="text-center">
-    <h1 class="display-4">Welcome to News Management</h1>
-
-    @if (User.Identity.IsAuthenticated)
-    {
-        <p>Welcome, <strong>@User.Identity.Name</strong>!</p>
-        <a asp-page="/Index" asp-page-handler="Logout" class="btn btn-warning mt-3">
-            <i class="bi bi-box-arrow-right"></i> Logout
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-newspaper"></i> News Articles</h1>
+        <a asp-page="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New
         </a>
-    }
-    else
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Sign In</h4>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Search & Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Search</label>
+                        <input type="text" class="form-control" name="searchKeyword"
+                               value="@Model.SearchKeyword" placeholder="Title, content...">
                     </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="filterCategory">
+                            <option value="">All Categories</option>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <option value="@cat.CategoryId" selected="@(Model.FilterCategory == cat.CategoryId)">
+                                    @cat.CategoryName (@cat.ArticleCount)
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="filterStatus">
+                            <option value="">All Status</option>
+                            <option value="true" selected="@(Model.FilterStatus == true)">Active</option>
+                            <option value="false" selected="@(Model.FilterStatus == false)">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="row g-4">
+        @foreach (var article in Model.NewsArticles)
+        {
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
                     <div class="card-body">
-                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                        {
-                            <div class="alert alert-danger">
-                                @Model.ErrorMessage
-                            </div>
-                        }
-
-                        <form method="post" asp-page-handler="Login">
-                            <div class="mb-3">
-                                <label asp-for="Email" class="form-label">Email:</label>
-                                <input asp-for="Email" type="email" class="form-control" placeholder="Enter your email" required />
-                            </div>
-                            <div class="mb-3">
-                                <label asp-for="Password" class="form-label">Password:</label>
-                                <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" required />
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="bi bi-person-check"></i> Login
-                                </button>
-                            </div>
-                        </form>
-
-                        <hr />
-                        <p class="text-muted text-center mt-3">Manage your news effectively</p>
+                        <h5 class="card-title">@article.NewsTitle</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@article.Headline</h6>
+                        <p class="card-text">
+                            @(article.NewsContent?.Length > 150
+                                                    ? article.NewsContent.Substring(0, 150) + "..."
+                                                    : article.NewsContent)
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge @(article.NewsStatus == true ? "bg-success" : "bg-secondary")">
+                            @(article.NewsStatus == true ? "Active" : "Inactive")
+                        </span>
+                        <small class="text-muted">
+                            @article.CreatedDate?.ToString("dd/MM/yyyy")
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="btn-group w-100" role="group">
+                        <a asp-page="Details" asp-route-id="@article.NewsArticleId"
+                           class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a asp-page="Edit" asp-route-id="@article.NewsArticleId"
+                           class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                onclick="duplicateArticle('@article.NewsArticleId')">
+                            <i class="bi bi-files"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                onclick="confirmDelete('@article.NewsArticleId', '@article.NewsTitle')">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+                }
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-page="Index" asp-route-pageNumber="@(Model.CurrentPage - 1)">
+                        Previous
+                    </a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-page="Index" asp-route-pageNumber="@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-page="Index" asp-route-pageNumber="@(Model.CurrentPage + 1)">
+                        Next
+                    </a>
+                </li>
+            </ul>
+        </nav>
     }
 </div>
 
+@section Scripts {
+    <script>
+        function confirmDelete(id, title) {
+            if (confirm(`Are you sure you want to delete "${title}"?`)) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '?handler=Delete&id=' + id;
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '__RequestVerificationToken';
+                input.value = token;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function duplicateArticle(id) {
+            if (confirm('Create a duplicate of this article?')) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '?handler=Duplicate&id=' + id;
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '__RequestVerificationToken';
+                input.value = token;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+}

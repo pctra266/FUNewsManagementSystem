@@ -1,6 +1,7 @@
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\DataAccess\bin\Debug\net8.0\DataAccess.deps.json
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\DataAccess\bin\Debug\net8.0\DataAccess.dll
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\DataAccess\bin\Debug\net8.0\DataAccess.pdb
+D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\DataAccess\obj\Debug\net8.0\DataAccess.csproj.AssemblyReference.cache
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\DataAccess\obj\Debug\net8.0\DataAccess.GeneratedMSBuildEditorConfig.editorconfig
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\DataAccess\obj\Debug\net8.0\DataAccess.AssemblyInfoInputs.cache
 D:\@DATA_CENTER\01 Projects\PRN232_Assignment01\FUNewsManagementSystem\FE\DataAccess\obj\Debug\net8.0\DataAccess.AssemblyInfo.cs

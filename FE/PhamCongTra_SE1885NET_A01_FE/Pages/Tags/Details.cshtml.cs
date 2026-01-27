@@ -1,49 +1,32 @@
 ﻿using BusinessLogic.Services;
 using DataAccess.Models;
-using Microsoft.AspNetCore.Authorization;
+using BusinessLogic.Services;
+using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PhamCongTra_SE1885NET_A01_FE.Pages.Tags
 {
-    [Authorize(Roles = "ADMIN,STAFF")]
     public class DetailsModel : PageModel
     {
         private readonly ITagService _tagService;
 
-        // 4. Inject Service
         public DetailsModel(ITagService tagService)
         {
             _tagService = tagService;
         }
 
-        public Tag Tag { get; set; } = default!;
+        public Tag Tag { get; set; } = new();
+        public List<NewsArticle> Articles { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
-            if (id == null)
-            {
+            Tag = await _tagService.GetByIdAsync(id);
+            if (Tag == null)
                 return NotFound();
-            }
 
-            try
-            {
-                // 5. Gọi Service để lấy thông tin Tag theo ID
-                // Hàm GetTagByIdAsync này đã được thêm vào Service ở bước trước (khi làm trang Delete)
-                Tag = await _tagService.GetTagByIdAsync(id.Value);
-
-                if (Tag == null)
-                {
-                    return NotFound();
-                }
-
-                return Page();
-            }
-            catch (Exception)
-            {
-                // Xử lý lỗi (Log nếu cần)
-                return NotFound("Error retrieving the tag. Please try again later.");
-            }
+            Articles = await _tagService.GetArticlesByTagAsync(id);
+            return Page();
         }
     }
 }

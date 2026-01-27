@@ -30,24 +30,24 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
+[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Accounts/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudHNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Accounts/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Categories/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Categories/Delete.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xEZWxldGUuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Categories/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xEZXRhaWxzLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Categories/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xFZGl0LmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Categories/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Dashboard/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Error.cshtml]
@@ -58,12 +58,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/NewsArticles/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmV3c0FydGljbGVzXENyZWF0ZS5jc2h0bWw=
+[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/NewsArticles/Delete.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmV3c0FydGljbGVzXERlbGV0ZS5jc2h0bWw=
+[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/NewsArticles/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmV3c0FydGljbGVzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/NewsArticles/Details.cshtml]
@@ -74,48 +74,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmV3c0FydGljbGVzXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/NewsArticles/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmV3c0FydGljbGVzXEluZGV4LmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Reports/NewsStatistics.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xOZXdzU3RhdGlzdGljcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/SystemAccounts/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWNjb3VudHNcQ3JlYXRlLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/SystemAccounts/Delete.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWNjb3VudHNcRGVsZXRlLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/SystemAccounts/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWNjb3VudHNcRGV0YWlscy5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/SystemAccounts/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWNjb3VudHNcRWRpdC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/SystemAccounts/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtQWNjb3VudHNcSW5kZXguY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Tags/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFnc1xDcmVhdGUuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Tags/Delete.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFnc1xEZWxldGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/@DATA_CENTER/01 Projects/PRN232_Assignment01/FUNewsManagementSystem/FE/PhamCongTra_SE1885NET_A01_FE/Pages/Tags/Details.cshtml]

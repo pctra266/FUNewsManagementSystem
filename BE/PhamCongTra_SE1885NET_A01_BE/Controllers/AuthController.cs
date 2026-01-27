@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Repositories;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FuNewsManagementAPI.Controllers
 {
@@ -24,7 +25,7 @@ namespace FuNewsManagementAPI.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            
+            // Check admin account
             var adminSection = _config.GetSection("AdminAccount");
             var adminEmail = adminSection["Email"];
             var adminPassword = adminSection["Password"];
@@ -36,40 +37,68 @@ namespace FuNewsManagementAPI.Controllers
                     AccountId = 0,
                     AccountName = "System Administrator",
                     AccountEmail = adminEmail,
-                    AccountRole = 99, 
-                    AccountPassword = adminPassword
+                    AccountRole = 99
                 };
-                var token = GenerateJwtToken(adminUser, "ADMIN");
-                return Ok(new { token });
+                var token = GenerateJwtToken(adminUser);
+                return Ok(new { token, role = "ADMIN", userName = adminUser.AccountName });
             }
 
-         
+            // Check database accounts
             var user = _accountRepo
                 .GetSystemAccounts()
                 .FirstOrDefault(u => u.AccountEmail == request.Email && u.AccountPassword == request.Password);
 
             if (user == null)
-                return Unauthorized("Invalid email or password");
+                return Unauthorized(new { message = "Invalid email or password" });
 
-            string role = user.AccountRole == 1 ? "STAFF" : "EDITOR";
-
-            var jwt = GenerateJwtToken(user, role);
-            return Ok(new { token = jwt });
+            var jwt = GenerateJwtToken(user);
+            var roleName = GetRoleName((short?)user.AccountRole);
+            
+            return Ok(new { token = jwt, role = roleName, userName = user.AccountName });
         }
 
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            return Ok(new { message = "Logged out successfully" });
+        }
 
-        private string GenerateJwtToken(SystemAccount user, string role)
+        [HttpGet("me")]
+        [Authorize]
+        public IActionResult GetCurrentUser()
+        {
+            var userId = User.FindFirst("UserId")?.Value;
+            var email = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            return Ok(new
+            {
+                userId,
+                email,
+                role,
+                isAdmin = User.IsInRole("ADMIN"),
+                isStaff = User.IsInRole("STAFF"),
+                isLecturer = User.IsInRole("LECTURER")
+            });
+        }
+
+        private string GenerateJwtToken(SystemAccount user)
         {
             var jwtSettings = _config.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
 
+            // Map AccountRole to Role Name
+            var roleName = GetRoleName((short?)user.AccountRole);
+
             var claims = new[]
             {
-        new Claim(JwtRegisteredClaimNames.Sub, user.AccountEmail ?? ""),
-        new Claim("UserId", user.AccountId.ToString()),
-        new Claim(ClaimTypes.Role, role), // 👈 Role claim chuẩn
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+                new Claim(JwtRegisteredClaimNames.Sub, user.AccountEmail ?? ""),
+                new Claim("UserId", user.AccountId.ToString()),
+                new Claim("UserName", user.AccountName ?? ""),
+                new Claim(ClaimTypes.Role, roleName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -84,6 +113,17 @@ namespace FuNewsManagementAPI.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        // ✅ Helper method: Map AccountRole (number) -> Role Name (string)
+        private string GetRoleName(short? accountRole)
+        {
+            return accountRole switch
+            {
+                1 => "STAFF",      // Staff - Manage categories and articles
+                2 => "LECTURER",   // Lecturer - Read and search only
+                99 => "ADMIN",     // Admin - Full control
+                _ => "LECTURER"    // Default to most restrictive
+            };
+        }
     }
 
     public class LoginRequest

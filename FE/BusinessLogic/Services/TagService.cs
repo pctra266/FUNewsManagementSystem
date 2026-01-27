@@ -1,50 +1,66 @@
 ﻿using DataAccess.Models;
-using DataAccess.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.Services
 {
-    public class TagService: ITagService
+    public interface ITagService
     {
-        private readonly ITagRepository _tagRepo;
+        Task<List<Tag>> GetAllAsync();
+        Task<Tag?> GetByIdAsync(int id);
+        Task<List<Tag>> SearchAsync(string? keyword);
+        Task<List<NewsArticle>> GetArticlesByTagAsync(int tagId);
+        Task CreateAsync(Tag tag);
+        Task UpdateAsync(Tag tag);
+        Task DeleteAsync(int id);
+    }
 
-        public TagService(ITagRepository tagRepo)
+    public class TagService : ITagService
+    {
+        private readonly IApiClient _apiClient;
+
+        public TagService(IApiClient apiClient)
         {
-            _tagRepo = tagRepo;
+            _apiClient = apiClient;
         }
 
-        public async Task CreateTagAsync(Tag tag)
+        public async Task<List<Tag>> GetAllAsync()
         {
-            // Có thể thêm logic validate: Không cho trùng tên Tag
-            // var allTags = await _tagRepo.GetAllTagsAsync();
-            // if (allTags.Any(t => t.TagName == tag.TagName)) throw new Exception("Tag name exists!");
-
-            await _tagRepo.CreateTagAsync(tag);
-        }
-        public async Task<Tag?> GetTagByIdAsync(int id)
-        {
-            return await _tagRepo.GetTagByIdAsync(id);
+            return await _apiClient.GetAsync<List<Tag>>("Tags")
+                   ?? new List<Tag>();
         }
 
-        public async Task DeleteTagAsync(int id)
+        public async Task<Tag?> GetByIdAsync(int id)
         {
-            // Có thể thêm logic kiểm tra: Tag đang được sử dụng bởi bài viết nào không?
-            // Nếu có thì chặn xóa (tùy nghiệp vụ)
+            return await _apiClient.GetAsync<Tag>($"Tags/{id}");
+        }
 
-            await _tagRepo.DeleteTagAsync(id);
-        }
-        public async Task UpdateTagAsync(Tag tag)
+        public async Task<List<Tag>> SearchAsync(string? keyword)
         {
-            // Có thể thêm validation nếu cần
-            await _tagRepo.UpdateTagAsync(tag);
+            if (string.IsNullOrEmpty(keyword))
+                return await GetAllAsync();
+
+            return await _apiClient.GetAsync<List<Tag>>($"Tags/Search?keyword={Uri.EscapeDataString(keyword)}")
+                   ?? new List<Tag>();
         }
-        public async Task<List<Tag>> GetAllTagsAsync()
+
+        public async Task<List<NewsArticle>> GetArticlesByTagAsync(int tagId)
         {
-            return await _tagRepo.GetAllTagsAsync();
+            return await _apiClient.GetAsync<List<NewsArticle>>($"Tags/{tagId}/Articles")
+                   ?? new List<NewsArticle>();
+        }
+
+        public async Task CreateAsync(Tag tag)
+        {
+            await _apiClient.PostAsync<Tag>("Tags", tag);
+        }
+
+        public async Task UpdateAsync(Tag tag)
+        {
+            await _apiClient.PutAsync<object>($"Tags/{tag.TagId}", tag);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            await _apiClient.DeleteAsync($"Tags/{id}");
         }
     }
 }

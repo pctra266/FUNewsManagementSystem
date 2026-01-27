@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OpenApi.Models;
 using Repositories;
 using Services;
 using System.Text;
@@ -21,39 +22,52 @@ namespace FuNewsManagementAPI
 
             // 🔹 JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("Jwt");
-            if (builder.Environment.IsDevelopment())
-            {
-                Console.WriteLine($" JWT Config Loaded:");
-                Console.WriteLine($"   Key: {jwtSettings["Key"]}");
-                Console.WriteLine($"   Issuer: {jwtSettings["Issuer"]}");
-                Console.WriteLine($"   Audience: {jwtSettings["Audience"]}");
-            }
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
 
             // 🔹 DbContext
             builder.Services.AddDbContext<NewsContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn"))
             );
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
 
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        ClockSkew = TimeSpan.Zero
-    };
-});
-            // 🔹 Add Controllers + OData (chỉ gọi 1 lần)
+            // 🔹 Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["Issuer"],
+                        ValidAudience = jwtSettings["Audience"],
+                        IssuerSigningKey = key,
+                        ClockSkew = TimeSpan.Zero,
+                        RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                    };
+                });
+
+            // 🔹 Authorization Policies - ĐƠN GIẢN VÀ RÕ RÀNG
+            builder.Services.AddAuthorization(options =>
+            {
+                // Policy cho Admin - Full control
+                options.AddPolicy("AdminOnly", policy => 
+                    policy.RequireRole("ADMIN"));
+
+                // Policy cho Staff - Quản lý categories và articles
+                options.AddPolicy("StaffAccess", policy => 
+                    policy.RequireRole("STAFF", "ADMIN"));
+
+                // Policy cho Lecturer - Chỉ đọc
+                options.AddPolicy("LecturerAccess", policy => 
+                    policy.RequireRole("LECTURER", "STAFF", "ADMIN"));
+
+                // Policy cho mọi user đã đăng nhập
+                options.AddPolicy("Authenticated", policy => 
+                    policy.RequireAuthenticatedUser());
+            });
+
+            // 🔹 Add Controllers + OData
             builder.Services.AddControllers()
                 .AddOData(options =>
                     options.Select()
@@ -72,7 +86,35 @@ namespace FuNewsManagementAPI
 
             // 🔹 Swagger
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FU News Management API", Version = "v1" });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter JWT with Bearer format: Bearer {token}",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
+            });
 
             // 🔹 Dependency Injection
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -100,16 +142,13 @@ namespace FuNewsManagementAPI
             app.Run();
         }
 
-        // 🔹 Khai báo EDM Model cho OData
         private static IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
-
             builder.EntitySet<NewsArticle>("Articles");
             builder.EntitySet<Category>("Categories");
             builder.EntitySet<Tag>("Tags");
             builder.EntitySet<SystemAccount>("SystemAccounts");
-
             return builder.GetEdmModel();
         }
     }

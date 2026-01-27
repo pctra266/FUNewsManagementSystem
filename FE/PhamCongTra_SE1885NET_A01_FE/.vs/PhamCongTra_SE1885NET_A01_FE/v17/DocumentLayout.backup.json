@@ -3,116 +3,76 @@
   "WorkspaceRootPath": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\services\\apiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:services\\apiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{F78EE308-167F-4606-8685-0A3CEFF71774}|..\\DataAccess\\DataAccess.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\dataaccess\\models\\apiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4DE74589-28F2-48D5-B258-C849032C26DF}|..\\BusinessLogic\\BusinessLogic.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\businesslogic\\services\\tagservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4DE74589-28F2-48D5-B258-C849032C26DF}|..\\BusinessLogic\\BusinessLogic.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\businesslogic\\services\\itagservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F78EE308-167F-4606-8685-0A3CEFF71774}|..\\DataAccess\\DataAccess.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\dataaccess\\repositories\\tagrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F78EE308-167F-4606-8685-0A3CEFF71774}|..\\DataAccess\\DataAccess.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\dataaccess\\repositories\\itagrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4DE74589-28F2-48D5-B258-C849032C26DF}|..\\BusinessLogic\\BusinessLogic.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\businesslogic\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{4DE74589-28F2-48D5-B258-C849032C26DF}|..\\BusinessLogic\\BusinessLogic.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\businesslogic\\services\\tagservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{4DE74589-28F2-48D5-B258-C849032C26DF}|..\\BusinessLogic\\BusinessLogic.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\businesslogic\\services\\categoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\services\\iapiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:services\\iapiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\categories\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\categories\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\categories\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\categories\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4DE74589-28F2-48D5-B258-C849032C26DF}|..\\BusinessLogic\\BusinessLogic.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\businesslogic\\services\\iaccountservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\categories\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\categories\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F78EE308-167F-4606-8685-0A3CEFF71774}|..\\DataAccess\\DataAccess.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\dataaccess\\repositories\\accountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4DE74589-28F2-48D5-B258-C849032C26DF}|..\\BusinessLogic\\BusinessLogic.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\businesslogic\\services\\accountservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F78EE308-167F-4606-8685-0A3CEFF71774}|..\\DataAccess\\DataAccess.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\dataaccess\\repositories\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\tags\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\tags\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\shared\\authenticationmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\shared\\authenticationmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\dashboard\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\dashboard\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\accounts\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\accounts\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\systemaccounts\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\systemaccounts\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|d:\\@data_center\\01 projects\\prn232_assignment01\\funewsmanagementsystem\\fe\\phamcongtra_se1885net_a01_fe\\pages\\accounts\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E6F9B6C3-3BC8-45E3-9258-345165B0C1DF}|PhamCongTra_SE1885NET_A01_FE.csproj|solutionrelative:pages\\accounts\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -122,396 +82,254 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Shared\\_Layout.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "Pages\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:44:56.746Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Index.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Index.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Index.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Index.cshtml.cs",
-              "RelativeToolTip": "Pages\\Tags\\Index.cshtml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAANAAAAAAAAAA==",
+              "DocumentIndex": 6,
+              "Title": "CategoryService.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\CategoryService.cs",
+              "RelativeDocumentMoniker": "..\\BusinessLogic\\Services\\CategoryService.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\CategoryService.cs",
+              "RelativeToolTip": "..\\BusinessLogic\\Services\\CategoryService.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAiwB0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:42:30.749Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Index.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Index.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Index.cshtml",
-              "RelativeToolTip": "Pages\\Tags\\Index.cshtml",
-              "ViewState": "AgIAAFcAAAAAAAAAAAAAAGkAAABOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:42:27.951Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Edit.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Edit.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Edit.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Edit.cshtml.cs",
-              "RelativeToolTip": "Pages\\Tags\\Edit.cshtml.cs",
-              "ViewState": "AgIAACkAAAAAAAAAAAAYwCkAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:40:54.362Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Edit.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Edit.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Edit.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Edit.cshtml",
-              "RelativeToolTip": "Pages\\Tags\\Edit.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:40:51.37Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "Details.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Details.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Details.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Details.cshtml.cs",
-              "RelativeToolTip": "Pages\\Tags\\Details.cshtml.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAAwBMAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:38:54.079Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Details.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Details.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Details.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Details.cshtml",
-              "RelativeToolTip": "Pages\\Tags\\Details.cshtml",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAABsAAABDAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:38:19.665Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Delete.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Delete.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Delete.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Delete.cshtml.cs",
-              "RelativeToolTip": "Pages\\Tags\\Delete.cshtml.cs",
-              "ViewState": "AgIAAC8AAAAAAAAAAAAowDMAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:34:45.545Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "Delete.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Delete.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Delete.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Delete.cshtml",
-              "RelativeToolTip": "Pages\\Tags\\Delete.cshtml",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:34:06.182Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:33:00.854Z",
+              "WhenOpened": "2026-01-27T13:03:36.624Z",
+              "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "TagService.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\TagService.cs",
-              "RelativeDocumentMoniker": "..\\BusinessLogic\\Services\\TagService.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\TagService.cs",
-              "RelativeToolTip": "..\\BusinessLogic\\Services\\TagService.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAowCkAAAAtAAAAAAAAAA==",
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "..\\BusinessLogic\\Services\\AuthService.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\AuthService.cs",
+              "RelativeToolTip": "..\\BusinessLogic\\Services\\AuthService.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAYwBYAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:32:26.006Z",
+              "WhenOpened": "2026-01-27T13:17:25.04Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ITagService.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\ITagService.cs",
-              "RelativeDocumentMoniker": "..\\BusinessLogic\\Services\\ITagService.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\ITagService.cs",
-              "RelativeToolTip": "..\\BusinessLogic\\Services\\ITagService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAlAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "ApiClient.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Services\\ApiClient.cs",
+              "RelativeDocumentMoniker": "Services\\ApiClient.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Services\\ApiClient.cs",
+              "RelativeToolTip": "Services\\ApiClient.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:31:55.35Z",
+              "WhenOpened": "2026-01-27T13:15:29.291Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IApiClient.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Services\\IApiClient.cs",
+              "RelativeDocumentMoniker": "Services\\IApiClient.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Services\\IApiClient.cs",
+              "RelativeToolTip": "Services\\IApiClient.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T13:14:29.451Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Categories\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Categories\\Index.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Categories\\Index.cshtml.cs",
+              "RelativeToolTip": "Pages\\Categories\\Index.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T13:10:56.9Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Categories\\Index.cshtml",
+              "RelativeDocumentMoniker": "Pages\\Categories\\Index.cshtml",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Categories\\Index.cshtml",
+              "RelativeToolTip": "Pages\\Categories\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-27T13:00:07.502Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ApiClient.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Models\\ApiClient.cs",
+              "RelativeDocumentMoniker": "..\\DataAccess\\Models\\ApiClient.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Models\\ApiClient.cs",
+              "RelativeToolTip": "..\\DataAccess\\Models\\ApiClient.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAADwvxUAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T12:57:32.142Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "TagRepository.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\TagRepository.cs",
-              "RelativeDocumentMoniker": "..\\DataAccess\\Repositories\\TagRepository.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\TagRepository.cs",
-              "RelativeToolTip": "..\\DataAccess\\Repositories\\TagRepository.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAQwCMAAAAAAAAAAAAAAA==",
+              "Title": "TagService.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\TagService.cs",
+              "RelativeDocumentMoniker": "..\\BusinessLogic\\Services\\TagService.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\TagService.cs",
+              "RelativeToolTip": "..\\BusinessLogic\\Services\\TagService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:29:49.391Z",
+              "WhenOpened": "2026-01-27T12:56:55.693Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ITagRepository.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\ITagRepository.cs",
-              "RelativeDocumentMoniker": "..\\DataAccess\\Repositories\\ITagRepository.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\ITagRepository.cs",
-              "RelativeToolTip": "..\\DataAccess\\Repositories\\ITagRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAkAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "Login.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Login.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Login.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Login.cshtml.cs",
+              "RelativeToolTip": "Pages\\Login.cshtml.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAIwAwAAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:29:26.522Z",
+              "WhenOpened": "2026-01-27T12:54:13.767Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T12:54:52.314Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 14,
-              "Title": "Create.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Create.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Create.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Create.cshtml.cs",
-              "RelativeToolTip": "Pages\\Tags\\Create.cshtml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Tags\\Index.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Index.cshtml.cs",
+              "RelativeToolTip": "Pages\\Tags\\Index.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:28:40.167Z",
+              "WhenOpened": "2026-01-27T12:53:58.364Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Edit.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Edit.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Tags\\Edit.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Edit.cshtml.cs",
+              "RelativeToolTip": "Pages\\Tags\\Edit.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T12:53:50.987Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Details.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Details.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Tags\\Details.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Details.cshtml.cs",
+              "RelativeToolTip": "Pages\\Tags\\Details.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T12:53:45.744Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 13,
-              "Title": "Create.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Create.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Tags\\Create.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Create.cshtml",
-              "RelativeToolTip": "Pages\\Tags\\Create.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABCAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:28:21.706Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "Index.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Index.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Index.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Index.cshtml.cs",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Index.cshtml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAsAAAAAAAAAA==",
+              "Title": "Create.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Create.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Tags\\Create.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Tags\\Create.cshtml.cs",
+              "RelativeToolTip": "Pages\\Tags\\Create.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:26:47.749Z",
+              "WhenOpened": "2026-01-27T12:53:35.866Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Index.cshtml",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Index.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Index.cshtml",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Index.cshtml",
-              "ViewState": "AgIAAFQAAAAAAAAAAAAAAGkAAABjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:26:45.642Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "Edit.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Edit.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Edit.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Edit.cshtml.cs",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Edit.cshtml.cs",
-              "ViewState": "AgIAAC4AAAAAAAAAAAAAADsAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 15,
+              "Title": "AuthenticationMiddleware.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Shared\\AuthenticationMiddleware.cs",
+              "RelativeDocumentMoniker": "Pages\\Shared\\AuthenticationMiddleware.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Shared\\AuthenticationMiddleware.cs",
+              "RelativeToolTip": "Pages\\Shared\\AuthenticationMiddleware.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:20:00.68Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "Edit.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Edit.cshtml",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Edit.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Edit.cshtml",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Edit.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:18:52.836Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "Details.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Details.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Details.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Details.cshtml.cs",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Details.cshtml.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:17:17.099Z",
+              "WhenOpened": "2026-01-27T12:52:56.361Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 16,
-              "Title": "Details.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Details.cshtml",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Details.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Details.cshtml",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Details.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:16:35.904Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "IAccountService.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\IAccountService.cs",
-              "RelativeDocumentMoniker": "..\\BusinessLogic\\Services\\IAccountService.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\IAccountService.cs",
-              "RelativeToolTip": "..\\BusinessLogic\\Services\\IAccountService.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABgAAAAaAAAAAAAAAA==",
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Dashboard\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Dashboard\\Index.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Dashboard\\Index.cshtml.cs",
+              "RelativeToolTip": "Pages\\Dashboard\\Index.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:15:09.606Z",
+              "WhenOpened": "2026-01-27T12:52:32.472Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
-              "Title": "AccountRepository.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\AccountRepository.cs",
-              "RelativeDocumentMoniker": "..\\DataAccess\\Repositories\\AccountRepository.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\AccountRepository.cs",
-              "RelativeToolTip": "..\\DataAccess\\Repositories\\AccountRepository.cs",
-              "ViewState": "AgIAADoAAAAAAAAAAAAzwEMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:14:55.024Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 24,
-              "Title": "IAccountRepository.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\IAccountRepository.cs",
-              "RelativeDocumentMoniker": "..\\DataAccess\\Repositories\\IAccountRepository.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\DataAccess\\Repositories\\IAccountRepository.cs",
-              "RelativeToolTip": "..\\DataAccess\\Repositories\\IAccountRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:14:44.112Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 27,
-              "Title": "Delete.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Delete.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Delete.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Delete.cshtml.cs",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Delete.cshtml.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAQwDkAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:12:33.736Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 26,
-              "Title": "Delete.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Delete.cshtml",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Delete.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Delete.cshtml",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Delete.cshtml",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAACoAAABBAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:12:16.432Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "AccountService.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\AccountService.cs",
-              "RelativeDocumentMoniker": "..\\BusinessLogic\\Services\\AccountService.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\BusinessLogic\\Services\\AccountService.cs",
-              "RelativeToolTip": "..\\BusinessLogic\\Services\\AccountService.cs",
-              "ViewState": "AgIAAD8AAAAAAAAAAAAowFwAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:10:32.401Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 9,
               "Title": "Create.cshtml.cs",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Create.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Create.cshtml.cs",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Create.cshtml.cs",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Create.cshtml.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAAACYAAAA4AAAAAAAAAA==",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Categories\\Create.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Categories\\Create.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Categories\\Create.cshtml.cs",
+              "RelativeToolTip": "Pages\\Categories\\Create.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T02:08:57.572Z",
+              "WhenOpened": "2026-01-27T12:52:14.876Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
-              "Title": "Create.cshtml",
-              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Create.cshtml",
-              "RelativeDocumentMoniker": "Pages\\SystemAccounts\\Create.cshtml",
-              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\SystemAccounts\\Create.cshtml",
-              "RelativeToolTip": "Pages\\SystemAccounts\\Create.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAABXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-25T02:08:18.347Z",
+              "DocumentIndex": 17,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Accounts\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Accounts\\Index.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Accounts\\Index.cshtml.cs",
+              "RelativeToolTip": "Pages\\Accounts\\Index.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T12:52:08.094Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Create.cshtml.cs",
+              "DocumentMoniker": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Accounts\\Create.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Accounts\\Create.cshtml.cs",
+              "ToolTip": "D:\\@DATA_CENTER\\01 Projects\\PRN232_Assignment01\\FUNewsManagementSystem\\FE\\PhamCongTra_SE1885NET_A01_FE\\Pages\\Accounts\\Create.cshtml.cs",
+              "RelativeToolTip": "Pages\\Accounts\\Create.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T12:51:57.05Z",
               "EditorCaption": ""
             }
           ]

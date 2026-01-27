@@ -1,30 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace DataAccess.Models;
-
-public partial class SystemAccount
+namespace DataAccess.Models
 {
-    [DisplayName("Account ID")]
-    public short AccountId { get; set; }
+    public class SystemAccount
+    {
+        [DisplayName("Account ID")]
+        public short AccountId { get; set; }
 
-    [DisplayName("Tên tài khoản")]
-    [Required(ErrorMessage = "Tên không được để trống")]
-    public string? AccountName { get; set; }
+        [DisplayName("Name")]
+        [Required(ErrorMessage = "Name is required")]
+        public string? AccountName { get; set; }
 
-    [DisplayName("Email")]
-    [Required]
-    [EmailAddress(ErrorMessage = "Email không hợp lệ")]
-    public string? AccountEmail { get; set; }
+        [DisplayName("Email")]
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string? AccountEmail { get; set; }
 
-    [DisplayName("Vai trò")]
-    public int? AccountRole { get; set; } 
+        [DisplayName("Role")]
+        public short? AccountRole { get; set; }
 
-    [DisplayName("Mật khẩu")]
-    [Required]
-    [DataType(DataType.Password)]
-    public string? AccountPassword { get; set; }
+        [DisplayName("Password")]
+        [DataType(DataType.Password)]
+        public string? AccountPassword { get; set; }
+
+        public string RoleName => AccountRole switch
+        {
+            1 => "STAFF",
+            2 => "LECTURER",
+            99 => "ADMIN",
+            _ => "UNKNOWN"
+        };
+    }
 }

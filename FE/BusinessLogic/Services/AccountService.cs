@@ -1,94 +1,76 @@
 ﻿using DataAccess.Models;
-using DataAccess.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.Services
 {
-    public class AccountService: IAccountService
+    public interface IAccountService
     {
-        private readonly IAccountRepository _accountRepo;
+        Task<List<SystemAccount>> GetAllAsync();
+        Task<SystemAccount?> GetByIdAsync(short id);
+        Task<List<SystemAccount>> SearchAsync(string? keyword, short? role);
+        Task CreateAsync(SystemAccount account);
+        Task UpdateAsync(SystemAccount account);
+        Task DeleteAsync(short id);
+        Task ChangePasswordAsync(short id, string currentPassword, string newPassword);
+    }
 
-        public AccountService(IAccountRepository accountRepo)
+    public class AccountService : IAccountService
+    {
+        private readonly IApiClient _apiClient;
+
+        public AccountService(IApiClient apiClient)
         {
-            _accountRepo = accountRepo;
+            _apiClient = apiClient;
         }
 
-        public async Task<SystemAccount?> LoginAsync(string email, string password)
+        public async Task<List<SystemAccount>> GetAllAsync()
         {
-            // Cách 1: Nếu API có endpoint Login riêng
-            return await _accountRepo.LoginAsync(email, password);
-
-            // Cách 2: Nếu API không có Login, phải get hết về rồi lọc (chỉ dùng khi project nhỏ)
-            /*
-            var accounts = await _accountRepo.GetAccountsAsync();
-            return accounts.FirstOrDefault(a => a.AccountEmail == email && a.AccountPassword == password);
-            */
+            return await _apiClient.GetAsync<List<SystemAccount>>("SystemAccounts")
+                   ?? new List<SystemAccount>();
         }
 
-        public async Task<List<SystemAccount>> GetAccountsAsync()
+        public async Task<SystemAccount?> GetByIdAsync(short id)
         {
-            return await _accountRepo.GetAccountsAsync();
+            return await _apiClient.GetAsync<SystemAccount>($"SystemAccounts/{id}");
         }
 
-        public async Task<SystemAccount?> GetAccountByEmailAsync(string email)
+        public async Task<List<SystemAccount>> SearchAsync(string? keyword, short? role)
         {
-            // Lấy danh sách từ Repo về và lọc
-            var accounts = await _accountRepo.GetAccountsAsync();
+            var queryParams = new List<string>();
 
-            // Trả về user đầu tiên khớp email (không phân biệt hoa thường)
-            return accounts.FirstOrDefault(a => a.AccountEmail != null &&
-                                                a.AccountEmail.Equals(email, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(keyword))
+                queryParams.Add($"keyword={Uri.EscapeDataString(keyword)}");
+
+            if (role.HasValue)
+                queryParams.Add($"role={role.Value}");
+
+            var query = string.Join("&", queryParams);
+            var endpoint = string.IsNullOrEmpty(query)
+                ? "SystemAccounts/Search"
+                : $"SystemAccounts/Search?{query}";
+
+            return await _apiClient.GetAsync<List<SystemAccount>>(endpoint)
+                   ?? new List<SystemAccount>();
         }
 
-        public async Task CreateAccountAsync(SystemAccount account)
+        public async Task CreateAsync(SystemAccount account)
         {
-            // LOGIC SINH ID (Vì Database của bạn không tự tăng ID cho bảng Account)
-            // Ta lấy danh sách hiện tại để tìm ID lớn nhất rồi + 1
-            var accounts = await _accountRepo.GetAccountsAsync();
-
-            short newId = 1;
-            if (accounts.Any())
-            {
-                newId = (short)(accounts.Max(a => a.AccountId) + 1);
-            }
-            account.AccountId = newId;
-
-            // Đảm bảo các trường bắt buộc có dữ liệu
-            if (string.IsNullOrEmpty(account.AccountPassword))
-            {
-                account.AccountPassword = "@1"; // Mật khẩu mặc định cho Google User
-            }
-
-            if (account.AccountRole == 0)
-            {
-                account.AccountRole = 2; // Mặc định là User thường
-            }
-
-            // Gọi Repo để đẩy xuống API
-            await _accountRepo.CreateAccountAsync(account);
-        }
-        public async Task<SystemAccount?> GetAccountByIdAsync(short id)
-        {
-            return await _accountRepo.GetAccountByIdAsync(id);
+            await _apiClient.PostAsync<SystemAccount>("SystemAccounts", account);
         }
 
-        public async Task DeleteAccountAsync(short id)
+        public async Task UpdateAsync(SystemAccount account)
         {
-            // Có thể thêm logic: Không cho phép xóa chính mình (Admin đang login)
-            // if (id == currentUserId) throw new Exception("Cannot delete yourself.");
-
-            await _accountRepo.DeleteAccountAsync(id);
+            await _apiClient.PutAsync<object>($"SystemAccounts/{account.AccountId}", account);
         }
-        public async Task UpdateAccountAsync(SystemAccount account)
-        {
-            // Có thể thêm logic: Nếu đổi password thì mã hóa lại, hoặc validation nghiệp vụ
-            // Ví dụ: Không cho phép đổi Role của chính mình nếu đang là Admin duy nhất...
 
-            await _accountRepo.UpdateAccountAsync(account);
+        public async Task DeleteAsync(short id)
+        {
+            await _apiClient.DeleteAsync($"SystemAccounts/{id}");
+        }
+
+        public async Task ChangePasswordAsync(short id, string currentPassword, string newPassword)
+        {
+            var request = new { CurrentPassword = currentPassword, NewPassword = newPassword };
+            await _apiClient.PutAsync<object>($"SystemAccounts/{id}/ChangePassword", request);
         }
     }
 }

@@ -1,56 +1,81 @@
 ﻿using DataAccess.Models;
-using DataAccess.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.Services
 {
+    public interface ICategoryService
+    {
+        Task<List<CategoryWithCount>> GetAllAsync();
+        Task<Category?> GetByIdAsync(short id);
+        Task<List<Category>> SearchAsync(string? keyword, bool? isActive);
+        Task CreateAsync(Category category);
+        Task UpdateAsync(Category category);
+        Task DeleteAsync(short id);
+        Task ToggleStatusAsync(short id);
+    }
+
     public class CategoryService : ICategoryService
     {
-        private readonly ICategoryRepository _categoryRepo;
+        private readonly IApiClient _apiClient;
 
-        public CategoryService(ICategoryRepository categoryRepo)
+        public CategoryService(IApiClient apiClient)
         {
-            _categoryRepo = categoryRepo;
+            _apiClient = apiClient;
         }
 
-        public async Task<List<Category>> GetAllCategoriesAsync()
+        public async Task<List<CategoryWithCount>> GetAllAsync()
         {
-            // Có thể thêm logic sort theo tên A-Z tại đây
-            var list = await _categoryRepo.GetAllAsync();
-            return list.OrderBy(c => c.CategoryName).ToList();
+            return await _apiClient.GetAsync<List<CategoryWithCount>>("Categories")
+                   ?? new List<CategoryWithCount>();
         }
 
-        public async Task<List<Category>> GetActiveCategoriesAsync()
+        public async Task<Category?> GetByIdAsync(short id)
         {
-            var all = await _categoryRepo.GetAllAsync();
-            // Logic: Chỉ lấy cái nào IsActive == true
-            return all.Where(c => c.IsActive == true).ToList();
+            return await _apiClient.GetAsync<Category>($"Categories/{id}");
         }
 
-        public async Task<Category?> GetCategoryByIdAsync(short id)
+        public async Task<List<Category>> SearchAsync(string? keyword, bool? isActive)
         {
-            return await _categoryRepo.GetByIdAsync(id);
+            var queryParams = new List<string>();
+
+            if (!string.IsNullOrEmpty(keyword))
+                queryParams.Add($"keyword={Uri.EscapeDataString(keyword)}");
+
+            if (isActive.HasValue)
+                queryParams.Add($"isActive={isActive.Value}");
+
+            var query = string.Join("&", queryParams);
+            var endpoint = string.IsNullOrEmpty(query)
+                ? "Categories/Search"
+                : $"Categories/Search?{query}";
+
+            return await _apiClient.GetAsync<List<Category>>(endpoint)
+                   ?? new List<Category>();
         }
 
-        public async Task CreateCategoryAsync(Category category)
+        public async Task CreateAsync(Category category)
         {
-            // Logic: Tự động set mặc định IsActive nếu chưa có
-            if (category.IsActive == null) category.IsActive = true;
-            await _categoryRepo.CreateAsync(category);
+            await _apiClient.PostAsync<Category>("Categories", category);
         }
 
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task UpdateAsync(Category category)
         {
-            await _categoryRepo.UpdateAsync(category);
+            await _apiClient.PutAsync<object>($"Categories/{category.CategoryId}", category);
         }
 
-        public async Task DeleteCategoryAsync(short id)
+        public async Task DeleteAsync(short id)
         {
-            await _categoryRepo.DeleteAsync(id);
+            await _apiClient.DeleteAsync($"Categories/{id}");
         }
+
+        public async Task ToggleStatusAsync(short id)
+        {
+            await _apiClient.PutAsync<object>($"Categories/{id}/ToggleStatus", new { });
+        }
+    }
+
+    // DTO for Category with article count
+    public class CategoryWithCount : Category
+    {
+        public int ArticleCount { get; set; }
     }
 }

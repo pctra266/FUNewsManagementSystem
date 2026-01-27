@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Services;
@@ -21,6 +23,7 @@ namespace FuNewsManagementAPI.Controllers
 
         // GET: api/NewsArticles
         [HttpGet]
+        [Authorize(Policy = "LecturerAccess")]
         public async Task<ActionResult<IEnumerable<NewsArticle>>> GetNewsArticles()
         {
             var newsArticles = await Task.Run(() => _newsArticleRepository.GetNewsArticles());
@@ -72,6 +75,7 @@ namespace FuNewsManagementAPI.Controllers
 
         // GET: api/NewsArticles/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "LecturerAccess")]
         public async Task<ActionResult<NewsArticle>> GetNewsArticle(string id)
         {
             var newsArticle = await Task.Run(() => _newsArticleRepository.GetNewsArticleById(id));
@@ -86,6 +90,7 @@ namespace FuNewsManagementAPI.Controllers
 
         // PUT: api/NewsArticles/5
         [HttpPut("{id}")]
+        [Authorize(Policy = "StaffAccess")]
         public async Task<IActionResult> PutNewsArticle(string id, NewsArticle newsArticle)
         {
             if (id != newsArticle.NewsArticleId)
@@ -114,6 +119,7 @@ namespace FuNewsManagementAPI.Controllers
 
         // POST: api/NewsArticles
         [HttpPost]
+        [Authorize(Policy = "StaffAccess")]
         public async Task<ActionResult<NewsArticle>> PostNewsArticle(NewsArticle newsArticle)
         {
             try
@@ -137,6 +143,7 @@ namespace FuNewsManagementAPI.Controllers
 
         // DELETE: api/NewsArticles/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "StaffAccess")]
         public async Task<IActionResult> DeleteNewsArticle(string id)
         {
             var newsArticle = await Task.Run(() => _newsArticleRepository.GetNewsArticleById(id));
@@ -147,6 +154,130 @@ namespace FuNewsManagementAPI.Controllers
 
             await Task.Run(() => _newsArticleRepository.DeleteNewsArticle(id));
             return NoContent();
+        }
+
+        // GET: api/NewsArticles/public
+        [HttpGet("public")]
+        [AllowAnonymous] // ✅ Cho phép truy cập không cần JWT
+        public async Task<ActionResult<IEnumerable<NewsArticle>>> GetPublicNewsArticles()
+        {
+            var activeNews = await Task.Run(() => 
+                _newsArticleRepository.GetActiveNewsArticles());
+            return Ok(activeNews);
+        }
+
+        // GET: api/NewsArticles/5/related
+        [HttpGet("{id}/related")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<NewsArticle>>> GetRelatedNews(string id)
+        {
+            var current = await Task.Run(() => _newsArticleRepository.GetNewsArticleById(id));
+            if (current == null) return NotFound();
+            
+            var related = await Task.Run(() => _newsArticleRepository
+                .GetNewsArticles()
+                .Where(n => n.NewsArticleId != id && 
+                            n.NewsStatus == true &&
+                            (n.CategoryId == current.CategoryId ||
+                             n.Tags.Any(t => current.Tags.Select(ct => ct.TagId).Contains(t.TagId))))
+                .Take(3)
+                .ToList());
+            
+            return Ok(related);
+        }
+
+        // GET: api/NewsArticles/Search?keyword=tech&categoryId=1&status=true&authorId=2
+        [HttpGet("Search")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<NewsArticle>>> SearchArticles(
+            [FromQuery] string? keyword,
+            [FromQuery] short? categoryId,
+            [FromQuery] bool? status,
+            [FromQuery] short? authorId,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate)
+        {
+            var articles = await Task.Run(() => _newsArticleRepository.GetNewsArticles());
+            
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                articles = articles.Where(a => 
+                    (a.NewsTitle != null && a.NewsTitle.Contains(keyword, StringComparison.OrdinalIgnoreCase)) ||
+                    (a.Headline != null && a.Headline.Contains(keyword, StringComparison.OrdinalIgnoreCase)) ||
+                    (a.NewsContent != null && a.NewsContent.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
+            
+            if (categoryId.HasValue)
+            {
+                articles = articles.Where(a => a.CategoryId == categoryId.Value).ToList();
+            }
+            
+            if (status.HasValue)
+            {
+                articles = articles.Where(a => a.NewsStatus == status.Value).ToList();
+            }
+            
+            if (authorId.HasValue)
+            {
+                articles = articles.Where(a => a.CreatedById == authorId.Value).ToList();
+            }
+            
+            if (startDate.HasValue)
+            {
+                articles = articles.Where(a => a.CreatedDate >= startDate.Value).ToList();
+            }
+            
+            if (endDate.HasValue)
+            {
+                articles = articles.Where(a => a.CreatedDate <= endDate.Value).ToList();
+            }
+            
+            // Sort by CreatedDate descending
+            articles = articles.OrderByDescending(a => a.CreatedDate).ToList();
+            
+            return Ok(articles);
+        }
+
+        // POST: api/NewsArticles/5/Duplicate
+        [HttpPost("{id}/Duplicate")]
+        [Authorize(Policy = "StaffAccess")]
+        public async Task<ActionResult<NewsArticle>> DuplicateArticle(string id)
+        {
+            var original = await Task.Run(() => _newsArticleRepository.GetNewsArticleById(id));
+            if (original == null)
+            {
+                return NotFound(new { message = "Article not found." });
+            }
+            
+            // Tạo bản sao với ID mới
+            var duplicate = new NewsArticle
+            {
+                NewsArticleId = $"{original.NewsArticleId}_COPY_{DateTime.Now:yyyyMMddHHmmss}",
+                NewsTitle = $"[COPY] {original.NewsTitle}",
+                Headline = original.Headline,
+                NewsContent = original.NewsContent,
+                NewsSource = original.NewsSource,
+                CategoryId = original.CategoryId,
+                NewsStatus = false, // Mặc định là inactive
+                CreatedById = original.CreatedById,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now,
+                UpdatedById = original.CreatedById
+            };
+            
+            try
+            {
+                await Task.Run(() => _newsArticleRepository.AddNewsArticle(duplicate));
+                
+                // TODO: Copy tags nếu cần
+                
+                return CreatedAtAction("GetNewsArticle", new { id = duplicate.NewsArticleId }, duplicate);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error duplicating article: {ex.Message}" });
+            }
         }
     }
 }

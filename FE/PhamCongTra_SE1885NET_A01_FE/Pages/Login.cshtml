@@ -1,0 +1,116 @@
+﻿@page
+@model PhamCongTra_SE1885NET_A01_FE.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FU News Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px 20px 0 0;
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card login-card border-0">
+                    <div class="login-header">
+                        <i class="bi bi-newspaper fs-1 mb-3 d-block"></i>
+                        <h2 class="mb-0">FU News Management</h2>
+                        <p class="mb-0">Sign in to continue</p>
+                    </div>
+                    <div class="card-body p-5">
+                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <i class="bi bi-exclamation-triangle"></i> @Model.ErrorMessage
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <form method="post">
+                            <div class="mb-4">
+                                <label asp-for="Email" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email Address
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg"
+                                       placeholder="Enter your email" required />
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Password" class="form-label">
+                                    <i class="bi bi-lock"></i> Password
+                                </label>
+                                <input asp-for="Password" type="password" class="form-control form-control-lg"
+                                       placeholder="Enter your password" required />
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-login btn-lg">
+                                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                                </button>
+                            </div>
+                        </form>
+
+                        <hr class="my-4">
+
+                        <div class="text-center text-muted">
+                            <p class="mb-2">
+                                <i class="bi bi-info-circle"></i> Demo Accounts:
+                            </p>
+                            <small>
+                                <strong>Admin:</strong> admin@funews.org / @@abc123@@<br />
+                                <strong>Staff:</strong> staff@funews.org / staff123<br />
+                                <strong>Lecturer:</strong> lecturer@funews.org / lecturer123
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
