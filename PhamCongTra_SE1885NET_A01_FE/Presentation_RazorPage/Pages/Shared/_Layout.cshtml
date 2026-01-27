@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FU News Management</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Assignment01_FE.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="/News/Active">
+                    <i class="fas fa-newspaper me-2"></i>FU News Management
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/News/Active">
+                                <i class="fas fa-home me-1"></i>Active News
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/News/Search">
+                                <i class="fas fa-search me-1"></i>Search
+                            </a>
+                        </li>
+                        
+                        @if (Context.Session.GetString("AuthToken") != null)
+                        {
+                            var userRole = Context.Session.GetString("UserRole");
+                            
+                            @if (userRole == "Admin")
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-shield-alt me-1"></i>Admin
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/Admin/Dashboard">
+                                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="/Admin/Accounts">
+                                            <i class="fas fa-users me-2"></i>Account Management
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="/Admin/Reports">
+                                            <i class="fas fa-chart-bar me-2"></i>System Reports
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><h6 class="dropdown-header">Browse Content</h6></li>
+                                        <li><a class="dropdown-item" href="/News/Active">
+                                            <i class="fas fa-eye me-2"></i>View Published News
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="/News/Search">
+                                            <i class="fas fa-search me-2"></i>Search Articles
+                                        </a></li>
+                                    </ul>
+                                </li>
+                            }
+                            
+                            @if (userRole == "1") // Staff role - content management
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-edit me-1"></i>Content Management
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><h6 class="dropdown-header">Article Management</h6></li>
+                                        <li><a class="dropdown-item" href="/Staff/NewsArticles">
+                                            <i class="fas fa-newspaper me-2"></i>All News Articles
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="/Staff/Articles">
+                                            <i class="fas fa-user-edit me-2"></i>My Articles
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><h6 class="dropdown-header">System Management</h6></li>
+                                        <li><a class="dropdown-item" href="/Staff/Categories">
+                                            <i class="fas fa-folder me-2"></i>Categories
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="/Staff/Tags">
+                                            <i class="fas fa-tags me-2"></i>Tags
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="/Staff/Articles/Create">
+                                            <i class="fas fa-plus-circle me-2"></i>Create New Article
+                                        </a></li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (userRole == "2") // Lecturer role - read only
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/News/Search">
+                                        <i class="fas fa-book-reader me-1"></i>Browse Articles
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    
+                    <ul class="navbar-nav">
+                        @if (Context.Session.GetString("AuthToken") != null)
+                        {
+                            var userRole = Context.Session.GetString("UserRole");
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle me-1"></i>@Context.Session.GetString("UserName")
+                                    @if (userRole == "Admin")
+                                    {
+                                        <small class="badge bg-danger ms-1">Admin</small>
+                                    }
+                                    else if (userRole == "1")
+                                    {
+                                        <small class="badge bg-primary ms-1">Staff</small>
+                                    }
+                                    else if (userRole == "2")
+                                    {
+                                        <small class="badge bg-info ms-1">Lecturer</small>
+                                    }
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><h6 class="dropdown-header">
+                                        @if (userRole == "Admin")
+                                        {
+                                            <text><i class="fas fa-shield-alt me-1"></i>Administrator</text>
+                                        }
+                                        else if (userRole == "1")
+                                        {
+                                            <text><i class="fas fa-user-edit me-1"></i>Staff Member</text>
+                                        }
+                                        else if (userRole == "2")
+                                        {
+                                            <text><i class="fas fa-chalkboard-teacher me-1"></i>Lecturer</text>
+                                        }
+                                    </h6></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/Profile">
+                                        <i class="fas fa-user-edit me-2"></i>Profile
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="/Profile/ChangePassword">
+                                        <i class="fas fa-key me-2"></i>Change Password
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/Logout">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-newspaper me-2"></i>FU News Management</h5>
+                    <p class="text-muted">Stay updated with the latest news and announcements from FPT University.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="mb-2">
+                        <a href="/News/Active" class="text-light text-decoration-none me-3">Active News</a>
+                        <a href="/News/Search" class="text-light text-decoration-none me-3">Search</a>
+                        <a href="/Privacy" class="text-light text-decoration-none">Privacy</a>
+                    </div>
+                    <p class="text-muted mb-0">&copy; @DateTime.Now.Year FU News Management System</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+<style>
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #667eea;
+}
+
+.dropdown-header {
+    color: #495057;
+    font-weight: 600;
+    text-transform: none;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-link .badge {
+    font-size: 0.65rem;
+    padding: 0.2em 0.4em;
+}
+
+footer {
+    margin-top: auto;
+}
+
+.text-light a:hover {
+    color: #667eea !important;
+}
+</style>

@@ -1,0 +1,479 @@
+@page
+@model Presentation_RazorPage.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">Admin Dashboard</h1>
+                    <p class="text-muted">Welcome back, @Model.UserName</p>
+                    <small class="text-info">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Admin Role: Account Management & Reports Only
+                    </small>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success" onclick="refreshDashboard()" id="refreshBtn">
+                        <i class="fas fa-sync me-2"></i>Refresh Data
+                    </button>
+                    <a href="/Admin/Accounts" class="btn btn-primary">
+                        <i class="fas fa-users me-2"></i>Manage Accounts
+                    </a>
+                    <a href="/Admin/Reports" class="btn btn-info">
+                        <i class="fas fa-chart-bar me-2"></i>Generate Reports
+                    </a>
+                    <a href="/Logout" class="btn btn-outline-secondary">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.HasError)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @Model.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Statistics Cards - Admin Overview Only -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Articles</div>
+                            <div class="h5 mb-0 font-weight-bold" id="totalArticles">@Model.DashboardData.TotalArticles</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-newspaper fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Active Articles</div>
+                            <div class="h5 mb-0 font-weight-bold" id="activeArticles">@Model.DashboardData.ActiveArticles</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Users</div>
+                            <div class="h5 mb-0 font-weight-bold" id="totalAccounts">@Model.DashboardData.TotalAccounts</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Categories</div>
+                            <div class="h5 mb-0 font-weight-bold" id="totalCategories">@Model.DashboardData.TotalCategories</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-folder fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent System Activity</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.DashboardData.RecentArticles.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="recentArticlesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Article Title</th>
+                                        <th>Author</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentArticlesBody">
+                                    @foreach (var article in Model.DashboardData.RecentArticles)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="/News/Details/@article.NewsArticleId" class="text-decoration-none">
+                                                    @article.NewsTitle
+                                                </a>
+                                            </td>
+                                            <td>@article.AuthorName</td>
+                                            <td>@article.CategoryName</td>
+                                            <td>
+                                                @if (article.Status == "Active")
+                                                {
+                                                    <span class="badge bg-success">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Draft</span>
+                                                }
+                                            </td>
+                                            <td>@article.CreatedDate?.ToString("MMM dd, yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Admin can view system activity but cannot manage content directly
+                            </small>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-line fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No recent activity found.</p>
+                            <a href="/Admin/Reports" class="btn btn-primary btn-sm">
+                                <i class="fas fa-chart-bar me-2"></i>Generate System Report
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Admin Functions -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Admin Functions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="/Admin/Accounts" class="list-group-item list-group-item-action">
+                            <i class="fas fa-users me-2 text-primary"></i>
+                            <strong>Manage Accounts</strong>
+                            <small class="d-block text-muted">Create, edit, delete user accounts</small>
+                        </a>
+                        <a href="/Admin/Reports" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-bar me-2 text-info"></i>
+                            <strong>Generate Reports</strong>
+                            <small class="d-block text-muted">Statistics by period and category</small>
+                        </a>
+                        <a href="/News/Active" class="list-group-item list-group-item-action">
+                            <i class="fas fa-eye me-2 text-success"></i>
+                            <strong>View Published News</strong>
+                            <small class="d-block text-muted">Browse active articles</small>
+                        </a>
+                        <a href="/News/Search" class="list-group-item list-group-item-action">
+                            <i class="fas fa-search me-2 text-warning"></i>
+                            <strong>Search System</strong>
+                            <small class="d-block text-muted">Find articles and content</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Information -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">System Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p class="mb-2"><strong>Staff Accounts:</strong> <span id="staffCount" class="text-primary">@Model.DashboardData.StaffAccounts</span></p>
+                            <p class="mb-2"><strong>Lecturer Accounts:</strong> <span id="lecturerCount" class="text-info">@Model.DashboardData.LecturerAccounts</span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-2"><strong>Active Categories:</strong> <span id="activeCategories" class="text-success">@Model.DashboardData.ActiveCategories</span></p>
+                            <p class="mb-2"><strong>Total Tags:</strong> <span id="totalTags" class="text-warning">@Model.DashboardData.TotalTags</span></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p class="mb-2"><strong>Draft Articles:</strong> <span class="text-secondary">@Model.DashboardData.InactiveArticles</span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            @{
+                                var activePercentage = Model.DashboardData.TotalArticles > 0 
+                                    ? Math.Round((double)Model.DashboardData.ActiveArticles / Model.DashboardData.TotalArticles * 100, 1) 
+                                    : 0;
+                            }
+                            <p class="mb-2"><strong>Publish Rate:</strong> <span class="text-success">@activePercentage%</span></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="alert alert-info alert-sm mb-0">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Admin Role:</strong> Account management and system reports only.
+                            Content management is handled by Staff users.
+                        </small>
+                    </div>
+                    <p class="mb-0 text-muted mt-2"><small>Last updated: <span id="lastUpdated">@DateTime.Now.ToString("MMM dd, yyyy HH:mm")</span></small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.DashboardData.MonthlyStats != null && Model.DashboardData.MonthlyStats.MonthlyStatistics.Any())
+    {
+        <!-- Monthly Statistics Chart -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Article Statistics (@Model.DashboardData.MonthlyStats.Year)</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlyChart" width="400" height="100"></canvas>
+                        <small class="text-muted d-block text-center mt-2">
+                            <i class="fas fa-chart-line me-1"></i>
+                            Use the Reports section to generate detailed statistics by custom date ranges
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize chart if data is available
+    @if (Model.DashboardData.MonthlyStats != null && Model.DashboardData.MonthlyStats.MonthlyStatistics.Any())
+    {
+        <text>
+        var monthlyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DashboardData.MonthlyStats.MonthlyStatistics));
+        initializeMonthlyChart(monthlyData);
+        </text>
+    }
+});
+
+function refreshDashboard() {
+    const refreshBtn = $('#refreshBtn');
+    refreshBtn.prop('disabled', true);
+    refreshBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Refreshing...');
+    
+    $.get('/Admin/Dashboard?handler=RefreshData')
+        .done(function(response) {
+            if (response.success) {
+                updateDashboardData(response.data);
+                showSuccessMessage('Dashboard data refreshed successfully');
+            } else {
+                showErrorMessage('Failed to refresh dashboard: ' + response.error);
+            }
+        })
+        .fail(function() {
+            showErrorMessage('Error connecting to server');
+        })
+        .always(function() {
+            refreshBtn.prop('disabled', false);
+            refreshBtn.html('<i class="fas fa-sync me-2"></i>Refresh Data');
+            $('#lastUpdated').text(new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString());
+        });
+}
+
+function updateDashboardData(data) {
+    $('#totalArticles').text(data.totalArticles);
+    $('#activeArticles').text(data.activeArticles);
+    $('#totalCategories').text(data.totalCategories);
+    $('#totalAccounts').text(data.totalAccounts);
+    $('#staffCount').text(data.staffAccounts);
+    $('#lecturerCount').text(data.lecturerAccounts);
+    $('#activeCategories').text(data.activeCategories);
+    $('#totalTags').text(data.totalTags);
+    
+    // Update recent articles table
+    if (data.recentArticles && data.recentArticles.length > 0) {
+        updateRecentArticlesTable(data.recentArticles);
+    }
+}
+
+function updateRecentArticlesTable(articles) {
+    let tbody = '';
+    articles.forEach(article => {
+        const statusBadge = article.status === 'Active' 
+            ? '<span class="badge bg-success">Active</span>'
+            : '<span class="badge bg-secondary">Draft</span>';
+            
+        tbody += `
+            <tr>
+                <td><a href="/News/Details/${article.newsArticleId}" class="text-decoration-none">${article.newsTitle}</a></td>
+                <td>${article.authorName || 'Unknown'}</td>
+                <td>${article.categoryName || 'Uncategorized'}</td>
+                <td>${statusBadge}</td>
+                <td>${new Date(article.createdDate).toLocaleDateString()}</td>
+            </tr>
+        `;
+    });
+    
+    $('#recentArticlesBody').html(tbody);
+}
+
+function initializeMonthlyChart(monthlyData) {
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+    
+    const labels = monthlyData.map(item => item.monthName);
+    const activeData = monthlyData.map(item => item.activeArticles);
+    const inactiveData = monthlyData.map(item => item.inactiveArticles);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Active Articles',
+                data: activeData,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.1
+            }, {
+                label: 'Draft Articles',
+                data: inactiveData,
+                borderColor: '#ffc107',
+                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'System Overview - Admin can generate detailed reports by period'
+                }
+            }
+        }
+    });
+}
+
+function showSuccessMessage(message) {
+    const alertHtml = `
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    $('.container-fluid').prepend(alertHtml);
+    setTimeout(() => $('.alert-success').fadeOut(), 3000);
+}
+
+function showErrorMessage(message) {
+    const alertHtml = `
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    $('.container-fluid').prepend(alertHtml);
+    setTimeout(() => $('.alert-danger').fadeOut(), 5000);
+}
+</script>
+}
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+.bg-success { background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%) !important; }
+.bg-warning { background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%) !important; }
+.bg-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+
+.text-gray-300 { color: rgba(255,255,255,0.8) !important; }
+
+.list-group-item-action:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+    transition: all 0.2s ease;
+}
+
+.alert {
+    border-radius: 15px;
+}
+
+.alert-sm {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 10px;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.badge {
+    font-size: 0.75rem;
+    border-radius: 6px;
+}
+</style>
