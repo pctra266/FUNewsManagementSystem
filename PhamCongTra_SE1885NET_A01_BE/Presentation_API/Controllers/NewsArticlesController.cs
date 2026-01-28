@@ -54,7 +54,7 @@ namespace Presentation_API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] NewsArticle article)
+        public async Task<IActionResult> Post([FromBody] NewsArticleCreateDto createDto)
         {
             if (!ModelState.IsValid)
             {
@@ -67,11 +67,22 @@ namespace Presentation_API.Controllers
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (!short.TryParse(userIdClaim, out short userId))
                 {
-                    userId = 1; // Default for testing
+                    return Unauthorized(new { message = "Invalid user identification" });
                 }
 
-                article.CreatedById = userId;
-                var createdArticle = await _newsArticleService.CreateNewsArticleAsync(article);
+                var article = new NewsArticle
+                {
+                    NewsTitle = createDto.NewsTitle,
+                    Headline = createDto.Headline,
+                    NewsContent = createDto.NewsContent,
+                    NewsSource = createDto.NewsSource,
+                    CategoryId = createDto.CategoryId,
+                    NewsStatus = createDto.NewsStatus ?? true,
+                    CreatedById = userId,
+                    CreatedDate = DateTime.Now
+                };
+
+                var createdArticle = await _newsArticleService.CreateNewsArticleAsync(article, createDto.TagIds);
                 return Created($"/odata/NewsArticles('{createdArticle.NewsArticleId}')", createdArticle);
             }
             catch (Exception ex)
@@ -81,7 +92,7 @@ namespace Presentation_API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromRoute] string key, [FromBody] NewsArticle article)
+        public async Task<IActionResult> Put([FromRoute] string key, [FromBody] NewsArticleUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
             {
@@ -90,17 +101,27 @@ namespace Presentation_API.Controllers
 
             try
             {
-                article.NewsArticleId = key;
-                
                 // Get current user ID for UpdatedById
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (!short.TryParse(userIdClaim, out short userId))
                 {
-                    userId = 1; // Default for testing
+                    return Unauthorized(new { message = "Invalid user identification" });
                 }
 
-                article.UpdatedById = userId;
-                var updatedArticle = await _newsArticleService.UpdateNewsArticleAsync(article);
+                var article = new NewsArticle
+                {
+                    NewsArticleId = key,
+                    NewsTitle = updateDto.NewsTitle,
+                    Headline = updateDto.Headline,
+                    NewsContent = updateDto.NewsContent,
+                    NewsSource = updateDto.NewsSource,
+                    CategoryId = updateDto.CategoryId,
+                    NewsStatus = updateDto.NewsStatus,
+                    UpdatedById = userId,
+                    ModifiedDate = DateTime.Now
+                };
+
+                var updatedArticle = await _newsArticleService.UpdateNewsArticleAsync(article, updateDto.TagIds);
                 return Ok(updatedArticle);
             }
             catch (InvalidOperationException ex)

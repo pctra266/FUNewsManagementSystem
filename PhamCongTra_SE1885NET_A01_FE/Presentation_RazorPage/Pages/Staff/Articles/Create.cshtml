@@ -86,7 +86,7 @@
 
                                 <div class="mb-3">
                                     <label class="form-label">Tags</label>
-                                    <div class="border rounded p-3 overflow-auto">
+                                    <div class="border rounded p-3 overflow-auto mh-100">
                                         @foreach (var tag in Model.Tags)
                                         {
                                             <div class="form-check">
@@ -158,7 +158,6 @@
     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         $(document).ready(function() {
-            // Initialize TinyMCE for rich text editing
             tinymce.init({
                 selector: '#Article_NewsContent',
                 height: 300,
@@ -174,11 +173,10 @@
                 }
             });
 
-            // Update character count
             function updateCharCount() {
                 const content = tinymce.get('Article_NewsContent').getContent({format: 'text'});
                 $('#contentCounter').text(content.length);
-                
+
                 if (content.length > 4000) {
                     $('#contentCounter').addClass('text-danger');
                 } else {
@@ -186,13 +184,12 @@
                 }
             }
 
-            // Real-time preview updates
             function updatePreview() {
                 const title = $('#Article_NewsTitle').val() || 'Article Title';
                 const headline = $('#Article_Headline').val() || 'Article headline';
                 const categoryText = $('#Article_CategoryId option:selected').text() || 'Category';
                 const isPublished = $('#Article_NewsStatus').is(':checked');
-                
+
                 $('#previewTitle').text(title);
                 $('#previewHeadline').text(headline);
                 $('#previewCategory').text(categoryText);
@@ -201,20 +198,17 @@
                     .addClass(isPublished ? 'text-success' : 'text-muted');
             }
 
-            // Bind preview updates to form changes
             $('#Article_NewsTitle, #Article_Headline').on('input', updatePreview);
             $('#Article_CategoryId, #Article_NewsStatus').on('change', updatePreview);
 
-            // Handle save vs publish
             $('button[name="action"][value="save"]').click(function() {
                 $('#Article_NewsStatus').prop('checked', false);
             });
-            
+
             $('button[name="action"][value="publish"]').click(function() {
                 $('#Article_NewsStatus').prop('checked', true);
             });
 
-            // Initial preview update
             updatePreview();
         });
     </script>

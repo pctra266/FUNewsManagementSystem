@@ -46,55 +46,7 @@
         </div>
     }
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="card bg-primary text-white shadow-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h6 class="text-uppercase text-white-50 mb-1">Total Categories</h6>
-                            <h3 class="mb-0">@Model.TotalCategories</h3>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-folder fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card bg-success text-white shadow-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h6 class="text-uppercase text-white-50 mb-1">Active</h6>
-                            <h3 class="mb-0">@Model.ActiveCategories</h3>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-folder-open fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card bg-warning text-white shadow-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h6 class="text-uppercase text-white-50 mb-1">Inactive</h6>
-                            <h3 class="mb-0">@Model.InactiveCategories</h3>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-folder-minus fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    
     <!-- Search -->
     <div class="row mb-4">
         <div class="col-12">
@@ -278,7 +230,7 @@
                         <label asp-for="CreateCategory.ParentCategoryId" class="form-label">Parent Category</label>
                         <select asp-for="CreateCategory.ParentCategoryId" class="form-select">
                             <option value="">None (Main Category)</option>
-                            @foreach (var category in Model.Categories.Where(c => c.ParentCategoryId == null && c.IsActive == true))
+                            @foreach (var category in Model.Categories.Where(c => c.IsActive == true))
                             {
                                 <option value="@category.CategoryId">@category.CategoryName</option>
                             }
@@ -327,7 +279,7 @@
                         <label class="form-label">Parent Category</label>
                         <select id="editParentCategoryId" name="ParentCategoryId" class="form-select">
                             <option value="">None (Main Category)</option>
-                            @foreach (var category in Model.Categories.Where(c => c.ParentCategoryId == null && c.IsActive == true))
+                            @foreach (var category in Model.Categories.Where(c => c.IsActive == true))
                             {
                                 <option value="@category.CategoryId">@category.CategoryName</option>
                             }

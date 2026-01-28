@@ -26,7 +26,7 @@ namespace Presentation_RazorPage.Pages.Staff.Articles
             // Check authentication and authorization
             var token = HttpContext.Session.GetString("AuthToken");
             var userRole = HttpContext.Session.GetString("UserRole");
-            
+
             if (string.IsNullOrEmpty(token) || (userRole != "1" && userRole != "Admin"))
             {
                 return RedirectToPage("/Login");
@@ -65,22 +65,23 @@ namespace Presentation_RazorPage.Pages.Staff.Articles
                 var token = HttpContext.Session.GetString("AuthToken");
                 _apiService.SetAuthToken(token!);
 
-                // Create NewsArticle object
-                var newArticle = new NewsArticleModel
+                // Create article with tags
+                var createData = new
                 {
                     NewsTitle = Article.NewsTitle,
                     Headline = Article.Headline,
                     NewsContent = Article.NewsContent,
                     NewsSource = Article.NewsSource,
                     CategoryId = Article.CategoryId,
-                    NewsStatus = Article.NewsStatus
+                    NewsStatus = Article.NewsStatus,
+                    TagIds = Article.SelectedTagIds
                 };
 
-                var result = await _apiService.PostAsync<NewsArticleModel>("/odata/NewsArticles", newArticle);
+                var result = await _apiService.PostAsync<object>("/odata/NewsArticles", createData);
 
                 if (result != null)
                 {
-                    TempData["SuccessMessage"] = "Article created successfully!";
+                    TempData["SuccessMessage"] = "Article created successfully! CreatedById has been set automatically.";
                     return RedirectToPage("/Staff/Articles/Index");
                 }
                 else
@@ -90,7 +91,7 @@ namespace Presentation_RazorPage.Pages.Staff.Articles
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "An error occurred while creating the article.");
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
             }
 
             await LoadDropdownDataAsync();
@@ -123,22 +124,22 @@ namespace Presentation_RazorPage.Pages.Staff.Articles
         [Required(ErrorMessage = "News title is required")]
         [StringLength(400, ErrorMessage = "News title cannot exceed 400 characters")]
         public string NewsTitle { get; set; } = string.Empty;
-        
+
         [Required(ErrorMessage = "Headline is required")]
         [StringLength(150, ErrorMessage = "Headline cannot exceed 150 characters")]
         public string Headline { get; set; } = string.Empty;
-        
+
         [StringLength(4000, ErrorMessage = "News content cannot exceed 4000 characters")]
         public string? NewsContent { get; set; }
-        
+
         [StringLength(400, ErrorMessage = "News source cannot exceed 400 characters")]
         public string? NewsSource { get; set; }
-        
+
         [Required(ErrorMessage = "Category is required")]
         public short CategoryId { get; set; }
-        
-        public bool? NewsStatus { get; set; } = true;
-        
+
+        public bool NewsStatus { get; set; } = true;
+
         public List<int> SelectedTagIds { get; set; } = new List<int>();
     }
 }

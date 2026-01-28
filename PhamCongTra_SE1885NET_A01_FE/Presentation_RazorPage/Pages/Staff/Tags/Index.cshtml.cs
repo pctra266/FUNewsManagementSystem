@@ -30,7 +30,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
             // Check if user is logged in and is staff
             var token = HttpContext.Session.GetString("AuthToken");
             var userRole = HttpContext.Session.GetString("UserRole");
-            
+
             if (string.IsNullOrEmpty(token))
             {
                 return RedirectToPage("/Login");
@@ -46,21 +46,29 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
 
             try
             {
-                // Get all tags
-                var tagsResponse = await _apiService.GetAsync<TagModel>("/odata/Tags");
-                var allTags = tagsResponse ?? new List<TagModel>();
+                // Get all tags with NewsArticles count
+                string query = "/odata/Tags?$expand=NewsArticles($select=NewsArticleId)";
+                var tagsResponse = await _apiService.GetAsync<TagWithArticlesModel>(query);
+
+                var allTags = tagsResponse?.Select(t => new TagModel
+                {
+                    TagId = t.TagId,
+                    TagName = t.TagName,
+                    Note = t.Note,
+                    ArticleCount = t.NewsArticles?.Count ?? 0
+                }).ToList() ?? new List<TagModel>();
 
                 // Apply search filter
                 if (!string.IsNullOrEmpty(SearchTerm))
                 {
-                    allTags = allTags.Where(t => 
+                    allTags = allTags.Where(t =>
                         t.TagName?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true ||
                         t.Note?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true
                     ).ToList();
                 }
 
                 Tags = allTags.OrderBy(t => t.TagName).ToList();
-                
+
                 // Calculate statistics
                 TotalTags = allTags.Count;
                 UsedTags = allTags.Count(t => t.ArticleCount > 0);
@@ -79,7 +87,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
         {
             var token = HttpContext.Session.GetString("AuthToken");
             var userRole = HttpContext.Session.GetString("UserRole");
-            
+
             if (string.IsNullOrEmpty(token) || userRole != "1")
             {
                 return RedirectToPage("/Access/Denied");
@@ -95,7 +103,13 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
 
             try
             {
-                var response = await _apiService.PostAsync<TagModel>("/api/Tags", CreateTag);
+                var createData = new
+                {
+                    TagName = CreateTag.TagName,
+                    Note = CreateTag.Note
+                };
+
+                var response = await _apiService.PostAsync<TagModel>("/odata/Tags", createData);
                 if (response != null)
                 {
                     TempData["SuccessMessage"] = "Tag created successfully!";
@@ -103,7 +117,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Failed to create tag. Please try again.";
+                    TempData["ErrorMessage"] = "Failed to create tag. Tag name might already exist.";
                 }
             }
             catch (Exception ex)
@@ -119,7 +133,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
         {
             var token = HttpContext.Session.GetString("AuthToken");
             var userRole = HttpContext.Session.GetString("UserRole");
-            
+
             if (string.IsNullOrEmpty(token) || userRole != "1")
             {
                 return RedirectToPage("/Access/Denied");
@@ -129,21 +143,20 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
 
             try
             {
-                var updateTag = new TagModel
+                var updateData = new
                 {
-                    TagId = tagId,
                     TagName = tagName,
                     Note = note
                 };
 
-                var response = await _apiService.PutAsync<TagModel>("/api/Tags", tagId, updateTag);
+                var response = await _apiService.PutAsync<TagModel>("/odata/Tags", tagId, updateData);
                 if (response != null)
                 {
                     TempData["SuccessMessage"] = "Tag updated successfully!";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Failed to update tag. Please try again.";
+                    TempData["ErrorMessage"] = "Failed to update tag. Tag name might already exist.";
                 }
             }
             catch (Exception ex)
@@ -158,7 +171,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
         {
             var token = HttpContext.Session.GetString("AuthToken");
             var userRole = HttpContext.Session.GetString("UserRole");
-            
+
             if (string.IsNullOrEmpty(token) || userRole != "1")
             {
                 return RedirectToPage("/Access/Denied");
@@ -168,7 +181,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
 
             try
             {
-                var success = await _apiService.DeleteAsync("/api/Tags", tagId);
+                var success = await _apiService.DeleteAsync("/odata/Tags", tagId);
                 if (success)
                 {
                     TempData["SuccessMessage"] = "Tag deleted successfully!";
@@ -185,5 +198,19 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
 
             return RedirectToPage("./Index", new { searchTerm = SearchTerm });
         }
+    }
+
+    // Helper class to deserialize tags with articles
+    public class TagWithArticlesModel
+    {
+        public int TagId { get; set; }
+        public string? TagName { get; set; }
+        public string? Note { get; set; }
+        public List<ArticleIdModel>? NewsArticles { get; set; }
+    }
+
+    public class ArticleIdModel
+    {
+        public string NewsArticleId { get; set; } = string.Empty;
     }
 }

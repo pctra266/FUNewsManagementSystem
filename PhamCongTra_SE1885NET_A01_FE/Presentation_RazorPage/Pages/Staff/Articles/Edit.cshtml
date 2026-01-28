@@ -18,12 +18,9 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="h3 mb-0">Edit Article</h1>
-                    <p class="text-muted">Modify your existing news article</p>
+                    <p class="text-muted">Update your news article</p>
                 </div>
-                <div class="d-flex gap-2">
-                    <a href="/News/Details/@Model.Article.NewsArticleId" class="btn btn-outline-info" target="_blank">
-                        <i class="fas fa-eye me-2"></i>Preview
-                    </a>
+                <div>
                     <a href="/Staff/Articles" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Back to Articles
                     </a>
@@ -35,32 +32,32 @@
     <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-semibold">Edit Article Information</h6>
-                    <small class="text-white-50">ID: @Model.Article.NewsArticleId</small>
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">Article Information</h6>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" id="editArticleForm" asp-route-id="@Model.ArticleId">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="mb-3">
                                     <label asp-for="Article.NewsTitle" class="form-label">Article Title *</label>
-                                    <input asp-for="Article.NewsTitle" class="form-control" />
+                                    <input asp-for="Article.NewsTitle" class="form-control" placeholder="Enter article title" />
                                     <span asp-validation-for="Article.NewsTitle" class="text-danger"></span>
                                 </div>
 
                                 <div class="mb-3">
                                     <label asp-for="Article.Headline" class="form-label">Headline *</label>
-                                    <input asp-for="Article.Headline" class="form-control" />
+                                    <input asp-for="Article.Headline" class="form-control" placeholder="Brief headline for the article" />
                                     <span asp-validation-for="Article.Headline" class="text-danger"></span>
                                     <div class="form-text">A short, catchy headline that summarizes the article.</div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label asp-for="Article.NewsContent" class="form-label">Content</label>
-                                    <textarea asp-for="Article.NewsContent" class="form-control" rows="12"></textarea>
+                                    <textarea asp-for="Article.NewsContent" class="form-control" rows="12"
+                                              placeholder="Write your article content here..."></textarea>
                                     <span asp-validation-for="Article.NewsContent" class="text-danger"></span>
                                     <div class="form-text">
                                         <span id="contentCounter">0</span>/4000 characters
@@ -69,7 +66,7 @@
 
                                 <div class="mb-3">
                                     <label asp-for="Article.NewsSource" class="form-label">News Source</label>
-                                    <input asp-for="Article.NewsSource" class="form-control" />
+                                    <input asp-for="Article.NewsSource" class="form-control" placeholder="Source of the news (optional)" />
                                     <span asp-validation-for="Article.NewsSource" class="text-danger"></span>
                                 </div>
                             </div>
@@ -89,12 +86,12 @@
 
                                 <div class="mb-3">
                                     <label class="form-label">Tags</label>
-                                    <div class="border rounded p-3 overflow-auto">
+                                    <div class="border rounded p-3 overflow-auto mh-100">
                                         @foreach (var tag in Model.Tags)
                                         {
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" 
-                                                       name="Article.SelectedTagIds" value="@tag.TagId" 
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="Article.SelectedTagIds" value="@tag.TagId"
                                                        id="tag_@tag.TagId"
                                                        checked="@(Model.Article.SelectedTagIds.Contains(tag.TagId))">
                                                 <label class="form-check-label" for="tag_@tag.TagId">
@@ -114,33 +111,25 @@
                                             Published
                                         </label>
                                     </div>
-                                    <div class="form-text">
-                                        @if (Model.Article.NewsStatus == true)
-                                        {
-                                            <span class="text-success">
-                                                <i class="fas fa-check-circle me-1"></i>This article is currently published
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-warning">
-                                                <i class="fas fa-edit me-1"></i>This article is currently a draft
-                                            </span>
-                                        }
-                                    </div>
+                                    <div class="form-text">Check to publish, uncheck to save as draft.</div>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <small>
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <strong>Note:</strong> UpdatedById and ModifiedDate will be set automatically when you save changes.
+                                    </small>
                                 </div>
 
                                 <div class="position-sticky top-0">
                                     <h6 class="text-muted mb-2">Article Preview</h6>
                                     <div class="card shadow-sm">
                                         <div class="card-body p-3">
-                                            <h6 class="card-title" id="previewTitle">@Model.Article.NewsTitle</h6>
-                                            <p class="card-text text-muted small" id="previewHeadline">@Model.Article.Headline</p>
+                                            <h6 class="card-title" id="previewTitle">Article Title</h6>
+                                            <p class="card-text text-muted small" id="previewHeadline">Article headline</p>
                                             <div class="d-flex justify-content-between">
                                                 <small class="text-muted" id="previewCategory">Category</small>
-                                                <small class="text-muted" id="previewStatus">
-                                                    @(Model.Article.NewsStatus == true ? "Published" : "Draft")
-                                                </small>
+                                                <small class="text-muted" id="previewStatus">Draft</small>
                                             </div>
                                         </div>
                                     </div>
@@ -157,54 +146,12 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="submit" class="btn btn-success me-2" name="action" value="save">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-2"></i>Save Changes
                                 </button>
-                                @if (Model.Article.NewsStatus != true)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="action" value="publish">
-                                        <i class="fas fa-upload me-2"></i>Save & Publish
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button type="submit" class="btn btn-warning" name="action" value="unpublish">
-                                        <i class="fas fa-eye-slash me-2"></i>Save & Unpublish
-                                    </button>
-                                }
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-
-            <!-- Article History (Future Enhancement) -->
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0 fw-semibold text-primary">Article Information</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <strong>Article ID:</strong><br>
-                            <code>@Model.Article.NewsArticleId</code>
-                        </div>
-                        <div class="col-md-4">
-                            <strong>Current Status:</strong><br>
-                            @if (Model.Article.NewsStatus == true)
-                            {
-                                <span class="badge bg-success">Published</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning">Draft</span>
-                            }
-                        </div>
-                        <div class="col-md-4">
-                            <strong>Last Modified:</strong><br>
-                            <small class="text-muted">Just updated</small>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -213,29 +160,12 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         $(document).ready(function() {
-            // Initialize TinyMCE
-            tinymce.init({
-                selector: '#Article_NewsContent',
-                height: 300,
-                plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-                toolbar_mode: 'floating',
-                toolbar: 'undo redo | formatselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                setup: function (editor) {
-                    editor.on('input', function () {
-                        updatePreview();
-                        updateCharCount();
-                    });
-                }
-            });
-
             function updateCharCount() {
-                const content = tinymce.get('Article_NewsContent').getContent({format: 'text'});
+                const content = $('#Article_NewsContent').val() || '';
                 $('#contentCounter').text(content.length);
-                
+
                 if (content.length > 4000) {
                     $('#contentCounter').addClass('text-danger');
                 } else {
@@ -244,11 +174,11 @@
             }
 
             function updatePreview() {
-                const title = $('#Article_NewsTitle').val() || '@Model.Article.NewsTitle';
-                const headline = $('#Article_Headline').val() || '@Model.Article.Headline';
+                const title = $('#Article_NewsTitle').val() || 'Article Title';
+                const headline = $('#Article_Headline').val() || 'Article headline';
                 const categoryText = $('#Article_CategoryId option:selected').text() || 'Category';
                 const isPublished = $('#Article_NewsStatus').is(':checked');
-                
+
                 $('#previewTitle').text(title);
                 $('#previewHeadline').text(headline);
                 $('#previewCategory').text(categoryText);
@@ -257,26 +187,15 @@
                     .addClass(isPublished ? 'text-success' : 'text-muted');
             }
 
-            // Bind preview updates
-            $('#Article_NewsTitle, #Article_Headline').on('input', updatePreview);
+            $('#Article_NewsTitle, #Article_Headline, #Article_NewsContent').on('input', function() {
+                updatePreview();
+                updateCharCount();
+            });
+
             $('#Article_CategoryId, #Article_NewsStatus').on('change', updatePreview);
 
-            // Handle different save actions
-            $('button[name="action"][value="save"]').click(function() {
-                // Keep current status
-            });
-            
-            $('button[name="action"][value="publish"]').click(function() {
-                $('#Article_NewsStatus').prop('checked', true);
-            });
-            
-            $('button[name="action"][value="unpublish"]').click(function() {
-                $('#Article_NewsStatus').prop('checked', false);
-            });
-
-            // Initial setup
-            updateCharCount();
             updatePreview();
+            updateCharCount();
         });
     </script>
 }

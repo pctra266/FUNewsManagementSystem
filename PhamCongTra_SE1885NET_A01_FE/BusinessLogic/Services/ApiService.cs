@@ -10,6 +10,7 @@ namespace BusinessLogic.Services
     {
         Task<LoginResponseModel?> LoginAsync(LoginViewModel loginModel);
         Task<List<T>?> GetAsync<T>(string endpoint);
+        Task<T?> GetByIdAsync<T>(string endpoint, object id, string query);
         Task<T?> GetByIdAsync<T>(string endpoint, object id);
         Task<T?> GetByIdAsync<T>(string endpoint);
         Task<T?> PostAsync<T>(string endpoint, object data);
@@ -115,7 +116,32 @@ namespace BusinessLogic.Services
                 return default(T);
             }
         }
-        
+        public async Task<T?> GetByIdAsync<T>(string endpoint, object id, string query)
+        {
+            try
+            {
+                var url = $"{endpoint}({id}){query}";
+                var response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        return default(T);
+                    }
+
+                    return JsonSerializer.Deserialize<T>(content, _jsonOptions);
+                }
+
+                return default(T);
+            }
+            catch (Exception)
+            {
+                return default(T);
+            }
+        }
         public async Task<T?> GetByIdAsync<T>(string endpoint)
         {
             try

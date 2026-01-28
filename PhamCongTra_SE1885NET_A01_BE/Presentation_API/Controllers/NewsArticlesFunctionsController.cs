@@ -59,6 +59,38 @@ namespace Presentation_API.Controllers
             }
         }
 
+        [HttpPost("Duplicate")]
+        [Authorize(Policy = "StaffOnly")]
+        public async Task<IActionResult> DuplicateArticle([FromBody] DuplicateArticleRequest request)
+        {
+            try
+            {
+                // Get current user ID from claims
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!short.TryParse(userIdClaim, out short userId))
+                {
+                    return Unauthorized(new { message = "Invalid user identification" });
+                }
+
+                var duplicatedArticle = await _newsArticleService.DuplicateArticleAsync(request.ArticleId, userId);
+
+                return Ok(new
+                {
+                    message = "Article duplicated successfully",
+                    articleId = duplicatedArticle.NewsArticleId,
+                    article = duplicatedArticle
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while duplicating the article", error = ex.Message });
+            }
+        }
+
         [HttpGet("ByAuthor")]
         [EnableQuery(PageSize = 20, MaxTop = 50)]
         [Authorize(Policy = "StaffOnly")]
@@ -109,5 +141,10 @@ namespace Presentation_API.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving related articles", error = ex.Message });
             }
         }
+        
+    }
+    public class DuplicateArticleRequest
+    {
+        public string ArticleId { get; set; } = string.Empty;
     }
 }
