@@ -44,7 +44,7 @@ namespace Presentation_RazorPage.Pages.News
         public int CurrentPage { get; set; } = 1;
         
         [BindProperty(SupportsGet = true)]
-        public int PageSize { get; set; } = 6; // Smaller page size for search results
+        public int PageSize { get; set; } = 9; // Updated page size
 
         public int TotalResults { get; set; }
         public bool HasSearched { get; set; }
@@ -53,7 +53,7 @@ namespace Presentation_RazorPage.Pages.News
         {
             // Validate pagination parameters
             if (CurrentPage < 1) CurrentPage = 1;
-            if (PageSize < 1) PageSize = 6;
+            if (PageSize < 1) PageSize = 9;
             if (PageSize > 24) PageSize = 24;
 
             // Load categories for filter dropdown
@@ -230,7 +230,7 @@ namespace Presentation_RazorPage.Pages.News
             if (SortOrder != "desc")
                 queryParams.Add($"sortOrder={SortOrder}");
                 
-            if (PageSize != 6)
+            if (PageSize != 9) // Updated page size check
                 queryParams.Add($"pageSize={PageSize}");
                 
             queryParams.Add($"currentPage={pageNum}");

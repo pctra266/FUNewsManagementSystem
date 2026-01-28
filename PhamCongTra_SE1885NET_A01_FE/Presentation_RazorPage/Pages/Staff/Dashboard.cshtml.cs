@@ -22,15 +22,12 @@ namespace Presentation_RazorPage.Pages.Staff
             {
                 return RedirectToPage("/Staff/NewsArticles/Index");
             }
-            else if (userRole == "2") // Lecturer
+            else
             {
                 // Lecturer can only read and search articles
                 return RedirectToPage("/News/Active");
             }
-            else // Admin or unknown role
-            {
-                return RedirectToPage("/Admin/Dashboard");
-            }
+            
         }
     }
 }

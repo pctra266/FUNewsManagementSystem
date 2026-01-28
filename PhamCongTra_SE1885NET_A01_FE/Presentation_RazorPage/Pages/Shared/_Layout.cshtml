@@ -29,11 +29,6 @@
                                 <i class="fas fa-home me-1"></i>Active News
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/News/Search">
-                                <i class="fas fa-search me-1"></i>Search
-                            </a>
-                        </li>
                         
                         @if (Context.Session.GetString("AuthToken") != null)
                         {
@@ -41,65 +36,50 @@
                             
                             @if (userRole == "Admin")
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-shield-alt me-1"></i>Admin
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Admin/Accounts">
+                                        <i class="fas fa-users me-1"></i>Account Management
                                     </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="/Admin/Dashboard">
-                                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="/Admin/Accounts">
-                                            <i class="fas fa-users me-2"></i>Account Management
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="/Admin/Reports">
-                                            <i class="fas fa-chart-bar me-2"></i>System Reports
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><h6 class="dropdown-header">Browse Content</h6></li>
-                                        <li><a class="dropdown-item" href="/News/Active">
-                                            <i class="fas fa-eye me-2"></i>View Published News
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="/News/Search">
-                                            <i class="fas fa-search me-2"></i>Search Articles
-                                        </a></li>
-                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Admin/Reports">
+                                        <i class="fas fa-chart-bar me-1"></i>System Reports
+                                    </a>
                                 </li>
                             }
                             
-                            @if (userRole == "1") // Staff role - content management
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-edit me-1"></i>Content Management
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><h6 class="dropdown-header">Article Management</h6></li>
-                                        <li><a class="dropdown-item" href="/Staff/NewsArticles">
-                                            <i class="fas fa-newspaper me-2"></i>All News Articles
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="/Staff/Articles">
-                                            <i class="fas fa-user-edit me-2"></i>My Articles
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><h6 class="dropdown-header">System Management</h6></li>
-                                        <li><a class="dropdown-item" href="/Staff/Categories">
-                                            <i class="fas fa-folder me-2"></i>Categories
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="/Staff/Tags">
-                                            <i class="fas fa-tags me-2"></i>Tags
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="/Staff/Articles/Create">
-                                            <i class="fas fa-plus-circle me-2"></i>Create New Article
-                                        </a></li>
-                                    </ul>
-                                </li>
-                            }
-                            else if (userRole == "2") // Lecturer role - read only
+                            @if (userRole == "1")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/News/Search">
+                                    <a class="nav-link" href="/Staff/NewsArticles">
+                                        <i class="fas fa-newspaper me-1"></i>All News Articles
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Staff/Articles">
+                                        <i class="fas fa-user-edit me-1"></i>My Articles
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Staff/Categories">
+                                        <i class="fas fa-folder me-1"></i>Categories
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Staff/Tags">
+                                        <i class="fas fa-tags me-1"></i>Tags
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Staff/Articles/Create">
+                                        <i class="fas fa-plus-circle me-1"></i>Create New Article
+                                    </a>
+                                </li>
+                            }
+                            else if (userRole == "2")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/News/Active">
                                         <i class="fas fa-book-reader me-1"></i>Browse Articles
                                     </a>
                                 </li>
@@ -114,40 +94,10 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-user-circle me-1"></i>@Context.Session.GetString("UserName")
-                                    @if (userRole == "Admin")
-                                    {
-                                        <small class="badge bg-danger ms-1">Admin</small>
-                                    }
-                                    else if (userRole == "1")
-                                    {
-                                        <small class="badge bg-primary ms-1">Staff</small>
-                                    }
-                                    else if (userRole == "2")
-                                    {
-                                        <small class="badge bg-info ms-1">Lecturer</small>
-                                    }
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><h6 class="dropdown-header">
-                                        @if (userRole == "Admin")
-                                        {
-                                            <text><i class="fas fa-shield-alt me-1"></i>Administrator</text>
-                                        }
-                                        else if (userRole == "1")
-                                        {
-                                            <text><i class="fas fa-user-edit me-1"></i>Staff Member</text>
-                                        }
-                                        else if (userRole == "2")
-                                        {
-                                            <text><i class="fas fa-chalkboard-teacher me-1"></i>Lecturer</text>
-                                        }
-                                    </h6></li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/Profile">
                                         <i class="fas fa-user-edit me-2"></i>Profile
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="/Profile/ChangePassword">
-                                        <i class="fas fa-key me-2"></i>Change Password
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/Logout">
@@ -184,7 +134,6 @@
                 <div class="col-md-6 text-md-end">
                     <div class="mb-2">
                         <a href="/News/Active" class="text-light text-decoration-none me-3">Active News</a>
-                        <a href="/News/Search" class="text-light text-decoration-none me-3">Search</a>
                         <a href="/Privacy" class="text-light text-decoration-none">Privacy</a>
                     </div>
                     <p class="text-light opacity-75 mb-0">&copy; @DateTime.Now.Year FU News Management System</p>
