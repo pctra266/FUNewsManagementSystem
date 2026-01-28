@@ -1,7 +1,8 @@
 @page
 @model Presentation_RazorPage.Pages.Admin.ReportsModel
 @{
-    ViewData["Title"] = "Reports & Analytics";
+    ViewData["Title"] = "Reports";
+    var today = DateTime.Today.ToString("yyyy-MM-dd");
 }
 
 <div class="container-fluid">
@@ -14,7 +15,7 @@
                 </div>
                 <div class="d-flex gap-2">
                     <form method="post" asp-page-handler="Export" class="d-inline">
-                        <input type="hidden" name="ReportType" value="@Model.ReportType" />
+                        @* <input type="hidden" name="ReportType" value="@Model.ReportType" /> *@
                         <input type="hidden" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
                         <input type="hidden" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
                         <button type="submit" class="btn btn-success">
@@ -57,26 +58,24 @@
                 </div>
                 <div class="card-body">
                     <form method="get" class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Report Type</label>
-                            <select name="ReportType" class="form-select" asp-for="ReportType">
-                                <option value="dashboard">Dashboard Overview</option>
-                                <option value="category">Articles by Category</option>
-                                <option value="author">Articles by Author</option>
-                                <option value="monthly">Monthly Statistics</option>
+                        <div class="col-md-4">
+                            <label class="form-label">Group By</label>
+                            <select name="GroupBy" class="form-select" asp-for="GroupBy">
+                                <option value="category">Category</option>
+                                <option value="author">Author</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label">Start Date</label>
-                            <input type="date" name="StartDate" class="form-control" asp-for="StartDate" />
+                            <input type="date" name="StartDate" class="form-control" asp-for="StartDate" max="@today" />
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label">End Date</label>
-                            <input type="date" name="EndDate" class="form-control" asp-for="EndDate" />
+                            <input type="date" name="EndDate" class="form-control" asp-for="EndDate" max="@today" />
                         </div>
-                        <div class="col-md-3 d-flex align-items-end">
+                        <div class="col-md-4 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-chart-bar me-2"></i>Generate Report
+                                <i class="fas fa-search me-2"></i>Apply Filters
                             </button>
                         </div>
                     </form>
@@ -86,211 +85,7 @@
     </div>
 
     <!-- Report Content -->
-    @if (Model.ReportType == "dashboard")
-    {
-        <!-- Dashboard Overview -->
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card bg-primary text-white shadow-sm">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h6 class="text-uppercase text-white-50 mb-1">Total Articles</h6>
-                                <h3 class="mb-0">@(Model.DashboardStats?.TotalArticles ?? 0)</h3>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-newspaper fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card bg-success text-white shadow-sm">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h6 class="text-uppercase text-white-50 mb-1">Published</h6>
-                                <h3 class="mb-0">@(Model.DashboardStats?.ActiveArticles ?? 0)</h3>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-check-circle fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card bg-warning text-white shadow-sm">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h6 class="text-uppercase text-white-50 mb-1">Categories</h6>
-                                <h3 class="mb-0">@(Model.DashboardStats?.TotalCategories ?? 0)</h3>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-folder fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card bg-info text-white shadow-sm">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h6 class="text-uppercase text-white-50 mb-1">Users</h6>
-                                <h3 class="mb-0">@(Model.DashboardStats?.TotalAccounts ?? 0)</h3>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-users fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="row">
-            <div class="col-xl-8 col-lg-7">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0 fw-semibold text-primary">Article Publishing Trends</h6>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.DashboardStats != null && Model.DashboardStats.TotalArticles > 0)
-                        {
-                            <div class="chart-area">
-                                <canvas id="articleTrendsChart"></canvas>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-4">
-                                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No Data Available</h5>
-                                <p class="text-muted">No article data found for the selected period.</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4 col-lg-5">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0 fw-semibold text-primary">Article Status Distribution</h6>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.DashboardStats != null && Model.DashboardStats.TotalArticles > 0)
-                        {
-                            <div class="chart-pie pt-4 pb-2">
-                                <canvas id="statusDistributionChart"></canvas>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-4">
-                                <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No Data Available</h5>
-                                <p class="text-muted">No article status data found.</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Additional Dashboard Info -->
-        @if (Model.DashboardStats != null)
-        {
-            <div class="row">
-                <div class="col-12">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0 fw-semibold text-primary">System Summary</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Staff Accounts:</strong> @Model.DashboardStats.StaffAccounts</p>
-                                    <p><strong>Lecturer Accounts:</strong> @Model.DashboardStats.LecturerAccounts</p>
-                                    <p><strong>Active Categories:</strong> @Model.DashboardStats.ActiveCategories</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Total Tags:</strong> @Model.DashboardStats.TotalTags</p>
-                                    <p><strong>Draft Articles:</strong> @Model.DashboardStats.InactiveArticles</p>
-                                    @{
-                                        var activeRate = Model.DashboardStats.TotalArticles > 0
-                                            ? Math.Round((double)Model.DashboardStats.ActiveArticles / Model.DashboardStats.TotalArticles * 100, 1)
-                                            : 0;
-                                    }
-                                    <p><strong>Active Rate:</strong> @activeRate%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    }
-    else if (Model.ReportType == "category")
-    {
-        <!-- Category Report -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0 fw-semibold text-primary">Articles by Category</h6>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.CategoryStats.Any())
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Category</th>
-                                            <th>Total Articles</th>
-                                            <th>Published</th>
-                                            <th>Draft</th>
-                                            <th>Percentage</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var stat in Model.CategoryStats)
-                                        {
-                                            <tr>
-                                                <td>@stat.CategoryName</td>
-                                                <td>@stat.TotalArticles</td>
-                                                <td><span class="badge bg-success">@stat.ActiveArticles</span></td>
-                                                <td><span class="badge bg-warning">@stat.InactiveArticles</span></td>
-                                                <td>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: @(stat.Percentage)%">@(stat.Percentage)%</div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-4">
-                                <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No Data Available</h5>
-                                <p class="text-muted">No category statistics found for the selected period.</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-    else if (Model.ReportType == "author")
+    @if (Model.GroupBy == "author")
     {
         <!-- Author Report -->
         <div class="row">
@@ -302,15 +97,15 @@
                     <div class="card-body">
                         @if (Model.AuthorStats.Any())
                         {
+
                             <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>Author</th>
-                                            <th>Role</th>
                                             <th>Total Articles</th>
-                                            <th>Published</th>
-                                            <th>Draft</th>
+                                            <th>Active</th>
+                                            <th>Inactive</th>
                                             <th>Last Article</th>
                                         </tr>
                                     </thead>
@@ -319,26 +114,18 @@
                                         {
                                             <tr>
                                                 <td>@stat.AuthorName</td>
-                                                <td>
-                                                    @if (stat.Role == 1)
-                                                    {
-                                                        <span class="badge bg-primary">Staff</span>
-                                                    }
-                                                    else if (stat.Role == 2)
-                                                    {
-                                                        <span class="badge bg-info">Lecturer</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge bg-danger">Admin</span>
-                                                    }
-                                                </td>
                                                 <td>@stat.TotalArticles</td>
                                                 <td><span class="badge bg-success">@stat.ActiveArticles</span></td>
                                                 <td><span class="badge bg-warning">@stat.InactiveArticles</span></td>
                                                 <td>@stat.LastArticleDate</td>
                                             </tr>
                                         }
+                                        <tr>
+                                            <td>Total</td>
+                                            <td>@Model.TotalArticles</td>
+                                            <td>@Model.TotalActiveArticles</td>
+                                            <td>@Model.TotalInactiveArticles</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -356,28 +143,54 @@
             </div>
         </div>
     }
-    else if (Model.ReportType == "monthly")
+    else
     {
-        <!-- Monthly Report -->
+        <!-- Category Report -->
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 fw-semibold text-primary">Monthly Article Statistics</h6>
+                        <h6 class="mb-0 fw-semibold text-primary">Articles by Category</h6>
                     </div>
                     <div class="card-body">
-                        @if (Model.MonthlyStats.Any())
+                        @if (Model.CategoryStats.Any())
                         {
-                            <div class="chart-area">
-                                <canvas id="monthlyChart"></canvas>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Total Articles</th>
+                                            <th>Active</th>
+                                            <th>Inactive</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var stat in Model.CategoryStats)
+                                        {
+                                            <tr>
+                                                <td>@stat.CategoryName</td>
+                                                <td>@stat.TotalArticles</td>
+                                                <td><span class="badge bg-success">@stat.ActiveArticles</span></td>
+                                                <td><span class="badge bg-warning">@stat.InactiveArticles</span></td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td>Total</td>
+                                            <td>@Model.TotalArticles</td>
+                                            <td>@Model.TotalActiveArticles</td>
+                                            <td>@Model.TotalInactiveArticles</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         }
                         else
                         {
                             <div class="text-center py-4">
-                                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                                <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
                                 <h5 class="text-muted">No Data Available</h5>
-                                <p class="text-muted">No monthly statistics found for the selected year.</p>
+                                <p class="text-muted">No category statistics found for the selected period.</p>
                             </div>
                         }
                     </div>
@@ -386,127 +199,3 @@
         </div>
     }
 </div>
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Initialize charts based on report type
-            @if (Model.ReportType == "dashboard" && Model.DashboardStats != null && Model.DashboardStats.TotalArticles > 0)
-            {
-                <text>
-                initializeDashboardCharts();
-                </text>
-            }
-
-        @if (Model.ReportType == "monthly")
-            {
-                <text>
-                var monthlyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyStats));
-                initializeMonthlyChart(monthlyData);
-                </text>
-            }
-
-            // Set max date to today
-            var today = new Date().toISOString().split('T')[0];
-            $('input[name="EndDate"]').attr('max', today);
-        });
-
-        function initializeDashboardCharts() {
-            // Article Trends Chart (Sample data)
-            if (document.getElementById('articleTrendsChart')) {
-                const ctx = document.getElementById('articleTrendsChart').getContext('2d');
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                const articleData = [12, 19, 15, 25, 22, 30];
-                
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [{
-                            label: 'Articles Published',
-                            data: articleData,
-                            borderColor: 'rgba(102, 126, 234, 1)',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                });
-            }
-
-            // Status Distribution Chart
-            if (document.getElementById('statusDistributionChart')) {
-                const ctx2 = document.getElementById('statusDistributionChart').getContext('2d');
-                
-                new Chart(ctx2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Published', 'Draft'],
-                        datasets: [{
-                            data: [@(Model.DashboardStats?.ActiveArticles ?? 0), @(Model.DashboardStats?.InactiveArticles ?? 0)],
-                            backgroundColor: [
-                                'rgba(75, 192, 192, 0.8)',
-                                'rgba(255, 159, 64, 0.8)'
-                            ],
-                            borderColor: [
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
-                });
-            }
-        }
-
-        function initializeMonthlyChart(monthlyData) {
-            if (document.getElementById('monthlyChart')) {
-                const ctx = document.getElementById('monthlyChart').getContext('2d');
-                
-                const labels = monthlyData.map(item => item.MonthName);
-                const activeData = monthlyData.map(item => item.ActiveArticles);
-                const inactiveData = monthlyData.map(item => item.InactiveArticles);
-                
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Active Articles',
-                            data: activeData,
-                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }, {
-                            label: 'Draft Articles',
-                            data: inactiveData,
-                            backgroundColor: 'rgba(255, 159, 64, 0.8)',
-                            borderColor: 'rgba(255, 159, 64, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: { y: { beginAtZero: true } }
-                    }
-                });
-            }
-        }
-
-        // Auto-submit form when report type changes
-        $('select[name="ReportType"]').on('change', function() {
-            $(this).closest('form').submit();
-        });
-    </script>
-}
