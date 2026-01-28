@@ -31,9 +31,9 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-8">
-            <div class="card shadow">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold text-primary">Article Information</h6>
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">Article Information</h6>
                 </div>
                 <div class="card-body">
                     <form method="post" id="createArticleForm">
@@ -56,7 +56,7 @@
 
                                 <div class="mb-3">
                                     <label asp-for="Article.NewsContent" class="form-label">Content</label>
-                                    <textarea asp-for="Article.NewsContent" class="form-control" rows="12" 
+                                    <textarea asp-for="Article.NewsContent" class="form-control" rows="12"
                                               placeholder="Write your article content here..."></textarea>
                                     <span asp-validation-for="Article.NewsContent" class="text-danger"></span>
                                     <div class="form-text">
@@ -86,12 +86,12 @@
 
                                 <div class="mb-3">
                                     <label class="form-label">Tags</label>
-                                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    <div class="border rounded p-3 overflow-auto">
                                         @foreach (var tag in Model.Tags)
                                         {
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" 
-                                                       name="Article.SelectedTagIds" value="@tag.TagId" 
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="Article.SelectedTagIds" value="@tag.TagId"
                                                        id="tag_@tag.TagId">
                                                 <label class="form-check-label" for="tag_@tag.TagId">
                                                     @tag.TagName
@@ -113,9 +113,9 @@
                                     <div class="form-text">Uncheck to save as draft.</div>
                                 </div>
 
-                                <div class="preview-section">
+                                <div class="position-sticky top-0">
                                     <h6 class="text-muted mb-2">Article Preview</h6>
-                                    <div class="card">
+                                    <div class="card shadow-sm">
                                         <div class="card-body p-3">
                                             <h6 class="card-title" id="previewTitle">Article Title</h6>
                                             <p class="card-text text-muted small" id="previewHeadline">Article headline</p>
@@ -220,52 +220,3 @@
     </script>
 }
 
-<style>
-.preview-section {
-    position: sticky;
-    top: 20px;
-}
-
-.card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);
-    border: none;
-}
-
-.breadcrumb {
-    background: transparent;
-    padding: 0;
-}
-
-.breadcrumb a {
-    color: #667eea;
-    text-decoration: none;
-}
-
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-#contentCounter.text-danger {
-    font-weight: bold;
-}
-
-.form-check-input:checked {
-    background-color: #667eea;
-    border-color: #667eea;
-}
-</style>

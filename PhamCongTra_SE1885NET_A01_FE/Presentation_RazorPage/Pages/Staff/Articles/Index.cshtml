@@ -49,7 +49,7 @@
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
-            <div class="card bg-gradient-primary text-white">
+            <div class="card bg-primary text-white shadow-sm">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col">
@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="col-md-4 mb-3">
-            <div class="card bg-gradient-success text-white">
+            <div class="card bg-success text-white shadow-sm">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col">
@@ -79,7 +79,7 @@
             </div>
         </div>
         <div class="col-md-4 mb-3">
-            <div class="card bg-gradient-warning text-white">
+            <div class="card bg-warning text-white shadow-sm">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col">
@@ -98,7 +98,7 @@
     <!-- Search and Filter -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <form method="get" class="row g-3">
                         <div class="col-md-4">
@@ -141,9 +141,9 @@
     <!-- Articles Table -->
     <div class="row">
         <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold text-primary">Articles (@Model.MyArticles.Count)</h6>
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">Articles (@Model.MyArticles.Count)</h6>
                 </div>
                 <div class="card-body">
                     @if (Model.MyArticles.Any())
@@ -204,7 +204,7 @@
                                                        class="btn btn-sm btn-outline-info" title="View" target="_blank">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <form method="post" style="display: inline;" asp-page-handler="ToggleStatus" 
+                                                    <form method="post" class="d-inline" asp-page-handler="ToggleStatus" 
                                                           asp-route-id="@article.NewsArticleId" 
                                                           asp-route-currentStatus="@(article.NewsStatus ?? false)">
                                                         <button type="submit" class="btn btn-sm btn-outline-secondary" 
@@ -213,7 +213,7 @@
                                                             <i class="fas fa-@(article.NewsStatus == true ? "eye-slash" : "upload")"></i>
                                                         </button>
                                                     </form>
-                                                    <form method="post" style="display: inline;" asp-page-handler="Delete" 
+                                                    <form method="post" class="d-inline" asp-page-handler="Delete" 
                                                           asp-route-id="@article.NewsArticleId">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" 
                                                                 title="Delete"
@@ -266,56 +266,3 @@
     </div>
 </div>
 
-<style>
-.bg-gradient-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.bg-gradient-success { background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%); }
-.bg-gradient-warning { background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%); }
-
-.card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
-
-.btn-outline-primary:hover,
-.btn-outline-info:hover,
-.btn-outline-secondary:hover,
-.btn-outline-danger:hover {
-    transform: translateY(-1px);
-}
-
-.breadcrumb {
-    background: transparent;
-    padding: 0;
-}
-
-.breadcrumb a {
-    color: #667eea;
-    text-decoration: none;
-}
-
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-.alert {
-    border: none;
-    border-radius: 10px;
-}
-
-.card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-</style>

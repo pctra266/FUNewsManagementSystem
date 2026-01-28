@@ -20,109 +20,108 @@
                 </nav>
 
                 <!-- Article Content -->
-                <article class="news-article">
-                    <!-- Status Badge (for logged in users) -->
-                    @if (HttpContext.Session.GetString("AuthToken") != null && Model.Article.NewsStatus != true)
-                    {
-                        <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
-                            <i class="fas fa-eye-slash me-2"></i>
-                            <div>
-                                <strong>Draft Article:</strong> This article is not published and only visible to you.
+                <article class="card shadow-sm">
+                    <div class="card-body">
+                        <!-- Status Badge (for logged in users) -->
+                        @if (HttpContext.Session.GetString("AuthToken") != null && Model.Article.NewsStatus != true)
+                        {
+                            <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+                                <i class="fas fa-eye-slash me-2"></i>
+                                <div>
+                                    <strong>Draft Article:</strong> This article is not published and only visible to you.
+                                </div>
                             </div>
-                        </div>
-                    }
+                        }
 
-                    <!-- Article Header -->
-                    <header class="article-header mb-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <span class="badge bg-primary category-badge">@Model.Article.CategoryName</span>
-                            <div class="article-actions">
-                                @if (HttpContext.Session.GetString("AuthToken") != null)
-                                {
-                                    var userRole = HttpContext.Session.GetString("UserRole");
-                                    var userId = HttpContext.Session.GetInt32("UserId");
-                                    
-                                    @if (userRole == "1" && Model.Article.CreatedById == userId)
+                        <!-- Article Header -->
+                        <header class="mb-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-primary">@Model.Article.CategoryName</span>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if (HttpContext.Session.GetString("AuthToken") != null)
                                     {
-                                        <a href="/Staff/Articles/Edit/@Model.Article.NewsArticleId" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-edit me-1"></i>Edit
-                                        </a>
+                                        var userRole = HttpContext.Session.GetString("UserRole");
+                                        var userId = HttpContext.Session.GetInt32("UserId");
+
+                                        @if (userRole == "1" && Model.Article.CreatedById == userId)
+                                        {
+                                            <a href="/Staff/Articles/Edit/@Model.Article.NewsArticleId" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </a>
+                                        }
+                                        else if (userRole == "Admin")
+                                        {
+                                            <a href="/Staff/Articles/Edit/@Model.Article.NewsArticleId" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </a>
+                                        }
                                     }
-                                    else if (userRole == "Admin")
-                                    {
-                                        <a href="/Staff/Articles/Edit/@Model.Article.NewsArticleId" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-edit me-1"></i>Edit
-                                        </a>
-                                    }
-                                }
-                                
-                                <button class="btn btn-sm btn-outline-secondary" onclick="shareArticle()">
-                                    <i class="fas fa-share me-1"></i>Share
-                                </button>
+
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="shareArticle()">
+                                        <i class="fas fa-share me-1"></i>Share
+                                    </button>
+                                </div>
                             </div>
-                        </div>
 
-                        <h1 class="article-title">@Model.Article.NewsTitle</h1>
-                        
-                        <p class="article-headline text-muted fs-5 mb-4">@Model.Article.Headline</p>
-                        
-                        <div class="article-meta">
-                            <div class="d-flex flex-wrap align-items-center text-muted">
-                                <div class="me-4 mb-2">
-                                    <i class="fas fa-user me-1"></i>
+                            <h1 class="h4 fw-bold mb-3">@Model.Article.NewsTitle</h1>
+                            <p class="text-body-secondary fs-5 mb-4">@Model.Article.Headline</p>
+
+                            <div class="d-flex flex-wrap align-items-center text-body-secondary small gap-3">
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="fas fa-user"></i>
                                     <span>@Model.Article.CreatedByName</span>
                                 </div>
-                                <div class="me-4 mb-2">
-                                    <i class="fas fa-calendar me-1"></i>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="fas fa-calendar"></i>
                                     <time datetime="@Model.Article.CreatedDate?.ToString("yyyy-MM-dd")">
                                         @Model.Article.CreatedDate?.ToString("MMMM dd, yyyy")
                                     </time>
                                 </div>
                                 @if (Model.Article.ModifiedDate.HasValue && Model.Article.ModifiedDate != Model.Article.CreatedDate)
                                 {
-                                    <div class="me-4 mb-2">
-                                        <i class="fas fa-edit me-1"></i>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <i class="fas fa-edit"></i>
                                         <span>Updated @Model.Article.ModifiedDate?.ToString("MMM dd, yyyy")</span>
                                     </div>
                                 }
                                 @if (!string.IsNullOrEmpty(Model.Article.NewsSource))
                                 {
-                                    <div class="mb-2">
-                                        <i class="fas fa-external-link-alt me-1"></i>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <i class="fas fa-external-link-alt"></i>
                                         <span>Source: @Model.Article.NewsSource</span>
                                     </div>
                                 }
                             </div>
-                        </div>
-                    </header>
+                        </header>
 
-                    <!-- Article Body -->
-                    <div class="article-content">
-                        @if (!string.IsNullOrEmpty(Model.Article.NewsContent))
+                        <!-- Article Body -->
+                        <div class="mb-4">
+                            @if (!string.IsNullOrEmpty(Model.Article.NewsContent))
+                            {
+                                @Html.Raw(Model.Article.NewsContent)
+                            }
+                            else
+                            {
+                                <p class="text-muted fst-italic">No content available for this article.</p>
+                            }
+                        </div>
+
+                        <!-- Tags -->
+                        @if (Model.Article.Tags.Any())
                         {
-                            @Html.Raw(Model.Article.NewsContent)
-                        }
-                        else
-                        {
-                            <p class="text-muted fst-italic">No content available for this article.</p>
+                            <div class="mt-4 pt-4 border-top">
+                                <h6 class="text-muted mb-3">Tags:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var tag in Model.Article.Tags)
+                                    {
+                                        <a href="/News/Active?search=@tag.TagName" class="badge text-bg-light text-decoration-none">
+                                            <i class="fas fa-tag me-1"></i>@tag.TagName
+                                        </a>
+                                    }
+                                </div>
+                            </div>
                         }
                     </div>
-
-                    <!-- Tags -->
-                    @if (Model.Article.Tags.Any())
-                    {
-                        <div class="article-tags mt-4 pt-4 border-top">
-                            <h6 class="text-muted mb-3">Tags:</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach (var tag in Model.Article.Tags)
-                                {
-                                    <a href="/News/Active?search=@tag.TagName" class="badge bg-light text-dark text-decoration-none tag-badge">
-                                        <i class="fas fa-tag me-1"></i>@tag.TagName
-                                    </a>
-                                }
-                            </div>
-                        </div>
-                    }
                 </article>
             </div>
         </div>
@@ -134,20 +133,20 @@
                 <div class="col-lg-10">
                     <hr class="my-5">
                     <h3 class="text-center mb-4">Related Articles</h3>
-                    
+
                     <div class="row">
                         @{
                             var articlesToShow = Model.RelatedArticles.Any() ? Model.RelatedArticles : Model.SameCategoryArticles;
                         }
-                        
+
                         @foreach (var article in articlesToShow)
                         {
                             <div class="col-md-4 mb-4">
-                                <div class="card h-100 related-article-card">
+                                <div class="card h-100 shadow-sm">
                                     <div class="card-body">
                                         <span class="badge bg-secondary mb-2">@article.CategoryName</span>
                                         <h6 class="card-title">
-                                            <a href="/News/Details/@article.NewsArticleId" class="text-decoration-none">
+                                            <a href="/News/Details/@article.NewsArticleId" class="link-dark text-decoration-none">
                                                 @article.NewsTitle
                                             </a>
                                         </h6>
@@ -165,7 +164,7 @@
                             </div>
                         }
                     </div>
-                    
+
                     <div class="text-center mt-4">
                         <a href="/News/Active" class="btn btn-outline-primary">
                             <i class="fas fa-arrow-left me-2"></i>Back to All Articles

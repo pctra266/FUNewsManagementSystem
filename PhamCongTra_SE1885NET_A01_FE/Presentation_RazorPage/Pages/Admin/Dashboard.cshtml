@@ -50,15 +50,15 @@
     <!-- Statistics Cards - Admin Overview Only -->
     <div class="row mb-4">
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card bg-primary text-white shadow">
+            <div class="card bg-primary text-white shadow-sm">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Articles</div>
-                            <div class="h5 mb-0 font-weight-bold" id="totalArticles">@Model.DashboardData.TotalArticles</div>
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="small fw-semibold text-uppercase mb-1">Total Articles</div>
+                            <div class="h5 mb-0 fw-bold" id="totalArticles">@Model.DashboardData.TotalArticles</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-newspaper fa-2x text-gray-300"></i>
+                            <i class="fas fa-newspaper fa-2x text-white-50"></i>
                         </div>
                     </div>
                 </div>
@@ -66,15 +66,15 @@
         </div>
 
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card bg-success text-white shadow">
+            <div class="card bg-success text-white shadow-sm">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Active Articles</div>
-                            <div class="h5 mb-0 font-weight-bold" id="activeArticles">@Model.DashboardData.ActiveArticles</div>
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="small fw-semibold text-uppercase mb-1">Active Articles</div>
+                            <div class="h5 mb-0 fw-bold" id="activeArticles">@Model.DashboardData.ActiveArticles</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                            <i class="fas fa-check-circle fa-2x text-white-50"></i>
                         </div>
                     </div>
                 </div>
@@ -82,15 +82,15 @@
         </div>
 
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card bg-info text-white shadow">
+            <div class="card bg-info text-white shadow-sm">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Users</div>
-                            <div class="h5 mb-0 font-weight-bold" id="totalAccounts">@Model.DashboardData.TotalAccounts</div>
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="small fw-semibold text-uppercase mb-1">Total Users</div>
+                            <div class="h5 mb-0 fw-bold" id="totalAccounts">@Model.DashboardData.TotalAccounts</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                            <i class="fas fa-users fa-2x text-white-50"></i>
                         </div>
                     </div>
                 </div>
@@ -98,15 +98,15 @@
         </div>
 
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card bg-warning text-white shadow">
+            <div class="card bg-warning text-white shadow-sm">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Categories</div>
-                            <div class="h5 mb-0 font-weight-bold" id="totalCategories">@Model.DashboardData.TotalCategories</div>
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="small fw-semibold text-uppercase mb-1">Total Categories</div>
+                            <div class="h5 mb-0 fw-bold" id="totalCategories">@Model.DashboardData.TotalCategories</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-folder fa-2x text-gray-300"></i>
+                            <i class="fas fa-folder fa-2x text-white-50"></i>
                         </div>
                     </div>
                 </div>
@@ -117,9 +117,9 @@
     <!-- Main Content -->
     <div class="row">
         <div class="col-lg-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent System Activity</h6>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">Recent System Activity</h6>
                 </div>
                 <div class="card-body">
                     @if (Model.DashboardData.RecentArticles.Any())
@@ -185,9 +185,9 @@
 
         <div class="col-lg-4">
             <!-- Admin Functions -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Admin Functions</h6>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">Admin Functions</h6>
                 </div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
@@ -216,9 +216,9 @@
             </div>
 
             <!-- System Information -->
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">System Overview</h6>
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">System Overview</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -238,20 +238,18 @@
                         </div>
                         <div class="col-sm-6">
                             @{
-                                var activePercentage = Model.DashboardData.TotalArticles > 0 
-                                    ? Math.Round((double)Model.DashboardData.ActiveArticles / Model.DashboardData.TotalArticles * 100, 1) 
+                                var activePercentage = Model.DashboardData.TotalArticles > 0
+                                    ? Math.Round((double)Model.DashboardData.ActiveArticles / Model.DashboardData.TotalArticles * 100, 1)
                                     : 0;
                             }
                             <p class="mb-2"><strong>Publish Rate:</strong> <span class="text-success">@activePercentage%</span></p>
                         </div>
                     </div>
                     <hr>
-                    <div class="alert alert-info alert-sm mb-0">
-                        <small>
-                            <i class="fas fa-info-circle me-1"></i>
-                            <strong>Admin Role:</strong> Account management and system reports only.
-                            Content management is handled by Staff users.
-                        </small>
+                    <div class="alert alert-info mb-0 py-2 small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <strong>Admin Role:</strong> Account management and system reports only.
+                        Content management is handled by Staff users.
                     </div>
                     <p class="mb-0 text-muted mt-2"><small>Last updated: <span id="lastUpdated">@DateTime.Now.ToString("MMM dd, yyyy HH:mm")</span></small></p>
                 </div>
@@ -264,9 +262,9 @@
         <!-- Monthly Statistics Chart -->
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card shadow">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Article Statistics (@Model.DashboardData.MonthlyStats.Year)</h6>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0 fw-semibold text-primary">Article Statistics (@Model.DashboardData.MonthlyStats.Year)</h6>
                     </div>
                     <div class="card-body">
                         <canvas id="monthlyChart" width="400" height="100"></canvas>
@@ -421,59 +419,3 @@ function showErrorMessage(message) {
 }
 </script>
 }
-
-<style>
-.card {
-    border: none;
-    border-radius: 15px;
-}
-
-.card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 15px 15px 0 0 !important;
-}
-
-.bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
-.bg-success { background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%) !important; }
-.bg-warning { background: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%) !important; }
-.bg-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
-
-.text-gray-300 { color: rgba(255,255,255,0.8) !important; }
-
-.list-group-item-action:hover {
-    background-color: #f8f9fa;
-    transform: translateX(5px);
-    transition: all 0.2s ease;
-}
-
-.alert {
-    border-radius: 15px;
-}
-
-.alert-sm {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    border: none;
-    border-radius: 10px;
-}
-
-.btn-success:hover {
-    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
-
-.badge {
-    font-size: 0.75rem;
-    border-radius: 6px;
-}
-</style>
