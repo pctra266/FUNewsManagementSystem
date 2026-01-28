@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
 using BussinessLogic.Services;
 using DataAccess.DTOs;
@@ -23,7 +24,16 @@ namespace Presentation_API.Controllers
         {
             try
             {
-                var accounts = _accountService.GetAccountsQueryable();
+                var accounts = _accountService.GetAccountsQueryable()
+                    .Select(a => new SystemAccountDto
+                    {
+                        AccountId = a.AccountId,
+                        AccountName = a.AccountName,
+                        AccountEmail = a.AccountEmail,
+                        AccountRole = a.AccountRole,
+                        ArticleCount = a.NewsArticles.Count
+                    });
+
                 return Ok(accounts);
             }
             catch (Exception ex)
@@ -37,11 +47,23 @@ namespace Presentation_API.Controllers
         {
             try
             {
-                var account = await _accountService.GetAccountByIdAsync(key);
+                var account = await _accountService.GetAccountsQueryable()
+                    .Where(a => a.AccountId == key)
+                    .Select(a => new SystemAccountDto
+                    {
+                        AccountId = a.AccountId,
+                        AccountName = a.AccountName,
+                        AccountEmail = a.AccountEmail,
+                        AccountRole = a.AccountRole,
+                        ArticleCount = a.NewsArticles.Count
+                    })
+                    .SingleOrDefaultAsync();
+
                 if (account == null)
                 {
                     return NotFound(new { message = $"Account with ID {key} not found" });
                 }
+
                 return Ok(account);
             }
             catch (Exception ex)

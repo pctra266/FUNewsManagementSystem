@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.Authorization;
-using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 using BussinessLogic.Services;
 using DataAccess.DTOs;
 
@@ -25,7 +25,34 @@ namespace Presentation_API.Controllers
         {
             try
             {
-                var accounts = await _accountService.SearchAccountsAsync(name, email, role);
+                var query = _accountService.GetAccountsQueryable();
+
+                if (!string.IsNullOrEmpty(name))
+                {
+                    query = query.Where(a => a.AccountName!.Contains(name));
+                }
+
+                if (!string.IsNullOrEmpty(email))
+                {
+                    query = query.Where(a => a.AccountEmail!.Contains(email));
+                }
+
+                if (role.HasValue)
+                {
+                    query = query.Where(a => a.AccountRole == role);
+                }
+
+                var accounts = await query
+                    .Select(a => new SystemAccountDto
+                    {
+                        AccountId = a.AccountId,
+                        AccountName = a.AccountName,
+                        AccountEmail = a.AccountEmail,
+                        AccountRole = a.AccountRole,
+                        ArticleCount = a.NewsArticles.Count
+                    })
+                    .ToListAsync();
+
                 return Ok(accounts);
             }
             catch (Exception ex)

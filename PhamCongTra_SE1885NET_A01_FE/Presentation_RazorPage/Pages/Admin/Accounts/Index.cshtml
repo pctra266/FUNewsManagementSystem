@@ -1,335 +1,310 @@
-@page
+﻿@page
 @model Presentation_RazorPage.Pages.Admin.Accounts.IndexModel
 @{
     ViewData["Title"] = "Manage Accounts";
 }
 
-<div class="container-fluid">
-    <!-- Header Section -->
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="h3 mb-0">Manage User Accounts</h1>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAccountModal">
-                        <i class="fas fa-user-plus me-2"></i>Create New Account
-                    </button>
-                </div>
-            </div>
+<style>
+    /* Styling riêng cho trang này để tránh xung đột */
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+        margin-right: 12px;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .card-header-actions {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge-soft-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .badge-soft-primary {
+        background-color: rgba(0, 123, 255, 0.1);
+        color: #007bff;
+    }
+
+    .badge-soft-secondary {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 text-gray-800">User Management</h1>
+            <p class="text-muted mb-0">Manage system access, roles and permissions</p>
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createAccountModal">
+                <i class="fas fa-plus-circle me-2"></i>Create New Account
+            </button>
         </div>
     </div>
 
-    <!-- Success/Error Messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="card bg-primary text-white shadow-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h6 class="text-uppercase text-white-50 mb-1">Total Accounts</h6>
-                            <h3 class="mb-0">@Model.TotalAccounts</h3>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x"></i>
-                        </div>
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header card-header-actions py-3">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0" id="searchTerm" name="searchTerm"
+                               value="@Model.SearchTerm" placeholder="Search by name or email...">
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card bg-success text-white shadow-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h6 class="text-uppercase text-white-50 mb-1">Staff Accounts</h6>
-                            <h3 class="mb-0">@Model.StaffAccounts</h3>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-tie fa-2x"></i>
-                        </div>
-                    </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="roleFilter" name="roleFilter" onchange="this.form.submit()">
+                        <option value="">All Roles</option>
+                        <option value="1" selected="@(Model.RoleFilter == 1)">Staff</option>
+                        <option value="2" selected="@(Model.RoleFilter == 2)">Lecturer</option>
+                    </select>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card bg-info text-white shadow-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h6 class="text-uppercase text-white-50 mb-1">Lecturer Accounts</h6>
-                            <h3 class="mb-0">@Model.LecturerAccounts</h3>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-chalkboard-teacher fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search and Filter -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form method="get" class="row g-3">
-                        <div class="col-md-6">
-                            <label for="searchTerm" class="form-label">Search Accounts</label>
-                            <input type="text" class="form-control" id="searchTerm" name="searchTerm"
-                                   value="@Model.SearchTerm" placeholder="Search by name or email...">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="roleFilter" class="form-label">Filter by Role</label>
-                            <select class="form-select" id="roleFilter" name="roleFilter">
-                                <option value="">All Roles</option>
-                                <option value="1" selected="@(Model.RoleFilter == 1)">Staff</option>
-                                <option value="2" selected="@(Model.RoleFilter == 2)">Lecturer</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-search me-2"></i>Search
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Accounts Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0 fw-semibold text-primary">User Accounts (@Model.Accounts.Count)</h6>
-                </div>
-                <div class="card-body">
-                    @if (Model.Accounts.Any())
+                <div class="col-md-4 text-end">
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.RoleFilter.HasValue)
                     {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Articles</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var account in Model.Accounts.OrderBy(a => a.AccountId))
-                                    {
-                                        <tr>
-                                            <td>
-                                                <strong>@account.AccountId</strong>
-                                            </td>
-                                            <td>
-                                                <div>
-                                                    <strong>@account.AccountName</strong>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="text-muted">@account.AccountEmail</span>
-                                            </td>
-                                            <td>
-                                                @switch (account.AccountRole)
-                                                {
-                                                    case 1:
-                                                        <span class="badge bg-primary">
-                                                            <i class="fas fa-user-tie me-1"></i>Staff
-                                                        </span>
-                                                        break;
-                                                    case 2:
-                                                        <span class="badge bg-info">
-                                                            <i class="fas fa-chalkboard-teacher me-1"></i>Lecturer
-                                                        </span>
-                                                        break;
-                                                    default:
-                                                        <span class="badge bg-danger">
-                                                            <i class="fas fa-user-shield me-1"></i>Admin
-                                                        </span>
-                                                        break;
-                                                }
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-secondary">@account.ArticleCount</span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                            onclick="editAccount(@account.AccountId, '@account.AccountName', '@account.AccountEmail', @account.AccountRole)"
-                                                            data-bs-toggle="modal" data-bs-target="#editAccountModal" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-
-                                                    @if (account.ArticleCount == 0)
-                                                    {
-                                                        <form method="post" class="d-inline" asp-page-handler="Delete"
-                                                              asp-route-id="@account.AccountId">
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                                    title="Delete"
-                                                                    onclick="return confirm('Are you sure you want to delete this account?')">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    }
-                                                    else
-                                                    {
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                                title="Cannot delete - has articles" disabled>
-                                                            <i class="fas fa-ban"></i>
-                                                        </button>
-                                                    }
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                        <a href="/Admin/Accounts" class="btn btn-outline-secondary">
+                            <i class="fas fa-sync-alt me-1"></i> Reset Filters
+                        </a>
+                        <button type="submit" class="btn btn-primary ms-2">Search</button>
                     }
                     else
                     {
-                        <div class="text-center py-5">
-                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Accounts Found</h5>
-                            <p class="text-muted">
-                                @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.RoleFilter.HasValue)
-                                {
-                                    <span>No accounts match your search criteria.</span>
-                                }
-                                else
-                                {
-                                    <span>No user accounts have been created yet.</span>
-                                }
-                            </p>
-                            <div class="mt-3">
-                                @if (string.IsNullOrEmpty(Model.SearchTerm) && !Model.RoleFilter.HasValue)
-                                {
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAccountModal">
-                                        <i class="fas fa-user-plus me-2"></i>Create First Account
-                                    </button>
-                                }
-                                else
-                                {
-                                    <a href="/Admin/Accounts" class="btn btn-primary">
-                                        <i class="fas fa-refresh me-2"></i>Clear Filters
-                                    </a>
-                                }
-                            </div>
-                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
                     }
                 </div>
-            </div>
+            </form>
+        </div>
+
+        <div class="card-body p-0">
+            @if (Model.Accounts != null && Model.Accounts.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-secondary text-uppercase text-xs fw-bold">
+                            <tr>
+                                <th class="ps-4 py-3">User Profile</th>
+                                <th class="py-3">Role</th>
+                                <th class="py-3 text-center">Articles</th>
+                                <th class="py-3 text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var account in Model.Accounts.OrderBy(a => a.AccountId))
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle">
+                                                @{
+                                                    var initial = !string.IsNullOrEmpty(account.AccountName) ? account.AccountName.Substring(0, 1) : "?";
+                                                }
+                                                @initial
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@account.AccountName</div>
+                                                <div class="small text-muted">@account.AccountEmail</div>
+                                                <div class="small text-muted d-block d-md-none">ID: @account.AccountId</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @switch (account.AccountRole)
+                                        {
+                                            case 1:
+                                                <span class="badge badge-soft-success px-3 py-2 rounded-pill">Staff</span>
+                                                break;
+                                            case 2:
+                                                <span class="badge badge-soft-primary px-3 py-2 rounded-pill">Lecturer</span>
+                                                break;
+                                            default:
+                                                <span class="badge badge-soft-secondary px-3 py-2 rounded-pill">Admin</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="fw-bold text-dark">@account.ArticleCount</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-link text-primary p-2"
+                                                    onclick="editAccount(@account.AccountId, '@account.AccountName', '@account.AccountEmail', @account.AccountRole)"
+                                                    data-bs-toggle="modal" data-bs-target="#editAccountModal" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+
+                                            @if (account.ArticleCount == 0)
+                                            {
+                                                <form method="post" asp-page-handler="Delete" asp-route-id="@account.AccountId" class="d-inline"
+                                                      onsubmit="return confirm('Are you sure you want to delete this account?');">
+                                                    <button type="submit" class="btn btn-link text-danger p-2" title="Delete">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-link text-secondary p-2 opacity-50"
+                                                        title="Cannot delete account with existing articles" disabled>
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="mb-3 text-muted">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h5 class="text-muted">No Accounts Found</h5>
+                    <p class="text-muted small">
+                        @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.RoleFilter.HasValue)
+                        {
+                            <span>No accounts match your search criteria. Try resetting filters.</span>
+                        }
+                        else
+                        {
+                            <span>No user accounts have been created yet.</span>
+                        }
+                    </p>
+                </div>
+            }
         </div>
     </div>
 </div>
 
-<!-- Create Account Modal -->
-<div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
             <form method="post" asp-page-handler="Create">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="createAccountModalLabel">Create New Account</h5>
+                    <h5 class="modal-title" id="createAccountLabel">
+                        <i class="fas fa-user-plus me-2"></i>Create New Account
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div class="modal-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3 py-2" role="alert"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="CreateAccount.AccountName" class="form-label">Full Name *</label>
-                        <input asp-for="CreateAccount.AccountName" class="form-control" />
-                        <span asp-validation-for="CreateAccount.AccountName" class="text-danger"></span>
+                    <div class="form-floating mb-3">
+                        <input asp-for="CreateAccount.AccountName" class="form-control" id="createName" placeholder="Full Name" />
+                        <label for="createName">Full Name <span class="text-danger">*</span></label>
+                        <span asp-validation-for="CreateAccount.AccountName" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="CreateAccount.AccountEmail" class="form-label">Email Address *</label>
-                        <input asp-for="CreateAccount.AccountEmail" type="email" class="form-control" />
-                        <span asp-validation-for="CreateAccount.AccountEmail" class="text-danger"></span>
+                    <div class="form-floating mb-3">
+                        <input asp-for="CreateAccount.AccountEmail" type="email" class="form-control" id="createEmail" placeholder="name@example.com" />
+                        <label for="createEmail">Email Address <span class="text-danger">*</span></label>
+                        <span asp-validation-for="CreateAccount.AccountEmail" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="CreateAccount.AccountPassword" class="form-label">Password *</label>
-                        <input asp-for="CreateAccount.AccountPassword" type="password" class="form-control" />
-                        <span asp-validation-for="CreateAccount.AccountPassword" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="CreateAccount.AccountRole" class="form-label">Role *</label>
-                        <select asp-for="CreateAccount.AccountRole" class="form-select">
-                            <option value="">Select Role</option>
-                            <option value="1">Staff</option>
-                            <option value="2">Lecturer</option>
-                        </select>
-                        <span asp-validation-for="CreateAccount.AccountRole" class="text-danger"></span>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="CreateAccount.AccountPassword" type="password" class="form-control" id="createPass" placeholder="Password" />
+                                <label for="createPass">Password <span class="text-danger">*</span></label>
+                                <span asp-validation-for="CreateAccount.AccountPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select asp-for="CreateAccount.AccountRole" class="form-select" id="createRole">
+                                    <option value="" selected disabled>Select Role</option>
+                                    <option value="1">Staff</option>
+                                    <option value="2">Lecturer</option>
+                                </select>
+                                <label for="createRole">Role <span class="text-danger">*</span></label>
+                                <span asp-validation-for="CreateAccount.AccountRole" class="text-danger small"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Account</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-link text-secondary text-decoration-none" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Create Account</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Edit Account Modal -->
-<div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
             <form id="editAccountForm" method="post" asp-page-handler="Update">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="editAccountModalLabel">Edit Account</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-white border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-primary" id="editAccountLabel">Edit Account Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4 pt-3">
+                    <p class="text-muted small mb-4">Update the user's personal information and access permissions.</p>
+
                     <input type="hidden" id="editAccountId" name="AccountId" />
 
                     <div class="mb-3">
-                        <label class="form-label">Full Name *</label>
+                        <label class="form-label small text-muted fw-bold text-uppercase">Full Name <span class="text-danger">*</span></label>
                         <input id="editAccountName" name="AccountName" class="form-control" required />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Email Address *</label>
-                        <input id="editAccountEmail" name="AccountEmail" type="email" class="form-control" required />
+                        <label class="form-label small text-muted fw-bold text-uppercase">Email Address</label>
+                        <input id="editAccountEmail" name="AccountEmail" type="email" class="form-control bg-light" readonly />
+                        <div class="form-text small"><i class="fas fa-lock me-1"></i>Email cannot be changed for security reasons.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Role *</label>
+                        <label class="form-label small text-muted fw-bold text-uppercase">Role <span class="text-danger">*</span></label>
                         <select id="editAccountRole" name="AccountRole" class="form-select" required>
                             <option value="1">Staff</option>
                             <option value="2">Lecturer</option>
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -340,6 +315,7 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         function editAccount(id, name, email, role) {
+            // Gán giá trị vào các input trong Modal Edit
             document.getElementById('editAccountId').value = id;
             document.getElementById('editAccountName').value = name;
             document.getElementById('editAccountEmail').value = email;
@@ -347,4 +323,3 @@
         }
     </script>
 }
-
