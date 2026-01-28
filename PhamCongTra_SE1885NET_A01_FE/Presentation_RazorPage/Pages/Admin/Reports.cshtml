@@ -15,16 +15,14 @@
                 </div>
                 <div class="d-flex gap-2">
                     <form method="post" asp-page-handler="Export" class="d-inline">
-                        @* <input type="hidden" name="ReportType" value="@Model.ReportType" /> *@
+                        <input type="hidden" name="GroupBy" value="@Model.GroupBy" />
+                        <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
                         <input type="hidden" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
                         <input type="hidden" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-file-excel me-2"></i>Export Excel
                         </button>
                     </form>
-                    <button class="btn btn-outline-secondary" onclick="window.print()">
-                        <i class="fas fa-print me-2"></i>Print
-                    </button>
                 </div>
             </div>
         </div>
@@ -72,6 +70,13 @@
                         <div class="col-md-4">
                             <label class="form-label">End Date</label>
                             <input type="date" name="EndDate" class="form-control" asp-for="EndDate" max="@today" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sort Order</label>
+                            <select name="SortOrder" class="form-select" asp-for="SortOrder">
+                                <option value="desc">Newest First</option>
+                                <option value="asc">Oldest First</option>
+                            </select>
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">
@@ -198,4 +203,62 @@
             </div>
         </div>
     }
+
+    <!-- Article Details -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">Article Details</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.ArticleDetails.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Category</th>
+                                        <th>Created Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var article in Model.ArticleDetails)
+                                    {
+                                        <tr>
+                                            <td>@article.NewsTitle</td>
+                                            <td>@article.CreatedByName</td>
+                                            <td>@article.CategoryName</td>
+                                            <td>@article.CreatedDate?.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                @if (article.NewsStatus == true)
+                                                {
+                                                    <span class="badge bg-success">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Inactive</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Data Available</h5>
+                            <p class="text-muted">No article details found for the selected period.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -8,14 +8,17 @@ namespace Presentation_RazorPage.Pages.Admin
     public class ReportsModel : PageModel
     {
         private readonly IApiService _apiService;
+        private readonly IExcelExportService _excelExportService;
 
-        public ReportsModel(IApiService apiService)
+        public ReportsModel(IApiService apiService, IExcelExportService excelExportService)
         {
             _apiService = apiService;
+            _excelExportService = excelExportService;
         }
 
         public List<CategoryStatisticModel> CategoryStats { get; set; } = new List<CategoryStatisticModel>();
         public List<AuthorStatisticModel> AuthorStats { get; set; } = new List<AuthorStatisticModel>();
+        public List<NewsArticleModel> ArticleDetails { get; set; } = new List<NewsArticleModel>();
 
         public int TotalArticles { get; set; }
         public int TotalActiveArticles { get; set; }
@@ -29,6 +32,9 @@ namespace Presentation_RazorPage.Pages.Admin
 
         [BindProperty(SupportsGet = true)]
         public string GroupBy { get; set; } = "category";
+
+        [BindProperty(SupportsGet = true)]
+        public string SortOrder { get; set; } = "desc";
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -57,6 +63,7 @@ namespace Presentation_RazorPage.Pages.Admin
                 TempData["ErrorMessage"] = $"Error loading report data: {ex.Message}";
                 CategoryStats = new List<CategoryStatisticModel>();
                 AuthorStats = new List<AuthorStatisticModel>();
+                ArticleDetails = new List<NewsArticleModel>();
                 TotalArticles = 0;
                 TotalActiveArticles = 0;
                 TotalInactiveArticles = 0;
@@ -65,8 +72,55 @@ namespace Presentation_RazorPage.Pages.Admin
             return Page();
         }
 
+        public async Task<IActionResult> OnPostExportAsync()
+        {
+            var token = HttpContext.Session.GetString("AuthToken");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            if (string.IsNullOrEmpty(token) || userRole != "Admin")
+            {
+                return RedirectToPage("/Login");
+            }
+
+            _apiService.SetAuthToken(token);
+
+            if (!StartDate.HasValue || !EndDate.HasValue)
+            {
+                EndDate = DateTime.Today;
+                StartDate = DateTime.Today.AddDays(-30);
+            }
+
+            try
+            {
+                await LoadReportDataAsync();
+
+                byte[] excelData;
+                string fileName;
+
+                if (GroupBy.Equals("author", StringComparison.OrdinalIgnoreCase))
+                {
+                    excelData = _excelExportService.ExportAuthorReport(AuthorStats, ArticleDetails, StartDate, EndDate);
+                    fileName = $"Author_Report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                }
+                else
+                {
+                    excelData = _excelExportService.ExportCategoryReport(CategoryStats, ArticleDetails, StartDate, EndDate);
+                    fileName = $"Category_Report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                }
+
+                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error generating Excel export: {ex.Message}";
+                return RedirectToPage(new { GroupBy, StartDate, EndDate, SortOrder });
+            }
+        }
+
         private async Task LoadReportDataAsync()
         {
+            await LoadArticleDetailsAsync();
+
             if (GroupBy.Equals("author", StringComparison.OrdinalIgnoreCase))
             {
                 await LoadAuthorStatsAsync();
@@ -92,6 +146,34 @@ namespace Presentation_RazorPage.Pages.Admin
                 TotalArticles = CategoryStats.Sum(c => c.TotalArticles);
                 TotalActiveArticles = CategoryStats.Sum(c => c.ActiveArticles);
                 TotalInactiveArticles = CategoryStats.Sum(c => c.InactiveArticles);
+            }
+        }
+
+        private async Task LoadArticleDetailsAsync()
+        {
+            try
+            {
+                var queryParts = new List<string>();
+
+                if (StartDate.HasValue)
+                    queryParts.Add($"startDate={StartDate:yyyy-MM-dd}");
+
+                if (EndDate.HasValue)
+                    queryParts.Add($"endDate={EndDate:yyyy-MM-dd}");
+
+                var searchUrl = "/odata/NewsArticlesFunctions/Search?" + string.Join("&", queryParts);
+                var searchResponse = await _apiService.GetAsync<NewsArticleModel>(searchUrl);
+
+                ArticleDetails = searchResponse ?? new List<NewsArticleModel>();
+
+                ArticleDetails = SortOrder == "asc"
+                    ? ArticleDetails.OrderBy(a => a.CreatedDate).ToList()
+                    : ArticleDetails.OrderByDescending(a => a.CreatedDate).ToList();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error loading article details: {ex.Message}";
+                ArticleDetails = new List<NewsArticleModel>();
             }
         }
 
