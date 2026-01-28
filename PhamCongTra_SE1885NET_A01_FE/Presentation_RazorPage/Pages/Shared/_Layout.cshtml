@@ -14,7 +14,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="/News/Active">
+                <a class="navbar-brand fw-bold" href="/News/Index">
                     <i class="fas fa-newspaper me-2"></i>FU News Management
                 </a>
                 
@@ -24,12 +24,6 @@
                 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/News/Active">
-                                <i class="fas fa-home me-1"></i>Active News
-                            </a>
-                        </li>
-                        
                         @if (Context.Session.GetString("AuthToken") != null)
                         {
                             var userRole = Context.Session.GetString("UserRole");
@@ -79,7 +73,7 @@
                             else if (userRole == "2")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/News/Active">
+                                    <a class="nav-link" href="/News/Index">
                                         <i class="fas fa-book-reader me-1"></i>Browse Articles
                                     </a>
                                 </li>
@@ -133,7 +127,7 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="mb-2">
-                        <a href="/News/Active" class="text-light text-decoration-none me-3">Active News</a>
+                        <a href="/News/Index" class="text-light text-decoration-none me-3">Active News</a>
                         <a href="/Privacy" class="text-light text-decoration-none">Privacy</a>
                     </div>
                     <p class="text-light opacity-75 mb-0">&copy; @DateTime.Now.Year FU News Management System</p>

@@ -25,7 +25,7 @@ namespace Presentation_RazorPage.Pages.Staff
             else
             {
                 // Lecturer can only read and search articles
-                return RedirectToPage("/News/Active");
+                return RedirectToPage("/News/Index");
             }
             
         }

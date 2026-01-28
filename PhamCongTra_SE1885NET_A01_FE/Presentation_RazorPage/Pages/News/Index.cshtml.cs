@@ -5,11 +5,11 @@ using BusinessLogic.Services;
 
 namespace Presentation_RazorPage.Pages.News
 {
-    public class ActiveModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly IApiService _apiService;
 
-        public ActiveModel(IApiService apiService)
+        public IndexModel(IApiService apiService)
         {
             _apiService = apiService;
         }
@@ -205,7 +205,7 @@ namespace Presentation_RazorPage.Pages.News
 
             queryParams.Add($"currentPage={page}");
 
-            return "/News/Active" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
+            return "/News/Index" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
         }
 
         public string GetPageSizeUrl(int newPageSize)
@@ -235,7 +235,7 @@ namespace Presentation_RazorPage.Pages.News
 
             queryParams.Add($"pageSize={newPageSize}");
             queryParams.Add("currentPage=1");
-            return "/News/Active" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
+            return "/News/Index" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
         }
     }
 }

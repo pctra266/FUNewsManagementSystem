@@ -45,7 +45,7 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapGet("/", async context =>
 {
-    context.Response.Redirect("/News/Active");
+    context.Response.Redirect("/News/Index");
 });
 
 // Logout endpoint

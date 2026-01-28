@@ -52,7 +52,7 @@ namespace Presentation_RazorPage.Pages
                     // Redirect based on user role according to project requirements
                     return response.Account.AccountRole switch
                     {
-                        _ => RedirectToPage("/News/Active")            // Admin - go to account management
+                        _ => RedirectToPage("/News/Index")            // Admin - go to account management
                     };
                 }
                 else

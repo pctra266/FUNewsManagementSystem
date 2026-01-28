@@ -1,0 +1,407 @@
+﻿@page
+@using System.Text.RegularExpressions
+@model Presentation_RazorPage.Pages.News.IndexModel
+@{
+    ViewData["Title"] = "Active News Articles";
+}
+
+
+<style>
+    /* 1. Background and Overlay Configuration */
+    body {                          
+        font-family: 'Poppins', sans-serif;
+        background: url('@Url.Content("~/image/background.jpg")') no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 0;
+    }
+
+     /* Ensure the image path is correct */
+
+    /* Dark overlay to highlight text */
+    .page-overlay {
+        background: linear-gradient(to bottom, rgba(var(--bs-dark-rgb), 0.7), rgba(var(--bs-dark-rgb), 0.5));
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* 2. Hero Section Styles */
+    .hero-section {
+        padding: 4rem 0 3rem 0;
+        text-align: center;
+        color: white;
+        text-shadow: 0 2px 4px rgba(var(--bs-dark-rgb), 0.5);
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    /* 3. Glassmorphism Styles */
+    .glass-panel {
+        background: rgba(var(--bs-white-rgb), 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px 0 rgba(var(--bs-dark-rgb), 0.15);
+        border: 1px solid rgba(var(--bs-white-rgb), 0.18);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* 4. Article Card Styles */
+    .news-card {
+        border: none;
+        border-radius: 12px;
+        background: var(--bs-white);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        overflow: hidden;
+        height: 100%;
+        position: relative;
+        top: 0;
+    }
+
+        .news-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(var(--bs-dark-rgb), 0.2);
+        }
+
+    .card-category-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(var(--bs-primary-rgb), 0.9);
+        color: var(--bs-white);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .news-title-link {
+        color: var(--bs-dark);
+        text-decoration: none;
+        font-weight: 700;
+        transition: color 0.2s;
+    }
+
+        .news-title-link:hover {
+            color: var(--bs-primary);
+        }
+
+    /* Card decoration when no image */
+    .card-header-decoration {
+        height: 6px;
+        background: linear-gradient(90deg, var(--bs-primary), var(--bs-info));
+        width: 100%;
+    }
+
+    /* Buttons and Form */
+    .btn-primary-custom {
+        background: linear-gradient(45deg, var(--bs-primary), var(--bs-info));
+        border: none;
+        color: var(--bs-white);
+    }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(45deg, var(--bs-primary), var(--bs-secondary));
+            color: var(--bs-white);
+        }
+
+    .pagination .page-link {
+        border-radius: 50%;
+        margin: 0 3px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: var(--bs-body-color);
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        color: var(--bs-white);
+        box-shadow: 0 4px 10px rgba(var(--bs-primary-rgb), 0.4);
+    }
+</style>
+
+<div class="page-overlay">
+    <div class="container">
+
+        <div class="hero-section">
+            <h1 class="hero-title">News Hub</h1>
+            <p class="hero-subtitle">Explore the latest and most featured news of the day</p>
+
+            @if (Model.Pagination.TotalItems > 0)
+            {
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                        <i class="fas fa-newspaper me-2"></i> @Model.Pagination.TotalItems articles currently displayed
+                    </span>
+                </div>
+            }
+        </div>
+
+        <div class="row mb-5 justify-content-center">
+            <div class="col-lg-10">
+                <div class="glass-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-search me-2 text-primary"></i>Search & Filters</h5>
+                        @if (Model.HasFilters)
+                        {
+                            <a href="/News/Index" class="btn btn-outline-danger btn-sm rounded-pill">
+                                <i class="fas fa-times me-1"></i> Clear filters
+                            </a>
+                        }
+                    </div>
+
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="SearchTerm" class="form-label small fw-bold text-muted text-uppercase">Keyword</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input asp-for="SearchTerm" class="form-control border-start-0 bg-light" placeholder="Search title or content..." />
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="CategoryId" class="form-label small fw-bold text-muted text-uppercase">Category</label>
+                            <select asp-for="CategoryId" class="form-select bg-light">
+                                <option value="">All categories</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="AuthorName" class="form-label small fw-bold text-muted text-uppercase">Author</label>
+                            <input asp-for="AuthorName" class="form-control bg-light" placeholder="Author name..." />
+                        </div>
+
+                        <div class="col-12">
+                            <a class="text-decoration-none small fw-bold" data-bs-toggle="collapse" href="#advancedFilters" role="button" aria-expanded="false">
+                                <i class="fas fa-sliders-h me-1"></i> Advanced options (Date & Sort)
+                            </a>
+                            <div class="collapse mt-3" id="advancedFilters">
+                                <div class="row g-3 p-3 bg-light rounded-3">
+                                    <div class="col-md-3">
+                                        <label asp-for="StartDate" class="form-label small">From date</label>
+                                        <input asp-for="StartDate" type="date" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="EndDate" class="form-label small">To date</label>
+                                        <input asp-for="EndDate" type="date" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="SortBy" class="form-label small">Sort by</label>
+                                        <select asp-for="SortBy" class="form-select form-select-sm">
+                                            <option value="date">Publish date</option>
+                                            <option value="title">Title</option>
+                                            <option value="author">Author</option>
+                                            <option value="category">Category</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="SortOrder" class="form-label small">Order</label>
+                                        <select asp-for="SortOrder" class="form-select form-select-sm">
+                                            <option value="desc">Newest</option>
+                                            <option value="asc">Oldest</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center mt-4">
+                            <input type="hidden" name="currentPage" value="1" />
+                            <button type="submit" class="btn btn-primary-custom px-5 py-2 rounded-pill fw-bold shadow">
+                                Apply filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            @if (Model.ActiveArticles.Any())
+            {
+                @foreach (var article in Model.ActiveArticles)
+                {
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card news-card shadow-sm h-100">
+                            <span class="card-category-badge shadow-sm">@article.CategoryName</span>
+
+                            <div class="card-header-decoration"></div>
+
+                            <div class="card-body d-flex flex-column pt-4 px-4 pb-3">
+                                <div class="mb-2 text-muted small">
+                                    <i class="far fa-calendar-alt me-1"></i> @article.CreatedDate?.ToString("dd MMM, yyyy")
+                                </div>
+
+                                <h5 class="card-title mb-3">
+                                    <a href="/News/Details/@article.NewsArticleId" class="news-title-link">
+                                        @article.NewsTitle
+                                    </a>
+                                </h5>
+
+                                <h6 class="card-subtitle mb-3 text-primary small">@article.Headline</h6>
+
+                                <div class="card-text text-muted mb-4 flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
+                                    @if (!string.IsNullOrEmpty(article.NewsContent) && article.NewsContent.Length > 100)
+                                    {
+                                        @(article.NewsContent.Substring(0, 100))
+                                    }
+                                    else
+                                    {
+                                        @article.NewsContent
+                                    }
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-2 text-secondary">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <small class="text-dark fw-bold">@article.CreatedByName</small>
+                                    </div>
+                                    <a href="/News/Details/@article.NewsArticleId" class="btn btn-link text-decoration-none p-0 fw-bold">
+                                        Read more <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="glass-panel text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-newspaper fa-4x text-muted opacity-50"></i>
+                        </div>
+                        <h4 class="text-secondary fw-bold">No articles found</h4>
+                        <p class="text-muted">
+                            @if (Model.HasFilters)
+                            {
+                                <span>Try adjusting your filters or search keywords.</span>
+                            }
+                            else
+                            {
+                                <span>There are currently no news articles.</span>
+                            }
+                        </p>
+                        <div class="mt-4">
+                            <a href="/News/Index" class="btn btn-primary-custom px-4 py-2 rounded-pill">
+                                <i class="fas fa-sync-alt me-2"></i>Reload page
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.Pagination.TotalPages > 1)
+        {
+            <div class="row mt-4 mb-5">
+                <div class="col-12">
+                    <div class="glass-panel py-3 px-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                        <div class="text-muted small mb-3 mb-md-0 fw-bold">
+                            Page @Model.Pagination.CurrentPage / @Model.Pagination.TotalPages
+                            <span class="mx-1">•</span> @Model.Pagination.TotalItems articles
+                        </div>
+
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination mb-0">
+                                <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
+                                    <a class="page-link" href="@Model.GetPageUrl(Model.Pagination.CurrentPage - 1)" aria-label="Previous">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                                    </a>
+                                </li>
+
+                                @foreach (var pageNum in Model.Pagination.GetPageNumbers())
+                                {
+                                    <li class="page-item @(pageNum == Model.Pagination.CurrentPage ? "active" : "")">
+                                        <a class="page-link" href="@Model.GetPageUrl(pageNum)">@pageNum</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
+                                    <a class="page-link" href="@Model.GetPageUrl(Model.Pagination.CurrentPage + 1)" aria-label="Next">
+                                        <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+
+                        <div class="btn-group mt-3 mt-md-0" role="group">
+                            <a href="@Model.GetPageSizeUrl(6)" class="btn btn-sm btn-outline-secondary @(Model.PageSize == 6 ? "active" : "")">6</a>
+                            <a href="@Model.GetPageSizeUrl(9)" class="btn btn-sm btn-outline-secondary @(Model.PageSize == 9 ? "active" : "")">9</a>
+                            <a href="@Model.GetPageSizeUrl(12)" class="btn btn-sm btn-outline-secondary @(Model.PageSize == 12 ? "active" : "")">12</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll when changing pages
+            const paginationLinks = document.querySelectorAll('.pagination a.page-link');
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 100);
+                });
+            });
+
+            // Auto submit when sort changes
+            const sortBySelect = document.getElementById('SortBy');
+            const sortOrderSelect = document.getElementById('SortOrder');
+            const filterForm = document.querySelector('form[method="get"]');
+
+            const submitOnChange = function() {
+                if (filterForm) filterForm.submit();
+            };
+
+            if (sortBySelect) sortBySelect.addEventListener('change', submitOnChange);
+            if (sortOrderSelect) sortOrderSelect.addEventListener('change', submitOnChange);
+
+            // Date handling
+            var today = new Date().toISOString().split('T')[0];
+            const endDateInput = document.getElementById('EndDate');
+            if (endDateInput) endDateInput.setAttribute('max', today);
+
+            const startDateInput = document.getElementById('StartDate');
+            const validateDates = function(event) {
+                const startDate = startDateInput?.value;
+                const endDate = endDateInput?.value;
+                if (startDate && endDate && startDate > endDate) {
+                    alert('Start date must be before end date');
+                    if (event?.target) event.target.value = '';
+                }
+            };
+
+            if (startDateInput) startDateInput.addEventListener('change', validateDates);
+            if (endDateInput) endDateInput.addEventListener('change', validateDates);
+        });
+    </script>
+}
