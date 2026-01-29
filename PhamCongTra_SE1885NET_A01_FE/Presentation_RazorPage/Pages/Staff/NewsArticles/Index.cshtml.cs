@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLogic.Services;
 using DataAccess.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 {
@@ -16,7 +17,17 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
         public List<NewsArticleModel> NewsArticles { get; set; } = new List<NewsArticleModel>();
         public List<CategoryModel> Categories { get; set; } = new List<CategoryModel>();
+        public List<TagModel> Tags { get; set; } = new List<TagModel>();
         public PaginationInfo Pagination { get; set; } = new PaginationInfo();
+
+        [BindProperty]
+        public NewsArticleCreateInput CreateArticle { get; set; } = new NewsArticleCreateInput();
+
+        [BindProperty]
+        public NewsArticleEditInput EditArticle { get; set; } = new NewsArticleEditInput();
+
+        public bool ShowCreateModal { get; set; }
+        public bool ShowEditModal { get; set; }
 
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
@@ -68,16 +79,134 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage("/Index");
             }
 
+            _apiService.SetAuthToken(token);
+
+            await LoadPageDataAsync();
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostCreateAsync()
+        {
+            var token = HttpContext.Session.GetString("AuthToken");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            if (string.IsNullOrEmpty(token) || userRole != "1")
+            {
+                TempData["ErrorMessage"] = "Access denied.";
+                return RedirectToPage();
+            }
+
+            _apiService.SetAuthToken(token);
+
+            ModelState.Clear();
+            if (!TryValidateModel(CreateArticle, nameof(CreateArticle)))
+            {
+                ShowCreateModal = true;
+                await LoadPageDataAsync();
+                return Page();
+            }
+
+            try
+            {
+                var createData = new
+                {
+                    NewsTitle = CreateArticle.NewsTitle,
+                    Headline = CreateArticle.Headline,
+                    NewsContent = CreateArticle.NewsContent,
+                    NewsSource = CreateArticle.NewsSource,
+                    CategoryId = CreateArticle.CategoryId,
+                    NewsStatus = CreateArticle.NewsStatus,
+                    TagIds = CreateArticle.SelectedTagIds
+                };
+
+                var result = await _apiService.PostAsync<object>("/odata/NewsArticles", createData);
+
+                if (result != null)
+                {
+                    TempData["SuccessMessage"] = "Article created successfully!";
+                    return RedirectToPage(GetRedirectRouteValues());
+                }
+
+                ModelState.AddModelError(string.Empty, "Failed to create article. Please try again.");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+            }
+
+            ShowCreateModal = true;
+            await LoadPageDataAsync();
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostEditAsync()
+        {
+            var token = HttpContext.Session.GetString("AuthToken");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            if (string.IsNullOrEmpty(token) || userRole != "1")
+            {
+                TempData["ErrorMessage"] = "Access denied.";
+                return RedirectToPage();
+            }
+
+            _apiService.SetAuthToken(token);
+
+            ModelState.Clear();
+            if (!TryValidateModel(EditArticle, nameof(EditArticle)))
+            {
+                ShowEditModal = true;
+                await LoadPageDataAsync();
+                return Page();
+            }
+
+            try
+            {
+                var updateData = new
+                {
+                    NewsTitle = EditArticle.NewsTitle,
+                    Headline = EditArticle.Headline,
+                    NewsContent = EditArticle.NewsContent,
+                    NewsSource = EditArticle.NewsSource,
+                    CategoryId = EditArticle.CategoryId,
+                    NewsStatus = EditArticle.NewsStatus,
+                    TagIds = EditArticle.SelectedTagIds
+                };
+
+                var result = await _apiService.PutAsync<NewsArticleModel>("/odata/NewsArticles", $"'{EditArticle.NewsArticleId}'", updateData);
+
+                if (result != null)
+                {
+                    TempData["SuccessMessage"] = "Article updated successfully!";
+                    return RedirectToPage(GetRedirectRouteValues());
+                }
+
+                ModelState.AddModelError(string.Empty, "Failed to update article. Please try again.");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+            }
+
+            ShowEditModal = true;
+            await LoadPageDataAsync();
+            return Page();
+        }
+
+        private async Task LoadPageDataAsync()
+        {
             if (CurrentPage < 1) CurrentPage = 1;
             if (PageSize < 1) PageSize = 10;
             if (PageSize > 50) PageSize = 50;
-
-            _apiService.SetAuthToken(token);
 
             try
             {
                 var categoriesResponse = await _apiService.GetAsync<CategoryModel>("/odata/Categories");
                 Categories = categoriesResponse?.Where(c => c.IsActive == true).ToList() ?? new List<CategoryModel>();
+
+                var tagsResponse = await _apiService.GetAsync<TagModel>("/odata/Tags");
+                Tags = tagsResponse ?? new List<TagModel>();
 
                 var query = BuildODataQuery();
                 var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticles{query}");
@@ -114,8 +243,23 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
             {
                 TempData["ErrorMessage"] = $"Error loading articles: {ex.Message}";
             }
+        }
 
-            return Page();
+        private object GetRedirectRouteValues()
+        {
+            return new
+            {
+                searchTerm = SearchTerm,
+                categoryFilter = CategoryFilter,
+                statusFilter = StatusFilter,
+                authorFilter = AuthorFilter,
+                startDate = StartDate?.ToString("yyyy-MM-dd"),
+                endDate = EndDate?.ToString("yyyy-MM-dd"),
+                sortBy = SortBy,
+                sortOrder = SortOrder,
+                currentPage = CurrentPage,
+                pageSize = PageSize
+            };
         }
 
         private string BuildODataQuery()
@@ -334,5 +478,35 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
             return $"/Staff/NewsArticles" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
         }
+    }
+
+    public class NewsArticleCreateInput
+    {
+        [Required(ErrorMessage = "News title is required")]
+        [StringLength(400, ErrorMessage = "News title cannot exceed 400 characters")]
+        public string NewsTitle { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Headline is required")]
+        [StringLength(150, ErrorMessage = "Headline cannot exceed 150 characters")]
+        public string Headline { get; set; } = string.Empty;
+
+        [StringLength(4000, ErrorMessage = "News content cannot exceed 4000 characters")]
+        public string? NewsContent { get; set; }
+
+        [StringLength(400, ErrorMessage = "News source cannot exceed 400 characters")]
+        public string? NewsSource { get; set; }
+
+        [Required(ErrorMessage = "Category is required")]
+        public short CategoryId { get; set; }
+
+        public bool NewsStatus { get; set; } = true;
+
+        public List<int> SelectedTagIds { get; set; } = new List<int>();
+    }
+
+    public class NewsArticleEditInput : NewsArticleCreateInput
+    {
+        [Required(ErrorMessage = "Article ID is required")]
+        public string NewsArticleId { get; set; } = string.Empty;
     }
 }

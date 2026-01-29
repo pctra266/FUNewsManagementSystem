@@ -4,358 +4,508 @@
     ViewData["Title"] = "News Articles Management";
 }
 
-<div class="container-fluid">
-    <!-- Header Section -->
-    <div class="row">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/Staff/Articles">My Articles</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">All News Articles</li>
-                </ol>
-            </nav>
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="h3 mb-0">News Articles Management</h1>
-                    <p class="text-muted">Manage all news articles in the system</p>
-                    @if (Model.Pagination.TotalItems > 0)
-                    {
-                        <small class="text-info">
-                            Showing @Model.Pagination.StartItem - @Model.Pagination.EndItem of @Model.Pagination.TotalItems articles
-                        </small>
-                    }
-                </div>
-                <div>
-                    <a href="/Staff/Articles/Create" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Create New Article
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success/Error Messages -->
+<div class="container-fluid py-4">
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show py-2 small shadow-sm border-0 border-start border-success border-4" role="alert">
             <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
+        <div class="d-flex align-items-center">
+            <h4 class="mb-0 fw-bold text-dark me-3">News Articles</h4>
+            <span class="badge bg-light text-dark border rounded-pill">@Model.Pagination.TotalItems total</span>
         </div>
-    }
-    <!-- Advanced Search and Filters -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0 fw-semibold text-primary">
-                        <i class="fas fa-filter me-2"></i>Advanced Search & Filters
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <form method="get" class="row g-3">
-                        <div class="col-md-6">
-                            <label for="searchTerm" class="form-label">Search Articles</label>
-                            <input type="text" class="form-control" id="searchTerm" name="searchTerm"
-                                   value="@Model.SearchTerm" placeholder="Search by title, content, or headline...">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="authorFilter" class="form-label">Author</label>
-                            <input type="text" class="form-control" id="authorFilter" name="authorFilter"
-                                   value="@Model.AuthorFilter" placeholder="Search by author name...">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="categoryFilter" class="form-label">Category</label>
-                            <select class="form-select" id="categoryFilter" name="categoryFilter">
-                                <option value="">All Categories</option>
-                                @foreach (var category in Model.Categories)
-                                {
-                                    <option value="@category.CategoryId"
-                                            selected="@(Model.CategoryFilter == category.CategoryId)">
-                                        @category.CategoryName
-                                    </option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="statusFilter" class="form-label">Status</label>
-                            <select class="form-select" id="statusFilter" name="statusFilter">
-                                <option value="">All Status</option>
-                                <option value="true" selected="@(Model.StatusFilter == true)">Active</option>
-                                <option value="false" selected="@(Model.StatusFilter == false)">Draft</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="startDate" name="startDate"
-                                   value="@(Model.StartDate?.ToString("yyyy-MM-dd"))">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="endDate" class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="endDate" name="endDate"
-                                   value="@(Model.EndDate?.ToString("yyyy-MM-dd"))">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="sortBy" class="form-label">Sort By</label>
-                            <select class="form-select" id="sortBy" name="sortBy">
-                                <option value="CreatedDate" selected="@(Model.SortBy == "CreatedDate")">Created Date</option>
-                                <option value="NewsTitle" selected="@(Model.SortBy == "NewsTitle")">Title</option>
-                                <option value="CategoryName" selected="@(Model.SortBy == "CategoryName")">Category</option>
-                                <option value="AuthorName" selected="@(Model.SortBy == "AuthorName")">Author</option>
-                                <option value="NewsStatus" selected="@(Model.SortBy == "NewsStatus")">Status</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="sortOrder" class="form-label">Order</label>
-                            <select class="form-select" id="sortOrder" name="sortOrder">
-                                <option value="desc" selected="@(Model.SortOrder == "desc")">Descending</option>
-                                <option value="asc" selected="@(Model.SortOrder == "asc")">Ascending</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-search me-2"></i>Apply Filters
-                            </button>
-                        </div>
-                    </form>
 
-                    @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.CategoryFilter.HasValue || Model.StatusFilter.HasValue || !string.IsNullOrEmpty(Model.AuthorFilter) || Model.StartDate.HasValue || Model.EndDate.HasValue)
-                    {
-                        <div class="mt-3">
-                            <a href="/Staff/NewsArticles" class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-times me-2"></i>Clear All Filters
-                            </a>
-                        </div>
-                    }
+        <div class="d-flex gap-2 align-items-center">
+            <form method="get" class="d-flex">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" name="searchTerm"
+                           value="@Model.SearchTerm" placeholder="Search title, content...">
                 </div>
-            </div>
+            </form>
+
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters">
+                <i class="fas fa-filter me-1"></i> Filters
+            </button>
+
+            <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal">
+                <i class="fas fa-plus me-1"></i> New Article
+            </button>
         </div>
     </div>
 
-    <!-- Articles Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0 fw-semibold text-primary">Articles (@Model.NewsArticles.Count)</h6>
+    <div class="collapse mb-3" id="advancedFilters">
+        <div class="card card-body bg-light border-0 shadow-sm">
+            <form method="get" class="row g-2">
+                <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
+
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Category</label>
+                    <select class="form-select form-select-sm" name="categoryFilter">
+                        <option value="">All Categories</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.CategoryId" selected="@(Model.CategoryFilter == category.CategoryId)">@category.CategoryName</option>
+                        }
+                    </select>
                 </div>
-                <div class="card-body">
-                    @if (Model.NewsArticles.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Author</th>
-                                        <th>Category</th>
-                                        <th>Tags</th>
-                                        <th>Status</th>
-                                        <th>Created Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var article in Model.NewsArticles.OrderBy(a => a.NewsArticleId))
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <strong>@article.NewsTitle</strong>
-                                                    @if (!string.IsNullOrEmpty(article.Headline))
-                                                    {
-                                                        <br>
-                                                        <small class="text-muted">@article.Headline</small>
-                                                    }
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Status</label>
+                    <select class="form-select form-select-sm" name="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="true" selected="@(Model.StatusFilter == true)">Active</option>
+                        <option value="false" selected="@(Model.StatusFilter == false)">Draft</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Author</label>
+                    <input type="text" class="form-control form-control-sm" name="authorFilter" value="@Model.AuthorFilter" placeholder="Author name...">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">From Date</label>
+                    <input type="date" class="form-control form-control-sm" name="startDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">To Date</label>
+                    <input type="date" class="form-control form-control-sm" name="endDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-sm btn-dark w-100 me-1">Apply</button>
+                    <a href="/Staff/NewsArticles" class="btn btn-sm btn-outline-secondary" title="Clear"><i class="fas fa-times"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            @if (Model.NewsArticles.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-secondary">
+                            <tr class="small text-uppercase">
+                                <th class="ps-4" style="width: 35%;">Article Info</th>
+                                <th style="width: 15%;">Category & Tags</th>
+                                <th style="width: 20%;">Author & Date</th>
+                                <th class="text-center" style="width: 10%;">Status</th>
+                                <th class="text-end pe-4" style="width: 20%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var article in Model.NewsArticles.OrderByDescending(a => a.CreatedDate))
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark mb-1">
+                                            @if (!string.IsNullOrEmpty(article.Headline))
+                                            {
+                                                <i class="fas fa-quote-left text-muted me-1 small" style="font-size: 0.7rem;"></i>
+                                            }
+                                            @article.NewsTitle
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(article.Headline))
+                                        {
+                                            <div class="text-muted small text-truncate" style="max-width: 350px;">
+                                                @article.Headline
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="mb-1">
+                                            <span class="badge bg-light text-dark border">@article.CategoryName</span>
+                                        </div>
+                                        <div>
+                                            @if (article.Tags != null && article.Tags.Any())
+                                            {
+                                                @foreach (var tag in article.Tags.Take(2))
+                                                {
+                                                    <span class="badge bg-white text-secondary border me-1" style="font-weight: normal;">#@tag.TagName</span>
+                                                }
+                                                @if (article.Tags.Count > 2)
+                                                {
+                                                    <span class="text-muted small" style="font-size: 0.75rem;">+@(article.Tags.Count - 2)</span>
+                                                }
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-placeholder bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary me-2" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-user small"></i>
+                                            </div>
+                                            <div>
+                                                <div class="small fw-bold text-dark">@article.CreatedByName</div>
+                                                <div class="small text-muted" style="font-size: 0.75rem;">
+                                                    @article.CreatedDate?.ToString("MMM dd, yyyy")
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span class="text-muted">@article.CreatedByName</span>
-                                                @if (article.UpdatedById.HasValue && article.ModifiedDate.HasValue)
-                                                {
-                                                    <br>
-                                                    <small class="text-info" title="Last updated by User ID @article.UpdatedById">
-                                                        Updated on @article.ModifiedDate?.ToString("MMM dd, yyyy")
-                                                    </small>
-                                                }
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-secondary">@article.CategoryName</span>
-                                            </td>
-                                            <td>
-                                                @if (article.Tags != null && article.Tags.Any())
-                                                {
-                                                    @foreach (var tag in article.Tags.Take(3))
-                                                    {
-                                                        <span class="badge bg-info text-dark me-1 mb-1">
-                                                            <i class="fas fa-tag me-1"></i>@tag.TagName
-                                                        </span>
-                                                    }
-                                                    @if (article.Tags.Count > 3)
-                                                    {
-                                                        <span class="badge bg-light text-dark">+@(article.Tags.Count - 3)</span>
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    <small class="text-muted">No tags</small>
-                                                }
-                                            </td>
-                                            <td>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (article.NewsStatus == true)
+                                        {
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-3">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning rounded-pill px-3">Draft</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group btn-group-sm shadow-sm" role="group">
+                                            <button type="button" class="btn btn-white border text-primary" title="Edit article"
+                                                    data-bs-toggle="modal" data-bs-target="#editArticleModal"
+                                                    data-article-id="@article.NewsArticleId"
+                                                    data-title="@System.Net.WebUtility.HtmlEncode(article.NewsTitle ?? "")"
+                                                    data-headline="@System.Net.WebUtility.HtmlEncode(article.Headline ?? "")"
+                                                    data-content="@System.Net.WebUtility.HtmlEncode(article.NewsContent ?? "")"
+                                                    data-source="@System.Net.WebUtility.HtmlEncode(article.NewsSource ?? "")"
+                                                    data-category-id="@article.CategoryId"
+                                                    data-status="@(article.NewsStatus == true ? "true" : "false")"
+                                                    data-tag-ids="@string.Join(",", article.Tags?.Select(t => t.TagId) ?? new List<int>())">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+
+                                            <button type="button" class="btn btn-white border text-secondary" title="Duplicate Draft" onclick="duplicateArticle('@article.NewsArticleId')">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+
+                                            <form method="post" class="d-inline" asp-page-handler="ToggleStatus"
+                                                  asp-route-articleId="@article.NewsArticleId" asp-route-currentStatus="@(article.NewsStatus ?? false)">
                                                 @if (article.NewsStatus == true)
                                                 {
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check-circle me-1"></i>Active
-                                                    </span>
+                                                    <button type="submit" class="btn btn-white border text-warning" title="Unpublish" onclick="return confirm('Unpublish this article?')" style="border-left: 0 !important;">
+                                                        <i class="fas fa-eye-slash"></i>
+                                                    </button>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-warning">
-                                                        <i class="fas fa-edit me-1"></i>Draft
-                                                    </span>
-                                                }
-                                            </td>
-                                            <td>
-                                                <span class="text-muted">@article.CreatedDate?.ToString("MMM dd, yyyy")</span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="/News/Details/@article.NewsArticleId"
-                                                       class="btn btn-sm btn-outline-info" title="View">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="/Staff/Articles/Edit/@article.NewsArticleId"
-                                                       class="btn btn-sm btn-outline-primary" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-outline-success"
-                                                            title="Duplicate" onclick="duplicateArticle('@article.NewsArticleId')">
-                                                        <i class="fas fa-copy"></i>
+                                                    <button type="submit" class="btn btn-white border text-success" title="Publish" onclick="return confirm('Publish this article?')" style="border-left: 0 !important;">
+                                                        <i class="fas fa-upload"></i>
                                                     </button>
-                                                    <form method="post" class="d-inline" asp-page-handler="ToggleStatus"
-                                                          asp-route-articleId="@article.NewsArticleId"
-                                                          asp-route-currentStatus="@(article.NewsStatus ?? false)">
-                                                        <button type="submit" class="btn btn-sm btn-outline-secondary"
-                                                                title="@(article.NewsStatus == true ? "Unpublish" : "Publish")"
-                                                                onclick="return confirm('@(article.NewsStatus == true ? "Unpublish this article?" : "Publish this article?")')">
-                                                            <i class="fas fa-@(article.NewsStatus == true ? "eye-slash" : "upload")"></i>
-                                                        </button>
-                                                    </form>
-                                                    <form method="post" class="d-inline" asp-page-handler="Delete"
-                                                          asp-route-articleId="@article.NewsArticleId">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                                title="Delete"
-                                                                onclick="return confirm('Are you sure you want to delete this article? This will also remove all related tags.')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                                }
+                                            </form>
 
-                        <!-- Pagination -->
-                        @if (Model.Pagination.TotalPages > 1)
-                        {
-                            <nav aria-label="Articles pagination" class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    <!-- Previous Button -->
-                                    <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
-                                        @if (Model.Pagination.HasPreviousPage)
-                                        {
-                                            <a class="page-link" href="@Model.GetPageUrl(Model.Pagination.CurrentPage - 1)">
-                                                <span aria-hidden="true">&laquo;</span> Previous
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <span class="page-link">
-                                                <span aria-hidden="true">&laquo;</span> Previous
-                                            </span>
-                                        }
+                                            <form method="post" class="d-inline" asp-page-handler="Delete" asp-route-articleId="@article.NewsArticleId">
+                                                <button type="submit" class="btn btn-white border text-danger" title="Delete"
+                                                        onclick="return confirm('Are you sure? This removes all tags too.')"
+                                                        style="border-left: 0 !important;">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.Pagination.TotalPages > 1)
+                {
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-light border-top">
+                        <small class="text-muted">Page @Model.Pagination.CurrentPage of @Model.Pagination.TotalPages</small>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
+                                    <a class="page-link border-0 bg-transparent" href="@Model.GetPageUrl(Model.Pagination.CurrentPage - 1)">Previous</a>
+                                </li>
+                                @foreach (var pageNum in Model.Pagination.GetPageNumbers())
+                                {
+                                    <li class="page-item @(pageNum == Model.Pagination.CurrentPage ? "active" : "")">
+                                        <a class="page-link border rounded-circle mx-1 text-center" style="width: 30px; height: 30px; line-height: 15px;"
+                                           href="@Model.GetPageUrl(pageNum)">@pageNum</a>
                                     </li>
-
-                                    <!-- Page Numbers -->
-                                    @foreach (var pageNum in Model.Pagination.GetPageNumbers())
-                                    {
-                                        <li class="page-item @(pageNum == Model.Pagination.CurrentPage ? "active" : "")">
-                                            @if (pageNum == Model.Pagination.CurrentPage)
-                                            {
-                                                <span class="page-link">@pageNum</span>
-                                            }
-                                            else
-                                            {
-                                                <a class="page-link" href="@Model.GetPageUrl(pageNum)">@pageNum</a>
-                                            }
-                                        </li>
-                                    }
-
-                                    <!-- Next Button -->
-                                    <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
-                                        @if (Model.Pagination.HasNextPage)
-                                        {
-                                            <a class="page-link" href="@Model.GetPageUrl(Model.Pagination.CurrentPage + 1)">
-                                                Next <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <span class="page-link">
-                                                Next <span aria-hidden="true">&raquo;</span>
-                                            </span>
-                                        }
-                                    </li>
-                                </ul>
-                            </nav>
-
-                            <!-- Pagination Info -->
-                            <div class="text-center mt-3">
-                                <small class="text-muted">
-                                    Page @Model.Pagination.CurrentPage of @Model.Pagination.TotalPages
-                                    (@Model.Pagination.TotalItems total articles)
-                                </small>
-                            </div>
-                        }
+                                }
+                                <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
+                                    <a class="page-link border-0 bg-transparent" href="@Model.GetPageUrl(Model.Pagination.CurrentPage + 1)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="text-muted mb-2 opacity-50"><i class="fas fa-newspaper fa-3x"></i></div>
+                    <p class="text-muted mb-3">No articles found matching your criteria.</p>
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.CategoryFilter.HasValue)
+                    {
+                        <a href="/Staff/NewsArticles" class="btn btn-sm btn-outline-primary">Clear Filters</a>
                     }
                     else
                     {
-                        <div class="text-center py-5">
-                            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Articles Found</h5>
-                            <p class="text-muted">
-                                No articles match your search criteria. Try adjusting your filters.
-                            </p>
-                            <div class="mt-3">
-                                <a href="/Staff/NewsArticles" class="btn btn-primary me-2">
-                                    <i class="fas fa-refresh me-2"></i>Clear Filters
-                                </a>
-                                <a href="/Staff/Articles/Create" class="btn btn-success">
-                                    <i class="fas fa-plus me-2"></i>Create New Article
-                                </a>
-                            </div>
-                        </div>
+                        <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal">
+                            <i class="fas fa-plus me-1"></i> Create First Article
+                        </button>
                     }
                 </div>
-            </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createArticleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Create">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Article</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                    <input type="hidden" name="CategoryFilter" value="@Model.CategoryFilter" />
+                    <input type="hidden" name="StatusFilter" value="@Model.StatusFilter" />
+                    <input type="hidden" name="AuthorFilter" value="@Model.AuthorFilter" />
+                    <input type="hidden" name="StartDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="EndDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                    <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+                    <input type="hidden" name="CurrentPage" value="@Model.CurrentPage" />
+                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="CreateArticle.NewsTitle" class="form-label">Article Title *</label>
+                                <input asp-for="CreateArticle.NewsTitle" class="form-control" />
+                                <span asp-validation-for="CreateArticle.NewsTitle" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="CreateArticle.Headline" class="form-label">Headline *</label>
+                                <input asp-for="CreateArticle.Headline" class="form-control" />
+                                <span asp-validation-for="CreateArticle.Headline" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="CreateArticle.NewsContent" class="form-label">Content</label>
+                                <textarea asp-for="CreateArticle.NewsContent" class="form-control" rows="8"></textarea>
+                                <span asp-validation-for="CreateArticle.NewsContent" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="CreateArticle.NewsSource" class="form-label">News Source</label>
+                                <input asp-for="CreateArticle.NewsSource" class="form-control" />
+                                <span asp-validation-for="CreateArticle.NewsSource" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="CreateArticle.CategoryId" class="form-label">Category *</label>
+                                <select asp-for="CreateArticle.CategoryId" class="form-select">
+                                    <option value="">Select Category</option>
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <option value="@category.CategoryId">@category.CategoryName</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CreateArticle.CategoryId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Tags</label>
+                                <div class="border rounded p-2 overflow-auto" style="max-height: 220px;">
+                                    @foreach (var tag in Model.Tags)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="CreateArticle.SelectedTagIds" value="@tag.TagId"
+                                                   id="createTag_@tag.TagId">
+                                            <label class="form-check-label" for="createTag_@tag.TagId">
+                                                @tag.TagName
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Publication Status</label>
+                                <div class="form-check">
+                                    <input asp-for="CreateArticle.NewsStatus" type="checkbox" class="form-check-input" id="createStatus">
+                                    <label class="form-check-label" for="createStatus">Publish immediately</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editArticleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Edit">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Article</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                    <input type="hidden" name="CategoryFilter" value="@Model.CategoryFilter" />
+                    <input type="hidden" name="StatusFilter" value="@Model.StatusFilter" />
+                    <input type="hidden" name="AuthorFilter" value="@Model.AuthorFilter" />
+                    <input type="hidden" name="StartDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="EndDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                    <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+                    <input type="hidden" name="CurrentPage" value="@Model.CurrentPage" />
+                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+
+                    <input asp-for="EditArticle.NewsArticleId" type="hidden" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="EditArticle.NewsTitle" class="form-label">Article Title *</label>
+                                <input asp-for="EditArticle.NewsTitle" class="form-control" />
+                                <span asp-validation-for="EditArticle.NewsTitle" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="EditArticle.Headline" class="form-label">Headline *</label>
+                                <input asp-for="EditArticle.Headline" class="form-control" />
+                                <span asp-validation-for="EditArticle.Headline" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="EditArticle.NewsContent" class="form-label">Content</label>
+                                <textarea asp-for="EditArticle.NewsContent" class="form-control" rows="8"></textarea>
+                                <span asp-validation-for="EditArticle.NewsContent" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="EditArticle.NewsSource" class="form-label">News Source</label>
+                                <input asp-for="EditArticle.NewsSource" class="form-control" />
+                                <span asp-validation-for="EditArticle.NewsSource" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="EditArticle.CategoryId" class="form-label">Category *</label>
+                                <select asp-for="EditArticle.CategoryId" class="form-select">
+                                    <option value="">Select Category</option>
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <option value="@category.CategoryId">@category.CategoryName</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="EditArticle.CategoryId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Tags</label>
+                                <div class="border rounded p-2 overflow-auto" style="max-height: 220px;">
+                                    @foreach (var tag in Model.Tags)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-tag-checkbox" type="checkbox"
+                                                   name="EditArticle.SelectedTagIds" value="@tag.TagId"
+                                                   id="editTag_@tag.TagId">
+                                            <label class="form-check-label" for="editTag_@tag.TagId">
+                                                @tag.TagName
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Publication Status</label>
+                                <div class="form-check">
+                                    <input asp-for="EditArticle.NewsStatus" type="checkbox" class="form-check-input" id="editStatus">
+                                    <label class="form-check-label" for="editStatus">Published</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <style>
+        .btn-white {
+            background-color: #fff;
+            border-color: #dee2e6;
+            color: #495057;
+        }
+
+            .btn-white:hover {
+                background-color: #f8f9fa;
+                border-color: #dee2e6;
+                color: #212529;
+            }
+    </style>
+
+    <partial name="_ValidationScriptsPartial" />
+
     <script>
+        const editArticleModal = document.getElementById('editArticleModal');
+
+        editArticleModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            if (!button) {
+                return;
+            }
+
+            document.getElementById('EditArticle_NewsArticleId').value = button.getAttribute('data-article-id') || '';
+            document.getElementById('EditArticle_NewsTitle').value = button.getAttribute('data-title') || '';
+            document.getElementById('EditArticle_Headline').value = button.getAttribute('data-headline') || '';
+            document.getElementById('EditArticle_NewsContent').value = button.getAttribute('data-content') || '';
+            document.getElementById('EditArticle_NewsSource').value = button.getAttribute('data-source') || '';
+            document.getElementById('EditArticle_CategoryId').value = button.getAttribute('data-category-id') || '';
+            document.getElementById('editStatus').checked = (button.getAttribute('data-status') === 'true');
+
+            const tagIds = (button.getAttribute('data-tag-ids') || '')
+                .split(',')
+                .map(x => x.trim())
+                .filter(x => x.length);
+
+            document.querySelectorAll('.edit-tag-checkbox').forEach(cb => {
+                cb.checked = tagIds.includes(cb.value);
+            });
+        });
+
+        @if (Model.ShowCreateModal)
+        {
+            <text>new bootstrap.Modal(document.getElementById('createArticleModal')).show();</text>
+        }
+
+        @if (Model.ShowEditModal)
+        {
+            <text>new bootstrap.Modal(document.getElementById('editArticleModal')).show();</text>
+        }
+
+        // Keep the exact same logic for duplication
         function duplicateArticle(articleId) {
-            if (confirm('Do you want to create a duplicate of this article? The duplicate will be created as a draft.')) {
+            if (confirm('Create a draft copy of this article?')) {
                 var form = document.createElement('form');
                 form.method = 'post';
                 form.action = '/Staff/NewsArticles?handler=Duplicate';
@@ -374,59 +524,9 @@
                     tokenInput.value = token.value;
                     form.appendChild(tokenInput);
                 }
-
-                @if (!string.IsNullOrEmpty(Model.SearchTerm))
-                {
-                        <text>
-                        var searchInput = document.createElement('input');
-                        searchInput.type = 'hidden';
-                        searchInput.name = 'searchTerm';
-                        searchInput.value = '@Model.SearchTerm';
-                        form.appendChild(searchInput);
-                        </text>
-                }
-
-                @if (Model.CategoryFilter.HasValue)
-                {
-                        <text>
-                        var catInput = document.createElement('input');
-                        catInput.type = 'hidden';
-                        catInput.name = 'categoryFilter';
-                        catInput.value = '@Model.CategoryFilter';
-                        form.appendChild(catInput);
-                        </text>
-                }
-
-                @if (Model.StatusFilter.HasValue)
-                {
-                        <text>
-                        var statusInput = document.createElement('input');
-                        statusInput.type = 'hidden';
-                        statusInput.name = 'statusFilter';
-                        statusInput.value = '@Model.StatusFilter';
-                        form.appendChild(statusInput);
-                        </text>
-                }
-
                 document.body.appendChild(form);
                 form.submit();
             }
         }
-
-        $(document).ready(function() {
-            $('#sortBy, #sortOrder').on('change', function() {
-                $(this).closest('form').submit();
-            });
-
-            $('#startDate, #endDate').on('change', function() {
-                var startDate = $('#startDate').val();
-                var endDate = $('#endDate').val();
-
-                if (startDate && endDate && startDate > endDate) {
-                    alert('Start date must be before end date');
-                    $(this).val('');
-                }
-            });
-        });
     </script>
 }
