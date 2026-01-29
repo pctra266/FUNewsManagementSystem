@@ -9,7 +9,6 @@ using DataAccess.DTOs;
 namespace Presentation_API.Controllers
 {
     [Route("odata/[controller]")]
-    [Authorize(Policy = "AdminOnly")]
     public class SystemAccountsFunctionsController : ODataController
     {
         private readonly IAccountService _accountService;
@@ -20,6 +19,7 @@ namespace Presentation_API.Controllers
         }
 
         [HttpGet("Search")]
+        [Authorize(Policy = "AdminOnly")]
         [EnableQuery]
         public async Task<IActionResult> Search([FromQuery] string? name, [FromQuery] string? email, [FromQuery] int? role)
         {
@@ -62,6 +62,7 @@ namespace Presentation_API.Controllers
         }
 
         [HttpPost("ChangePassword")]
+        [Authorize(Policy = "StaffOnly")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
         {
             if (!ModelState.IsValid)
