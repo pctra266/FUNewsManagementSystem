@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using DataAccess.Models;
 using BussinessLogic.Services;
 using DataAccess.DTOs;
 
 namespace Presentation_API.Controllers
 {
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize]
     public class SystemAccountsController : ODataController
     {
         private readonly IAccountService _accountService;
@@ -19,6 +20,7 @@ namespace Presentation_API.Controllers
             _accountService = accountService;
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [EnableQuery]
         public async Task<IActionResult> Get()
         {
@@ -42,9 +44,20 @@ namespace Presentation_API.Controllers
             }
         }
 
+        [Authorize(Policy = "StaffOnly")]
         [EnableQuery]
         public async Task<IActionResult> Get([FromRoute] short key)
         {
+            if (!TryGetUserId(out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user identification" });
+            }
+
+            if (!IsAdmin() && userId != key)
+            {
+                return Forbid();
+            }
+
             try
             {
                 var account = await _accountService.GetAccountsQueryable()
@@ -72,6 +85,7 @@ namespace Presentation_API.Controllers
             }
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] SystemAccountCreateDto createDto)
         {
@@ -103,6 +117,7 @@ namespace Presentation_API.Controllers
             }
         }
 
+        [Authorize(Policy = "StaffOnly")]
         [HttpPut]
         public async Task<IActionResult> Put([FromRoute] short key, [FromBody] SystemAccountUpdateDto updateDto)
         {
@@ -121,6 +136,17 @@ namespace Presentation_API.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!TryGetUserId(out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user identification" });
+            }
+
+            var isAdmin = IsAdmin();
+            if (!isAdmin && userId != key)
+            {
+                return Forbid();
+            }
+
             try
             {
                 Console.WriteLine($"Looking for account with ID: {key}");
@@ -136,7 +162,7 @@ namespace Presentation_API.Controllers
                 
                 existingAccount.AccountName = updateDto.AccountName;
                 existingAccount.AccountEmail = updateDto.AccountEmail;
-                existingAccount.AccountRole = updateDto.AccountRole;
+                existingAccount.AccountRole = isAdmin ? updateDto.AccountRole : existingAccount.AccountRole;
 
                 Console.WriteLine($"Calling UpdateAccountAsync...");
                 var updatedAccount = await _accountService.UpdateAccountAsync(existingAccount);
@@ -160,6 +186,7 @@ namespace Presentation_API.Controllers
             }
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromRoute] short key)
         {
@@ -183,6 +210,18 @@ namespace Presentation_API.Controllers
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the account", error = ex.Message });
             }
+        }
+
+        private bool TryGetUserId(out short userId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return short.TryParse(userIdClaim, out userId);
+        }
+
+        private bool IsAdmin()
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            return string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

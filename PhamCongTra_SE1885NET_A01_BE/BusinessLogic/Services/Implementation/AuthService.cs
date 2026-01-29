@@ -102,7 +102,7 @@ namespace BussinessLogic.Services
                     new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
                     new Claim(ClaimTypes.Name, account.AccountName ?? ""),
                     new Claim(ClaimTypes.Email, account.AccountEmail ?? ""),
-                    new Claim("role", roleValue)
+                    new Claim(ClaimTypes.Role, roleValue)
                 }),
                 Expires = DateTime.UtcNow.AddHours(24),
                 Issuer = _configuration["Jwt:Issuer"],

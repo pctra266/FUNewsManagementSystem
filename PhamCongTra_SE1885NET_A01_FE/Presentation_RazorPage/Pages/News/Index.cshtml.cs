@@ -7,6 +7,7 @@ namespace Presentation_RazorPage.Pages.News
 {
     public class IndexModel : PageModel
     {
+        private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags";
         private readonly IApiService _apiService;
 
         public IndexModel(IApiService apiService)
@@ -73,6 +74,8 @@ namespace Presentation_RazorPage.Pages.News
                     .Where(a => a.NewsStatus == true)
                     .ToList();
 
+                HydrateArticles(activeArticles);
+
                 var sortedArticles = SortResults(activeArticles);
                 var totalItems = sortedArticles.Count;
                 var totalPages = (int)Math.Ceiling((double)totalItems / PageSize);
@@ -121,12 +124,12 @@ namespace Presentation_RazorPage.Pages.News
         {
             if (HasFilters)
             {
-                var searchUrl = "/odata/NewsArticlesFunctions/Search?" + BuildSearchQuery();
+                var searchUrl = $"/odata/NewsArticlesFunctions/Search?{BuildSearchQuery()}&{ExpandClause}";
                 var searchResponse = await _apiService.GetAsync<NewsArticleModel>(searchUrl);
                 return searchResponse ?? new List<NewsArticleModel>();
             }
 
-            var articlesResponse = await _apiService.GetAsync<NewsArticleModel>("/odata/NewsArticlesFunctions/Active");
+            var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/Active?{ExpandClause}");
             return articlesResponse ?? new List<NewsArticleModel>();
         }
 
@@ -236,6 +239,14 @@ namespace Presentation_RazorPage.Pages.News
             queryParams.Add($"pageSize={newPageSize}");
             queryParams.Add("currentPage=1");
             return "/News/Index" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
+        }
+
+        private static void HydrateArticles(IEnumerable<NewsArticleModel> articles)
+        {
+            foreach (var article in articles)
+            {
+                article.HydrateMetadata();
+            }
         }
     }
 }

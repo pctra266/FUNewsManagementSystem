@@ -7,6 +7,7 @@ namespace Presentation_RazorPage.Pages.News
 {
     public class DetailsModel : PageModel
     {
+        private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags";
         private readonly IApiService _apiService;
 
         public DetailsModel(IApiService apiService)
@@ -27,45 +28,45 @@ namespace Presentation_RazorPage.Pages.News
 
             try
             {
-                // Get the article (no authentication needed for active articles)
-                Article = await _apiService.GetByIdAsync<NewsArticleModel>("/odata/NewsArticles", $"'{id}'");
-                
+                Article = await _apiService.GetByIdAsync<NewsArticleModel>("/odata/NewsArticles", $"'{id}'", $"?{ExpandClause}");
+
                 if (Article == null)
                 {
                     return NotFound();
                 }
 
-                // Only show active articles to public
+                Article.HydrateMetadata();
+
                 if (Article.NewsStatus != true)
                 {
-                    // Check if user is logged in and has permission to view drafts
                     var token = HttpContext.Session.GetString("AuthToken");
                     var userRole = HttpContext.Session.GetString("UserRole");
                     var userId = HttpContext.Session.GetInt32("UserId");
-                    
-                    if (string.IsNullOrEmpty(token) || 
+
+                    if (string.IsNullOrEmpty(token) ||
                         (userRole != "Admin" && Article.CreatedById != userId))
                     {
                         return NotFound();
                     }
                 }
 
-                // Get related articles
                 try
                 {
-                    var relatedResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/Related?articleId={id}&limit=3");
+                    var relatedResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/Related?articleId={id}&limit=3&{ExpandClause}");
                     RelatedArticles = relatedResponse ?? new List<NewsArticleModel>();
+                    HydrateArticles(RelatedArticles);
                 }
                 catch
                 {
-                    // Fallback to same category articles
                     if (Article.CategoryId.HasValue)
                     {
-                        var sameCategoryResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/ByCategory?categoryId={Article.CategoryId}");
+                        var sameCategoryResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/ByCategory?categoryId={Article.CategoryId}&{ExpandClause}");
                         SameCategoryArticles = sameCategoryResponse?
                             .Where(a => a.NewsArticleId != id && a.NewsStatus == true)
                             .Take(3)
                             .ToList() ?? new List<NewsArticleModel>();
+
+                        HydrateArticles(SameCategoryArticles);
                     }
                 }
             }
@@ -75,6 +76,14 @@ namespace Presentation_RazorPage.Pages.News
             }
 
             return Page();
+        }
+
+        private static void HydrateArticles(IEnumerable<NewsArticleModel> articles)
+        {
+            foreach (var article in articles)
+            {
+                article.HydrateMetadata();
+            }
         }
     }
 }

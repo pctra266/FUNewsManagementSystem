@@ -36,6 +36,8 @@ namespace Presentation_RazorPage.Pages.Admin
         [BindProperty(SupportsGet = true)]
         public string SortOrder { get; set; } = "desc";
 
+        private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName)";
+
         public async Task<IActionResult> OnGetAsync()
         {
             var token = HttpContext.Session.GetString("AuthToken");
@@ -161,10 +163,15 @@ namespace Presentation_RazorPage.Pages.Admin
                 if (EndDate.HasValue)
                     queryParts.Add($"endDate={EndDate:yyyy-MM-dd}");
 
-                var searchUrl = "/odata/NewsArticlesFunctions/Search?" + string.Join("&", queryParts);
+                var query = string.Join("&", queryParts);
+                var searchUrl = $"/odata/NewsArticlesFunctions/Search?{query}{(string.IsNullOrEmpty(query) ? string.Empty : "&")}{ExpandClause}";
                 var searchResponse = await _apiService.GetAsync<NewsArticleModel>(searchUrl);
 
-                ArticleDetails = searchResponse ?? new List<NewsArticleModel>();
+                ArticleDetails = (searchResponse ?? new List<NewsArticleModel>());
+                foreach (var article in ArticleDetails)
+                {
+                    article.HydrateMetadata();
+                }
 
                 ArticleDetails = SortOrder == "asc"
                     ? ArticleDetails.OrderBy(a => a.CreatedDate).ToList()
