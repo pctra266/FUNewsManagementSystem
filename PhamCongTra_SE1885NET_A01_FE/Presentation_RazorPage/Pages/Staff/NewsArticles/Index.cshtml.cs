@@ -214,6 +214,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 if (articlesResponse != null)
                 {
                     var allFilteredArticles = articlesResponse.ToList();
+                    HydrateArticles(allFilteredArticles);
 
                     TotalArticles = allFilteredArticles.Count;
                     ActiveArticles = allFilteredArticles.Count(a => a.NewsStatus == true);
@@ -477,6 +478,14 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
             queryParams.Add($"currentPage={pageNumber}");
 
             return $"/Staff/NewsArticles" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
+        }
+
+        private static void HydrateArticles(IEnumerable<NewsArticleModel> articles)
+        {
+            foreach (var article in articles)
+            {
+                article.HydrateMetadata();
+            }
         }
     }
 

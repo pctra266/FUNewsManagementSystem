@@ -19,7 +19,7 @@ namespace Presentation_API.Controllers
         }
 
         [HttpGet("Active")]
-        [EnableQuery(PageSize = 20, MaxTop = 50)] // Giới hạn 7 items per page
+        [EnableQuery(PageSize = 99, MaxTop = 50)] // Giới hạn 7 items per page
         [AllowAnonymous]
         public async Task<IActionResult> GetActive()
         {

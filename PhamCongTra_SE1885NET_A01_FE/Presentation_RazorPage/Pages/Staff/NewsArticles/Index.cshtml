@@ -457,11 +457,32 @@
             color: #495057;
         }
 
-            .btn-white:hover {
-                background-color: #f8f9fa;
-                border-color: #dee2e6;
-                color: #212529;
-            }
+        .btn-white:hover {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #212529;
+        }
+
+        #createArticleModal .modal-content,
+        #editArticleModal .modal-content {
+            max-height: calc(100vh - 2rem);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #createArticleModal .modal-body,
+        #editArticleModal .modal-body {
+            overflow-y: auto;
+        }
+
+        #createArticleModal .modal-footer,
+        #editArticleModal .modal-footer {
+            position: sticky;
+            bottom: 0;
+            background-color: #fff;
+            border-top: 1px solid #dee2e6;
+            z-index: 1;
+        }
     </style>
 
     <partial name="_ValidationScriptsPartial" />
