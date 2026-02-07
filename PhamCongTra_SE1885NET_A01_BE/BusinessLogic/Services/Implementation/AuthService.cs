@@ -19,7 +19,7 @@ namespace BussinessLogic.Services
             _configuration = configuration;
         }
 
-        public async Task<string?> AuthenticateAsync(string email, string password)
+        public async Task<(string AccessToken, string RefreshToken)?> AuthenticateAsync(string email, string password)
         {
             SystemAccount? account = null;
 
@@ -28,6 +28,11 @@ namespace BussinessLogic.Services
             if (adminAccount != null && adminAccount.AccountEmail == email && adminAccount.AccountPassword == password)
             {
                 account = adminAccount;
+                // Admin doesn't use DB, so we can't save refresh token easily unless we treat it specially
+                // For this requirement, let's just return tokens without saving for Admin
+                // OR we can't support Refresh Token for statically configured Admin.
+                // Decision: Generate but don't save for Admin (meaning Admin refresh might fail if we require DB check).
+                // Better: Only support Refresh Token for DB users.
             }
             else
             {
@@ -41,7 +46,20 @@ namespace BussinessLogic.Services
                 return null;
             }
 
-            return GenerateJwtToken(account);
+            var accessToken = GenerateJwtToken(account);
+            var refreshToken = GenerateRefreshToken();
+
+            // Save Refresh Token to DB if it's a regular user
+            if (account.AccountId != 0) // Not Admin
+            {
+                account.RefreshToken = refreshToken;
+                account.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // 7 days validity
+                
+                _unitOfWork.AccountRepository.Update(account);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            return (accessToken, refreshToken);
         }
 
         public async Task<SystemAccount?> ValidateTokenAsync(string token)
@@ -159,6 +177,47 @@ namespace BussinessLogic.Services
             {
                 return null;
             }
+        }
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        public async Task<(string AccessToken, string RefreshToken)?> RefreshTokenAsync(string accessToken, string refreshToken)
+        {
+            var principal = await ValidateJwtTokenAsync(accessToken);
+            if (principal == null)
+            {
+                return null;
+            }
+
+            var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
+
+            var account = await _unitOfWork.AccountRepository.FindSingleAsync(a => a.AccountEmail == email);
+            if (account == null || account.RefreshToken != refreshToken || account.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return null;
+            }
+
+            var newAccessToken = GenerateJwtToken(account);
+            var newRefreshToken = GenerateRefreshToken();
+
+            account.RefreshToken = newRefreshToken;
+            account.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Renew for another 7 days
+
+            _unitOfWork.AccountRepository.Update(account);
+            await _unitOfWork.SaveChangesAsync();
+
+            return (newAccessToken, newRefreshToken);
         }
     }
 }

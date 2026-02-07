@@ -5,8 +5,8 @@ namespace BussinessLogic.Services
     public interface IReportService
     {
         Task<object> GetArticleStatisticsByPeriodAsync(DateTime startDate, DateTime endDate);
-        Task<object> GetArticleStatisticsByCategoryAsync(DateTime? startDate = null, DateTime? endDate = null);
-        Task<object> GetArticleStatisticsByAuthorAsync(DateTime? startDate = null, DateTime? endDate = null);
+        Task<object> GetArticleStatisticsByCategoryAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null);
+        Task<object> GetArticleStatisticsByAuthorAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null);
         Task<object> GetArticleStatisticsByStatusAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task<object> GetCategoryUsageStatisticsAsync();
         Task<object> GetDashboardStatisticsAsync();
@@ -14,5 +14,6 @@ namespace BussinessLogic.Services
         Task<object> GetTopAuthorsAsync(int limit = 10);
         Task<object> GetTopCategoriesAsync(int limit = 10);
         Task<object> GetTagUsageStatisticsAsync();
+        Task<byte[]> ExportToExcelAsync(DateTime? startDate = null, DateTime? endDate = null);
     }
 }

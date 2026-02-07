@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using DataAccess.Models;
 using BussinessLogic.Services;
 using DataAccess.DTOs;
+using Microsoft.AspNetCore.SignalR;
+using Presentation_API.Hubs;
 
 namespace Presentation_API.Controllers
 {
@@ -13,10 +15,17 @@ namespace Presentation_API.Controllers
     public class NewsArticlesController : ODataController
     {
         private readonly INewsArticleService _newsArticleService;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly INotificationService _notificationService;
 
-        public NewsArticlesController(INewsArticleService newsArticleService)
+        public NewsArticlesController(
+            INewsArticleService newsArticleService,
+            IHubContext<NotificationHub> hubContext,
+            INotificationService notificationService)
         {
             _newsArticleService = newsArticleService;
+            _hubContext = hubContext;
+            _notificationService = notificationService;
         }
 
         [EnableQuery]
@@ -53,6 +62,22 @@ namespace Presentation_API.Controllers
             }
         }
 
+        [HttpGet("Recommend/{key}")]
+        [EnableQuery]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetRecommended([FromRoute] string key)
+        {
+            try
+            {
+                var articles = await _newsArticleService.GetRecommendedArticlesAsync(key);
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving recommended articles", error = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] NewsArticleCreateDto createDto)
         {
@@ -83,6 +108,14 @@ namespace Presentation_API.Controllers
                 };
 
                 var createdArticle = await _newsArticleService.CreateNewsArticleAsync(article, createDto.TagIds);
+                
+                // Send real-time notification via SignalR
+                var notificationMessage = $"📰 New article published: {createdArticle.NewsTitle}";
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", notificationMessage);
+                
+                // Store notification in service
+                _notificationService.AddNotification(notificationMessage);
+                
                 return Created($"/odata/NewsArticles('{createdArticle.NewsArticleId}')", createdArticle);
             }
             catch (Exception ex)
@@ -139,7 +172,15 @@ namespace Presentation_API.Controllers
         {
             try
             {
-                var success = await _newsArticleService.DeleteNewsArticleAsync(key);
+                // Get current user ID for audit log
+                short? userId = null;
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (short.TryParse(userIdClaim, out short parsedId))
+                {
+                    userId = parsedId;
+                }
+
+                var success = await _newsArticleService.DeleteNewsArticleAsync(key, userId);
                 if (!success)
                 {
                     return NotFound(new { message = $"News article with ID {key} not found" });
@@ -150,6 +191,46 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the news article", error = ex.Message });
+            }
+        }
+        [HttpPost("/api/NewsArticles/upload-image")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            // 5MB limit
+            const long maxFileSize = 5 * 1024 * 1024;
+            if (file.Length > maxFileSize)
+                return BadRequest("File size exceeds 5MB limit.");
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(extension))
+                return BadRequest("Invalid file type. Only .jpg, .jpeg, .png, .gif are allowed.");
+
+            try
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + extension;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+                var fileUrl = $"{baseUrl}/uploads/{uniqueFileName}";
+
+                return Ok(new { url = fileUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while uploading the image", error = ex.Message });
             }
         }
     }

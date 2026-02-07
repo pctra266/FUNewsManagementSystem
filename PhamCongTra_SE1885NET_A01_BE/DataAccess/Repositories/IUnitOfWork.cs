@@ -7,7 +7,8 @@ namespace DataAccess.Repositories
         IRepository<SystemAccount> AccountRepository { get; }
         IRepository<Category> CategoryRepository { get; }
         IRepository<NewsArticle> NewsArticleRepository { get; }
-        IRepository<Tag> TagRepository { get; }
+        ITagRepository TagRepository { get; }
+        IRepository<AuditLog> AuditLogRepository { get; }
         
         Task<int> SaveChangesAsync();
         Task BeginTransactionAsync();

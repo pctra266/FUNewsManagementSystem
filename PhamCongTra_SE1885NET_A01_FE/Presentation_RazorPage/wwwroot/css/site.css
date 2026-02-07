@@ -8,7 +8,67 @@ html {
     }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+/* Notification Bell Styles */
+#notificationBell {
+    position: relative;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+#notificationBell:hover {
+    color: #ffc107 !important;
+}
+
+#notificationCount {
+    font-size: 0.65rem;
+    padding: 0.25em 0.4em;
+    min-width: 1.5em;
+}
+
+#notificationList .dropdown-item {
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#notificationList .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#notificationList .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+#notificationList .dropdown-header {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Global Loading Indicator */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+}
+
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+}

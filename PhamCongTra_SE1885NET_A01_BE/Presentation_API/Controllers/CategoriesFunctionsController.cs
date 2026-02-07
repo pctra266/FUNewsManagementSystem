@@ -8,7 +8,7 @@ using DataAccess.DTOs;
 
 namespace Presentation_API.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     public class CategoriesFunctionsController : ODataController
     {
         private readonly ICategoryService _categoryService;

@@ -38,7 +38,7 @@ namespace Presentation_RazorPage.Pages.Staff
                     return RedirectToPage("/Login");
                 }
 
-                _apiService.SetAuthToken(token);
+                //_apiService.SetAuthToken(token);
 
                 await LoadCategoriesAsync();
 
@@ -98,7 +98,7 @@ namespace Presentation_RazorPage.Pages.Staff
                 try
                 {
                     var token = HttpContext.Session.GetString("AuthToken");
-                    _apiService.SetAuthToken(token!);
+                    //_apiService.SetAuthToken(token!);
 
                     var result = await _apiService.PostAsync<CategoryModel>("/odata/Categories", new
                     {
@@ -129,7 +129,7 @@ namespace Presentation_RazorPage.Pages.Staff
             public async Task<IActionResult> OnPostDeleteAsync(short id)
             {
                 var token = HttpContext.Session.GetString("AuthToken");
-                _apiService.SetAuthToken(token!);
+                //_apiService.SetAuthToken(token!);
 
                 try
                 {
@@ -154,7 +154,7 @@ namespace Presentation_RazorPage.Pages.Staff
             public async Task<IActionResult> OnPostToggleStatusAsync(short id, bool currentStatus)
             {
                 var token = HttpContext.Session.GetString("AuthToken");
-                _apiService.SetAuthToken(token!);
+                //_apiService.SetAuthToken(token!);
 
                 try
                 {
@@ -198,7 +198,7 @@ namespace Presentation_RazorPage.Pages.Staff
                 }
 
                 var token = HttpContext.Session.GetString("AuthToken");
-                _apiService.SetAuthToken(token!);
+                //_apiService.SetAuthToken(token!);
 
                 try
                 {

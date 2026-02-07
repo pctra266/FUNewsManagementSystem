@@ -1,30 +1,175 @@
 @page
 @model Presentation_RazorPage.Pages.Staff.DashboardModel
 @{
-    ViewData["Title"] = "Staff Portal";
+    ViewData["Title"] = "Staff Dashboard - Analytics";
 }
 
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm mt-5">
-                <div class="card-body text-center py-5">
-                    <div class="spinner-border text-primary mb-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Analytics Dashboard</h1>
+        <a asp-page-handler="Export" class="btn btn-sm btn-success shadow-sm">
+            <i class="fas fa-download fa-sm text-white-50"></i> Generate Excel Report
+        </a>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Total Articles -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Articles</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.DashboardStats.TotalArticles</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
                     </div>
-                    <h5>Redirecting to your workspace...</h5>
-                    <p class="text-muted">
-                        You're being redirected to the appropriate section based on your role.
-                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Articles -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Articles</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.DashboardStats.ActiveArticles</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inactive Articles -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Draft/Inactive</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.DashboardStats.InactiveArticles</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-pause-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Accounts -->
+        <div class="col-xl-3 col-md-6 mb-4">
+             <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Authors</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.DashboardStats.TotalAccounts</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Trending Articles (Most Viewed)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                         <table class="table table-bordered" id="trendingTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Views</th>
+                                    <th>Author</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(Model.TrendingArticles != null && Model.TrendingArticles.Any())
+                                {
+                                    @foreach(var article in Model.TrendingArticles)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="/News/Details?id=@article.NewsArticleId">@article.NewsTitle</a>
+                                            </td>
+                                            <td>@(article.Category?.CategoryName ?? "Uncategorized")</td>
+                                            <td>@article.ViewCount</td>
+                                            <td>@(article.CreatedBy?.AccountName ?? "Unknown")</td>
+                                            <td>
+                                                 @if(article.NewsStatus == true)
+                                                {
+                                                    <span class="badge bg-success">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Draft</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">No trending data available</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Distribution -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Monthly Statistics</h6>
+                </div>
+                <div class="card-body">
+                     @if(Model.DashboardStats.MonthlyStats != null)
+                     {
+                         <div class="mb-4">
+                             <div class="small font-weight-bold">Current Year: @Model.DashboardStats.MonthlyStats.Year</div>
+                             <div class="text-xs text-muted">Total Posts: @Model.DashboardStats.MonthlyStats.YearTotal</div>
+                         </div>
+                         <div class="list-group list-group-flush small">
+                             @foreach(var month in Model.DashboardStats.MonthlyStats.MonthlyStatistics.OrderByDescending(m => m.Month).Take(6))
+                             {
+                                 <div class="list-group-item d-flex justify-content-between align-items-center">
+                                     <span>@month.MonthName</span>
+                                     <span class="badge bg-primary rounded-pill">@month.TotalArticles</span>
+                                 </div>
+                             }
+                         </div>
+                     }
+                     else
+                     {
+                         <p class="text-center">No monthly data loading...</p>
+                     }
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-// This script runs if redirect doesn't work for some reason
-setTimeout(function() {
-    window.location.href = '/Staff/Articles';
-}, 2000);
-</script>

@@ -144,7 +144,7 @@
                 <h5 class="modal-title fw-bold">New Tag</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" asp-page-handler="Create">
+            <form method="post" asp-page-handler="Create" onsubmit="return confirm('Create this new tag?')">
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-1" role="alert"></div>
                     <div class="mb-3">
@@ -177,7 +177,7 @@
                 <h5 class="modal-title fw-bold">Edit Tag</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editTagForm" method="post" asp-page-handler="Update">
+            <form id="editTagForm" method="post" asp-page-handler="Update" onsubmit="return confirm('Save changes to this tag?')">
                 <div class="modal-body">
                     <input type="hidden" id="editTagId" name="tagId" />
                     <div class="mb-3">

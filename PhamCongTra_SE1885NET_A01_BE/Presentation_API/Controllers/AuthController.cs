@@ -31,9 +31,9 @@ namespace Presentation_API.Controllers
 
             try
             {
-                var token = await _authService.AuthenticateAsync(loginDto.Email, loginDto.Password);
+                var result = await _authService.AuthenticateAsync(loginDto.Email, loginDto.Password);
                 
-                if (token == null)
+                if (result == null)
                 {
                     return Unauthorized(new { message = "Invalid email or password" });
                 }
@@ -58,7 +58,8 @@ namespace Presentation_API.Controllers
 
                 var response = new LoginResponseDto
                 {
-                    Token = token,
+                    Token = result.Value.AccessToken,
+                    RefreshToken = result.Value.RefreshToken,
                     Account = new SystemAccountDto
                     {
                         AccountId = account.AccountId,
@@ -74,6 +75,36 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred during authentication", error = ex.Message });
+            }
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _authService.RefreshTokenAsync(tokenRequest.AccessToken, tokenRequest.RefreshToken);
+
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Invalid client request" });
+                }
+
+                return Ok(new
+                {
+                    Token = result.Value.AccessToken,
+                    RefreshToken = result.Value.RefreshToken,
+                    ExpiresAt = DateTime.UtcNow.AddHours(24)
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred during token refresh", error = ex.Message });
             }
         }
 

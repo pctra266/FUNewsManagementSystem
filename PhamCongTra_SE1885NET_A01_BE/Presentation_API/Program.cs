@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using DataAccess.Data;
+using Presentation_API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.MaxDepth = 64;
     });
 
+builder.Services.AddSignalR();
+
 // Add AutoMapper - Temporarily disabled
 // builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -55,6 +58,10 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IAIService, AIService>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
+
 
 // JWT Authentication
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -102,13 +109,16 @@ builder.Services.AddSwaggerGen();
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    options.AddPolicy("MyCors", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.SetIsOriginAllowed(origin => true) // Allow any origin
                .AllowAnyMethod()
-               .AllowAnyHeader();
+               .AllowAnyHeader()
+               .AllowCredentials();
     });
 });
+
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -119,9 +129,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
 
-app.UseCors("MyCors");
+    app.UseStaticFiles(); // Enable static file serving (for uploaded images)
+
+    app.UseCors("MyCors");
 
 // Critical: Authentication MUST come before custom middleware
 app.UseAuthentication();
@@ -129,5 +141,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hub/notifications");
+app.MapHealthChecks("/api/health")
+   .WithMetadata(new HttpMethodMetadata(new[] { "GET", "HEAD" }));
 
 app.Run();

@@ -11,7 +11,7 @@ namespace BussinessLogic.Services
         Task<IEnumerable<NewsArticle>> GetNewsArticlesByCategoryAsync(short categoryId);
         Task<NewsArticle> CreateNewsArticleAsync(NewsArticle article, IEnumerable<int>? tagIds = null);
         Task<NewsArticle> UpdateNewsArticleAsync(NewsArticle article, IEnumerable<int>? tagIds = null);
-        Task<bool> DeleteNewsArticleAsync(string id);
+        Task<bool> DeleteNewsArticleAsync(string id, short? userId = null);
         Task<IEnumerable<NewsArticle>> SearchNewsArticlesAsync(
             string? title = null, 
             string? authorName = null, 
@@ -36,6 +36,10 @@ namespace BussinessLogic.Services
             bool? status = null,
             DateTime? startDate = null,
             DateTime? endDate = null);
-        IQueryable<NewsArticle> GetNewsArticlesSummaryQueryable();
+    IQueryable<NewsArticle> GetNewsArticlesSummaryQueryable();
+        
+        // Analytics Methods
+        Task<IEnumerable<NewsArticle>> GetTrendingArticlesAsync(int top = 5);
+        Task<IEnumerable<NewsArticle>> GetRecommendedArticlesAsync(string articleId, int top = 5);
     }
 }

@@ -12,10 +12,12 @@ namespace Presentation_API.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly IReportService _reportService;
+        private readonly INewsArticleService _newsArticleService;
 
-        public ReportsController(IReportService reportService)
+        public ReportsController(IReportService reportService, INewsArticleService newsArticleService)
         {
             _reportService = reportService;
+            _newsArticleService = newsArticleService;
         }
 
         [HttpGet("Dashboard")]
@@ -56,7 +58,8 @@ namespace Presentation_API.Controllers
         [HttpGet("ArticlesByCategory")]
         public async Task<IActionResult> GetArticleStatisticsByCategory(
             [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate)
+            [FromQuery] DateTime? endDate,
+            [FromQuery] bool? status)
         {
             try
             {
@@ -65,7 +68,7 @@ namespace Presentation_API.Controllers
                     return BadRequest(new { message = "Start date cannot be greater than end date" });
                 }
 
-                var statistics = await _reportService.GetArticleStatisticsByCategoryAsync(startDate, endDate);
+                var statistics = await _reportService.GetArticleStatisticsByCategoryAsync(startDate, endDate, status);
                 return Ok(statistics);
             }
             catch (Exception ex)
@@ -77,7 +80,8 @@ namespace Presentation_API.Controllers
         [HttpGet("ArticlesByAuthor")]
         public async Task<IActionResult> GetArticleStatisticsByAuthor(
             [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate)
+            [FromQuery] DateTime? endDate,
+            [FromQuery] bool? status)
         {
             try
             {
@@ -86,7 +90,7 @@ namespace Presentation_API.Controllers
                     return BadRequest(new { message = "Start date cannot be greater than end date" });
                 }
 
-                var statistics = await _reportService.GetArticleStatisticsByAuthorAsync(startDate, endDate);
+                var statistics = await _reportService.GetArticleStatisticsByAuthorAsync(startDate, endDate, status);
                 return Ok(statistics);
             }
             catch (Exception ex)
@@ -203,6 +207,39 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while retrieving top categories", error = ex.Message });
+            }
+        }
+
+
+        [HttpGet("Trending")]
+        public async Task<IActionResult> GetTrendingArticles([FromQuery] int top = 5)
+        {
+            try
+            {
+                var articles = await _newsArticleService.GetTrendingArticlesAsync(top);
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving trending articles", error = ex.Message });
+            }
+        }
+
+        [HttpGet("Export")]
+        public async Task<IActionResult> ExportToExcel(
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate)
+        {
+            try
+            {
+                var content = await _reportService.ExportToExcelAsync(startDate, endDate);
+                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var fileName = $"ArticleReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(content, contentType, fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while exporting report", error = ex.Message });
             }
         }
     }

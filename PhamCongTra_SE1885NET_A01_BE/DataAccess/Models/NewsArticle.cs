@@ -21,6 +21,8 @@ public partial class NewsArticle
 
     public bool? NewsStatus { get; set; }
 
+    public int ViewCount { get; set; } // Added for Analytics
+
     public short? CreatedById { get; set; }
 
     public short? UpdatedById { get; set; }

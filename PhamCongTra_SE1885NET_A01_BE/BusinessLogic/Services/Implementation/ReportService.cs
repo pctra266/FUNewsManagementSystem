@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
 using DataAccess.Repositories;
+using ClosedXML.Excel;
 
 namespace BussinessLogic.Services
 {
@@ -42,7 +43,7 @@ namespace BussinessLogic.Services
             return statistics;
         }
 
-        public async Task<object> GetArticleStatisticsByCategoryAsync(DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<object> GetArticleStatisticsByCategoryAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null)
         {
             IQueryable<NewsArticle> query = _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.Category);
@@ -52,6 +53,9 @@ namespace BussinessLogic.Services
 
             if (endDate.HasValue)
                 query = query.Where(n => n.CreatedDate <= endDate);
+
+            if (status.HasValue)
+                query = query.Where(n => n.NewsStatus == status);
 
             var articles = await query.ToListAsync();
 
@@ -76,7 +80,7 @@ namespace BussinessLogic.Services
             };
         }
 
-        public async Task<object> GetArticleStatisticsByAuthorAsync(DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<object> GetArticleStatisticsByAuthorAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null)
         {
             IQueryable<NewsArticle> query = _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.CreatedBy);
@@ -86,6 +90,9 @@ namespace BussinessLogic.Services
 
             if (endDate.HasValue)
                 query = query.Where(n => n.CreatedDate <= endDate);
+
+            if (status.HasValue)
+                query = query.Where(n => n.NewsStatus == status);
 
             var articles = await query.ToListAsync();
 
@@ -325,6 +332,65 @@ namespace BussinessLogic.Services
                 UsagePercentage = totalTags > 0 ? Math.Round((double)usedTags / totalTags * 100, 2) : 0,
                 TagStatistics = tags
             };
+        }
+
+
+        public async Task<byte[]> ExportToExcelAsync(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            // 1. Fetch Data
+            IQueryable<NewsArticle> query = _unitOfWork.NewsArticleRepository.Query()
+                .Include(n => n.Category)
+                .Include(n => n.CreatedBy)
+                .Include(n => n.Tags);
+
+            if (startDate.HasValue) query = query.Where(n => n.CreatedDate >= startDate);
+            if (endDate.HasValue) query = query.Where(n => n.CreatedDate <= endDate);
+
+            var articles = await query
+                .OrderByDescending(n => n.CreatedDate)
+                .ToListAsync();
+
+            // 2. Create Excel
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Article Report");
+
+                // Headers
+                worksheet.Cell(1, 1).Value = "ID";
+                worksheet.Cell(1, 2).Value = "Title";
+                worksheet.Cell(1, 3).Value = "Category";
+                worksheet.Cell(1, 4).Value = "Author";
+                worksheet.Cell(1, 5).Value = "Created Date";
+                worksheet.Cell(1, 6).Value = "Status";
+                worksheet.Cell(1, 7).Value = "View Count";
+                
+                // Style Header
+                var headerRange = worksheet.Range("A1:G1");
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+
+                // Data
+                int row = 2;
+                foreach (var article in articles)
+                {
+                    worksheet.Cell(row, 1).Value = article.NewsArticleId;
+                    worksheet.Cell(row, 2).Value = article.NewsTitle;
+                    worksheet.Cell(row, 3).Value = article.Category?.CategoryName ?? "N/A";
+                    worksheet.Cell(row, 4).Value = article.CreatedBy?.AccountName ?? "Unknown";
+                    worksheet.Cell(row, 5).Value = article.CreatedDate?.ToString("yyyy-MM-dd HH:mm");
+                    worksheet.Cell(row, 6).Value = article.NewsStatus == true ? "Active" : "Inactive";
+                    worksheet.Cell(row, 7).Value = article.ViewCount;
+                    row++;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    return stream.ToArray();
+                }
+            }
         }
     }
 }

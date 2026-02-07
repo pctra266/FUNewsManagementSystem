@@ -11,8 +11,10 @@ namespace DataAccess.Repositories
         
         private IRepository<SystemAccount>? _accountRepository;
         private IRepository<Category>? _categoryRepository;
+
         private IRepository<NewsArticle>? _newsArticleRepository;
-        private IRepository<Tag>? _tagRepository;
+        private ITagRepository? _tagRepository;
+        private IRepository<AuditLog>? _auditLogRepository;
 
         public UnitOfWork(NewsContext context)
         {
@@ -34,9 +36,14 @@ namespace DataAccess.Repositories
             get { return _newsArticleRepository ??= new Repository<NewsArticle>(_context); }
         }
 
-        public IRepository<Tag> TagRepository
+        public ITagRepository TagRepository
         {
-            get { return _tagRepository ??= new Repository<Tag>(_context); }
+            get { return _tagRepository ??= new TagRepository(_context); }
+        }
+
+        public IRepository<AuditLog> AuditLogRepository
+        {
+            get { return _auditLogRepository ??= new Repository<AuditLog>(_context); }
         }
 
         public async Task<int> SaveChangesAsync()

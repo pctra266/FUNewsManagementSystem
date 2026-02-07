@@ -218,7 +218,7 @@
 <div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <form method="post" asp-page-handler="Create">
+            <form method="post" asp-page-handler="Create" onsubmit="return confirm('Create this new account?')">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="createAccountLabel">
                         <i class="fas fa-user-plus me-2"></i>Create New Account
@@ -273,7 +273,7 @@
 <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <form id="editAccountForm" method="post" asp-page-handler="Update">
+            <form id="editAccountForm" method="post" asp-page-handler="Update" onsubmit="return confirm('Save changes to this account?')">
                 <div class="modal-header bg-white border-bottom-0 pb-0">
                     <h5 class="modal-title fw-bold text-primary" id="editAccountLabel">Edit Account Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

@@ -23,7 +23,6 @@ namespace Presentation_RazorPage.Pages
         {
             // Clear any existing session
             HttpContext.Session.Clear();
-            _apiService.ClearAuthToken();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -41,13 +40,15 @@ namespace Presentation_RazorPage.Pages
                 {
                     // Store token and user info in session
                     HttpContext.Session.SetString("AuthToken", response.Token);
+                    HttpContext.Session.SetString("RefreshToken", response.RefreshToken);
                     HttpContext.Session.SetString("UserName", response.Account.AccountName ?? "User");
                     HttpContext.Session.SetString("UserRole", response.Account.AccountRole?.ToString() ?? "Admin");
                     HttpContext.Session.SetString("UserEmail", response.Account.AccountEmail ?? "");
                     HttpContext.Session.SetInt32("UserId", response.Account.AccountId);
+                    HttpContext.Session.SetString("TokenExpiresAt", response.ExpiresAt.ToString("o"));
 
-                    // Set auth token for API service
-                    _apiService.SetAuthToken(response.Token);
+                    // Set auth token for API service - Removed as per refactor
+                    // _apiService.SetAuthToken(response.Token);
 
                     // Redirect based on user role according to project requirements
                     return response.Account.AccountRole switch

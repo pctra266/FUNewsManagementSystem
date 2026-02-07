@@ -7,10 +7,12 @@ namespace BussinessLogic.Services
     public class NewsArticleService : INewsArticleService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuditService _auditService;
 
-        public NewsArticleService(IUnitOfWork unitOfWork)
+        public NewsArticleService(IUnitOfWork unitOfWork, IAuditService auditService)
         {
             _unitOfWork = unitOfWork;
+            _auditService = auditService;
         }
 
         public async Task<IEnumerable<NewsArticle>> GetAllNewsArticlesAsync()
@@ -24,11 +26,23 @@ namespace BussinessLogic.Services
 
         public async Task<NewsArticle?> GetNewsArticleByIdAsync(string id)
         {
-            return await _unitOfWork.NewsArticleRepository.Query()
+            var article = await _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.Category)
                 .Include(n => n.CreatedBy)
                 .Include(n => n.Tags)
                 .FirstOrDefaultAsync(n => n.NewsArticleId == id);
+            
+            if (article != null)
+            {
+                // Increment ViewCount
+                article.ViewCount++;
+                _unitOfWork.NewsArticleRepository.Update(article);
+                // We typically want to save this, but keep in mind performance impact.
+                // For this assignment scope, saving immediately is fine.
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            return article;
         }
 
         public async Task<IEnumerable<NewsArticle>> GetActiveNewsArticlesAsync()
@@ -81,6 +95,14 @@ namespace BussinessLogic.Services
             await _unitOfWork.NewsArticleRepository.AddAsync(article);
             await _unitOfWork.SaveChangesAsync();
 
+            // Audit Log
+            if (article.CreatedById.HasValue)
+            {
+                 // Avoid circular reference in serialization by passing anonymous object or handling it in AuditService
+                 // Passing article directly might be OK if ReferenceHandler.IgnoreCycles is set
+                await _auditService.LogAsync(article.CreatedById.Value, "Create", "NewsArticle", article.NewsArticleId, null, article);
+            }
+
             return article;
         }
 
@@ -88,25 +110,31 @@ namespace BussinessLogic.Services
         {
             var existingArticle = await _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.Tags)
+                .AsNoTracking() // Get a copy for OldValues
                 .FirstOrDefaultAsync(n => n.NewsArticleId == article.NewsArticleId);
 
             if (existingArticle == null)
             {
                 throw new InvalidOperationException("Article not found");
             }
+            
+            // Re-fetch tracked entity to update
+             var articleToUpdate = await _unitOfWork.NewsArticleRepository.Query()
+                .Include(n => n.Tags)
+                .FirstOrDefaultAsync(n => n.NewsArticleId == article.NewsArticleId);
 
             // Update properties
-            existingArticle.NewsTitle = article.NewsTitle;
-            existingArticle.Headline = article.Headline;
-            existingArticle.NewsContent = article.NewsContent;
-            existingArticle.NewsSource = article.NewsSource;
-            existingArticle.CategoryId = article.CategoryId;
-            existingArticle.NewsStatus = article.NewsStatus;
-            existingArticle.UpdatedById = article.UpdatedById;
-            existingArticle.ModifiedDate = DateTime.Now;
+            articleToUpdate!.NewsTitle = article.NewsTitle;
+            articleToUpdate.Headline = article.Headline;
+            articleToUpdate.NewsContent = article.NewsContent;
+            articleToUpdate.NewsSource = article.NewsSource;
+            articleToUpdate.CategoryId = article.CategoryId;
+            articleToUpdate.NewsStatus = article.NewsStatus;
+            articleToUpdate.UpdatedById = article.UpdatedById;
+            articleToUpdate.ModifiedDate = DateTime.Now;
 
             // Handle tags
-            existingArticle.Tags.Clear();
+            articleToUpdate.Tags.Clear();
             if (tagIds != null && tagIds.Any())
             {
                 var tags = await _unitOfWork.TagRepository.Query()
@@ -114,20 +142,27 @@ namespace BussinessLogic.Services
                     .ToListAsync();
                 foreach (var tag in tags)
                 {
-                    existingArticle.Tags.Add(tag);
+                    articleToUpdate.Tags.Add(tag);
                 }
             }
 
-            _unitOfWork.NewsArticleRepository.Update(existingArticle);
+            _unitOfWork.NewsArticleRepository.Update(articleToUpdate);
             await _unitOfWork.SaveChangesAsync();
 
-            return existingArticle;
+             // Audit Log
+            if (article.UpdatedById.HasValue)
+            {
+                await _auditService.LogAsync(article.UpdatedById.Value, "Update", "NewsArticle", article.NewsArticleId, existingArticle, articleToUpdate);
+            }
+
+            return articleToUpdate;
         }
 
-        public async Task<bool> DeleteNewsArticleAsync(string id)
+        public async Task<bool> DeleteNewsArticleAsync(string id, short? userId = null)
         {
             var article = await _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.Tags)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(n => n.NewsArticleId == id);
 
             if (article == null)
@@ -135,12 +170,26 @@ namespace BussinessLogic.Services
                 return false;
             }
 
-            // Clear tags relationship
-            article.Tags.Clear();
+            // Capture data for log
+            // Re-fetch tracked entity to delete
+            var articleToDelete = await _unitOfWork.NewsArticleRepository.Query()
+                 .Include(n => n.Tags)
+                 .FirstOrDefaultAsync(n => n.NewsArticleId == id);
             
-            _unitOfWork.NewsArticleRepository.Delete(article);
-            await _unitOfWork.SaveChangesAsync();
+            if (articleToDelete == null) return false;
 
+            // Clear tags relationship
+            articleToDelete.Tags.Clear();
+            
+            _unitOfWork.NewsArticleRepository.Delete(articleToDelete);
+            await _unitOfWork.SaveChangesAsync();
+            
+            // Audit Log
+            if (userId.HasValue)
+            {
+                await _auditService.LogAsync(userId.Value, "Delete", "NewsArticle", id, article, null);
+            }
+            
             return true;
         }
 
@@ -469,6 +518,50 @@ namespace BussinessLogic.Services
                     CreatedBy = n.CreatedBy,
                     Tags = n.Tags
                 });
+        }
+
+
+        public async Task<IEnumerable<NewsArticle>> GetTrendingArticlesAsync(int top = 5)
+        {
+            return await _unitOfWork.NewsArticleRepository.Query()
+                .Where(n => n.NewsStatus == true)
+                .Include(n => n.Category)
+                .Include(n => n.CreatedBy)
+                .OrderByDescending(n => n.ViewCount)
+                .Take(top)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<NewsArticle>> GetRecommendedArticlesAsync(string articleId, int top = 5)
+        {
+             var article = await _unitOfWork.NewsArticleRepository.Query()
+                .Include(n => n.Tags)
+                .FirstOrDefaultAsync(n => n.NewsArticleId == articleId);
+            
+            if (article == null) return new List<NewsArticle>();
+
+            // Recommend based on Category or Tags
+            var query = _unitOfWork.NewsArticleRepository.Query()
+                .Where(n => n.NewsArticleId != articleId && n.NewsStatus == true)
+                .Include(n => n.Category)
+                .Include(n => n.CreatedBy);
+
+            // 1. Prioritize same category AND shared tags
+            // 2. Same category
+            // 3. Shared tags
+            
+            // Simplified approach for EF Core translation:
+            // Get candidate articles that match either category or tags
+            var tagIds = article.Tags.Select(t => t.TagId).ToList();
+            
+            var recommendations = await query
+                .Where(n => n.CategoryId == article.CategoryId || n.Tags.Any(t => tagIds.Contains(t.TagId)))
+                .OrderByDescending(n => n.CategoryId == article.CategoryId) // Prioritize category match
+                .ThenByDescending(n => n.ViewCount) // Then popular ones
+                .Take(top)
+                .ToListAsync();
+                
+            return recommendations;
         }
     }
 }

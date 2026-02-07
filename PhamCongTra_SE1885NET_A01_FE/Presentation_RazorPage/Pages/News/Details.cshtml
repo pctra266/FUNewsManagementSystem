@@ -118,7 +118,7 @@
                         var articlesToShow = Model.RelatedArticles.Any() ? Model.RelatedArticles : Model.SameCategoryArticles;
                         
                         <div class="p-4 mb-3 bg-light rounded shadow-sm">
-                            <h4 class="fst-italic mb-3 pb-2 border-bottom">Related News</h4>
+                            <h4 class="fst-italic mb-3 pb-2 border-bottom">Recommended For You</h4>
                             <div class="d-flex flex-column gap-3">
                                 @foreach (var article in articlesToShow.Take(5))
                                 {

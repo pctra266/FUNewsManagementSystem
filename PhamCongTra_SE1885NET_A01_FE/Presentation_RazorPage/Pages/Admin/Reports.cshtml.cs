@@ -36,6 +36,9 @@ namespace Presentation_RazorPage.Pages.Admin
         [BindProperty(SupportsGet = true)]
         public string SortOrder { get; set; } = "desc";
 
+        [BindProperty(SupportsGet = true)]
+        public bool? Status { get; set; }
+
         private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName)";
 
         public async Task<IActionResult> OnGetAsync()
@@ -48,7 +51,7 @@ namespace Presentation_RazorPage.Pages.Admin
                 return RedirectToPage("/Login");
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             if (!StartDate.HasValue || !EndDate.HasValue)
             {
@@ -84,7 +87,7 @@ namespace Presentation_RazorPage.Pages.Admin
                 return RedirectToPage("/Login");
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             if (!StartDate.HasValue || !EndDate.HasValue)
             {
@@ -193,6 +196,18 @@ namespace Presentation_RazorPage.Pages.Admin
                 {
                     query = $"?startDate={StartDate:yyyy-MM-dd}&endDate={EndDate:yyyy-MM-dd}";
                 }
+                else if (StartDate.HasValue || EndDate.HasValue)
+                {
+                    query = "?";
+                    if (StartDate.HasValue) query += $"startDate={StartDate:yyyy-MM-dd}";
+                    if (EndDate.HasValue) query += $"endDate={EndDate:yyyy-MM-dd}";
+                }
+
+                if (Status.HasValue)
+                {
+                    query += string.IsNullOrEmpty(query) ? "?" : "&";
+                    query += $"status={Status.Value.ToString().ToLower()}";
+                }
 
                 var categoryResponse = await _apiService.GetByIdAsync<CategoryReportModel>($"/api/Reports/ArticlesByCategory{query}");
 
@@ -220,6 +235,18 @@ namespace Presentation_RazorPage.Pages.Admin
                 if (StartDate.HasValue && EndDate.HasValue)
                 {
                     query = $"?startDate={StartDate:yyyy-MM-dd}&endDate={EndDate:yyyy-MM-dd}";
+                }
+                else if (StartDate.HasValue || EndDate.HasValue)
+                {
+                    query = "?";
+                    if (StartDate.HasValue) query += $"startDate={StartDate:yyyy-MM-dd}";
+                    if (EndDate.HasValue) query += $"endDate={EndDate:yyyy-MM-dd}";
+                }
+
+                if (Status.HasValue)
+                {
+                    query += string.IsNullOrEmpty(query) ? "?" : "&";
+                    query += $"status={Status.Value.ToString().ToLower()}";
                 }
 
                 var authorResponse = await _apiService.GetByIdAsync<AuthorReportModel>($"/api/Reports/ArticlesByAuthor{query}");

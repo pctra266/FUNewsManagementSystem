@@ -32,7 +32,7 @@
                 <i class="fas fa-filter me-1"></i> Filters
             </button>
 
-            <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal">
+            <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal" data-crud-action="create">
                 <i class="fas fa-plus me-1"></i> New Article
             </button>
         </div>
@@ -160,6 +160,7 @@
                                         <div class="btn-group btn-group-sm shadow-sm" role="group">
                                             <button type="button" class="btn btn-white border text-primary" title="Edit article"
                                                     data-bs-toggle="modal" data-bs-target="#editArticleModal"
+                                                    data-crud-action="edit"
                                                     data-article-id="@article.NewsArticleId"
                                                     data-title="@System.Net.WebUtility.HtmlEncode(article.NewsTitle ?? "")"
                                                     data-headline="@System.Net.WebUtility.HtmlEncode(article.Headline ?? "")"
@@ -171,7 +172,7 @@
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
 
-                                            <button type="button" class="btn btn-white border text-secondary" title="Duplicate Draft" onclick="duplicateArticle('@article.NewsArticleId')">
+                                            <button type="button" class="btn btn-white border text-secondary" title="Duplicate Draft" onclick="duplicateArticle('@article.NewsArticleId')" data-crud-action="modify">
                                                 <i class="fas fa-copy"></i>
                                             </button>
 
@@ -179,13 +180,13 @@
                                                   asp-route-articleId="@article.NewsArticleId" asp-route-currentStatus="@(article.NewsStatus ?? false)">
                                                 @if (article.NewsStatus == true)
                                                 {
-                                                    <button type="submit" class="btn btn-white border text-warning" title="Unpublish" onclick="return confirm('Unpublish this article?')" style="border-left: 0 !important;">
+                                                    <button type="submit" class="btn btn-white border text-warning" title="Unpublish" onclick="return confirm('Unpublish this article?')" style="border-left: 0 !important;" data-crud-action="modify">
                                                         <i class="fas fa-eye-slash"></i>
                                                     </button>
                                                 }
                                                 else
                                                 {
-                                                    <button type="submit" class="btn btn-white border text-success" title="Publish" onclick="return confirm('Publish this article?')" style="border-left: 0 !important;">
+                                                    <button type="submit" class="btn btn-white border text-success" title="Publish" onclick="return confirm('Publish this article?')" style="border-left: 0 !important;" data-crud-action="modify">
                                                         <i class="fas fa-upload"></i>
                                                     </button>
                                                 }
@@ -194,7 +195,8 @@
                                             <form method="post" class="d-inline" asp-page-handler="Delete" asp-route-articleId="@article.NewsArticleId">
                                                 <button type="submit" class="btn btn-white border text-danger" title="Delete"
                                                         onclick="return confirm('Are you sure? This removes all tags too.')"
-                                                        style="border-left: 0 !important;">
+                                                        style="border-left: 0 !important;"
+                                                        data-crud-action="delete">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </form>
@@ -241,7 +243,7 @@
                     }
                     else
                     {
-                        <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal">
+                        <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal" data-crud-action="create">
                             <i class="fas fa-plus me-1"></i> Create First Article
                         </button>
                     }
@@ -254,7 +256,7 @@
 <div class="modal fade" id="createArticleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
-            <form method="post" asp-page-handler="Create">
+            <form method="post" asp-page-handler="Create" enctype="multipart/form-data" onsubmit="return confirm('Create this news article?')">
                 <div class="modal-header">
                     <h5 class="modal-title">Create Article</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -295,8 +297,14 @@
 
                             <div class="mb-3">
                                 <label asp-for="CreateArticle.NewsSource" class="form-label">News Source</label>
-                                <input asp-for="CreateArticle.NewsSource" class="form-control" />
+                                <input asp-for="CreateArticle.NewsSource" class="form-control" placeholder="Source or Image URL" />
                                 <span asp-validation-for="CreateArticle.NewsSource" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Upload Image</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                <div class="form-text small">Max 5MB. Uploading will replace the News Source URL.</div>
                             </div>
                         </div>
 
@@ -315,6 +323,18 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Tags</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary float-end mb-1" onclick="suggestTags('create')">
+                                    <i class="fas fa-magic me-1"></i> Suggest Tags (AI)
+                                </button>
+                                
+                                <!-- AI Suggested Tags as Chips/Badges -->
+                                <div id="createSuggestedTagsArea" class="mb-2" style="display: none;">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="fas fa-lightbulb text-warning me-1"></i>AI Suggested Tags (click to select):
+                                    </small>
+                                    <div id="createSuggestedTagsChips" class="d-flex flex-wrap gap-1"></div>
+                                </div>
+                                
                                 <div class="border rounded p-2 overflow-auto" style="max-height: 220px;">
                                     @foreach (var tag in Model.Tags)
                                     {
@@ -352,7 +372,7 @@
 <div class="modal fade" id="editArticleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-xl">
         <div class="modal-content">
-            <form method="post" asp-page-handler="Edit">
+            <form method="post" asp-page-handler="Edit" enctype="multipart/form-data" onsubmit="return confirm('Save changes to this article?')">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Article</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -398,6 +418,12 @@
                                 <input asp-for="EditArticle.NewsSource" class="form-control" />
                                 <span asp-validation-for="EditArticle.NewsSource" class="text-danger"></span>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Upload Image</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                <div class="form-text small">Max 5MB. Uploading will update the News Source URL.</div>
+                            </div>
                         </div>
 
                         <div class="col-md-4">
@@ -415,6 +441,18 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Tags</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary float-end mb-1" onclick="suggestTags('edit')">
+                                    <i class="fas fa-magic me-1"></i> Suggest Tags (AI)
+                                </button>
+                                
+                                <!-- AI Suggested Tags as Chips/Badges -->
+                                <div id="editSuggestedTagsArea" class="mb-2" style="display: none;">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="fas fa-lightbulb text-warning me-1"></i>AI Suggested Tags (click to select):
+                                    </small>
+                                    <div id="editSuggestedTagsChips" class="d-flex flex-wrap gap-1"></div>
+                                </div>
+                                
                                 <div class="border rounded p-2 overflow-auto" style="max-height: 220px;">
                                     @foreach (var tag in Model.Tags)
                                     {
@@ -488,6 +526,156 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+        async function suggestTags(mode) {
+            const prefix = mode === 'create' ? 'CreateArticle' : 'EditArticle';
+            const title = document.getElementById(`${prefix}_NewsTitle`).value;
+            const headline = document.getElementById(`${prefix}_Headline`).value;
+            const content = document.getElementById(`${prefix}_NewsContent`).value;
+
+            const fullText = `${title} ${headline} ${content}`.trim();
+
+            if (!fullText) {
+                alert("Please enter some content first.");
+                return;
+            }
+
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> A.I. Thinking...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`?handler=SuggestTags`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ content: fullText })
+                });
+
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    const suggestedTags = Object.keys(suggestions);
+                    
+                    if (suggestedTags.length === 0) {
+                        alert("No specific tags suggested. Try adding more content.");
+                        // Hide chips area
+                        document.getElementById(`${mode}SuggestedTagsArea`).style.display = 'none';
+                    } else {
+                        // Show and populate chips/badges area
+                        const chipsContainer = document.getElementById(`${mode}SuggestedTagsChips`);
+                        const areaContainer = document.getElementById(`${mode}SuggestedTagsArea`);
+                        
+                        chipsContainer.innerHTML = ''; // Clear previous suggestions
+                        
+                        // Sort by confidence score (highest first)
+                        const sortedTags = Object.entries(suggestions)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 8); // Show top 8 suggestions
+                        
+                        sortedTags.forEach(([tagName, confidence]) => {
+                            // Find matching checkbox
+                            const checkboxes = mode === 'create' 
+                                ? document.querySelectorAll('input[name="CreateArticle.SelectedTagIds"]')
+                                : document.querySelectorAll('.edit-tag-checkbox');
+                            
+                            let matchingCheckbox = null;
+                            checkboxes.forEach(cb => {
+                                const label = cb.nextElementSibling.innerText.trim();
+                                if (label.toLowerCase() === tagName.toLowerCase()) {
+                                    matchingCheckbox = cb;
+                                }
+                            });
+                            
+                            if (matchingCheckbox) {
+                                // Create chip/badge
+                                const chip = document.createElement('span');
+                                chip.className = matchingCheckbox.checked 
+                                    ? 'badge bg-primary text-white' 
+                                    : 'badge bg-light text-dark border';
+                                chip.style.cursor = 'pointer';
+                                chip.style.fontSize = '0.85rem';
+                                chip.style.padding = '0.4rem 0.6rem';
+                                chip.style.transition = 'all 0.2s';
+                                
+                                // Confidence indicator
+                                const confidencePercent = Math.round(confidence * 100);
+                                let confidenceIcon = '';
+                                if (confidence >= 0.8) {
+                                    confidenceIcon = '<i class="fas fa-star text-warning me-1" style="font-size: 0.7rem;"></i>';
+                                } else if (confidence >= 0.5) {
+                                    confidenceIcon = '<i class="fas fa-check-circle text-success me-1" style="font-size: 0.7rem;"></i>';
+                                }
+                                
+                                chip.innerHTML = `${confidenceIcon}${tagName} <small class="opacity-75">(${confidencePercent}%)</small>`;
+                                
+                                // Click to toggle
+                                chip.addEventListener('click', function() {
+                                    matchingCheckbox.checked = !matchingCheckbox.checked;
+                                    
+                                    if (matchingCheckbox.checked) {
+                                        chip.className = 'badge bg-primary text-white';
+                                    } else {
+                                        chip.className = 'badge bg-light text-dark border';
+                                    }
+                                });
+                                
+                                // Hover effect
+                                chip.addEventListener('mouseenter', function() {
+                                    chip.style.transform = 'scale(1.05)';
+                                    chip.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+                                });
+                                chip.addEventListener('mouseleave', function() {
+                                    chip.style.transform = 'scale(1)';
+                                    chip.style.boxShadow = 'none';
+                                });
+                                
+                                chipsContainer.appendChild(chip);
+                            }
+                        });
+                        
+                        // Show the chips area
+                        areaContainer.style.display = 'block';
+                        
+                        // Auto-select high confidence tags
+                        let autoSelectedCount = 0;
+                        const checkboxes = mode === 'create' 
+                            ? document.querySelectorAll('input[name="CreateArticle.SelectedTagIds"]')
+                            : document.querySelectorAll('.edit-tag-checkbox');
+
+                        checkboxes.forEach(cb => {
+                            const label = cb.nextElementSibling.innerText.trim();
+                            const match = sortedTags.find(([st]) => st.toLowerCase() === label.toLowerCase());
+                            
+                            if (match && match[1] >= 0.7 && !cb.checked) {
+                                cb.checked = true;
+                                autoSelectedCount++;
+                                
+                                // Brief highlight effect
+                                cb.nextElementSibling.style.fontWeight = "bold";
+                                cb.nextElementSibling.classList.add("text-primary");
+                                setTimeout(() => {
+                                    cb.nextElementSibling.style.fontWeight = "";
+                                    cb.nextElementSibling.classList.remove("text-primary");
+                                }, 3000);
+                            }
+                        });
+                    }
+                } else {
+                    console.error("AI Error", response);
+                    alert("Failed to get suggestions.");
+                }
+
+            } catch (error) {
+                console.error("AI Error", error);
+                alert("Error connecting to AI service.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
         const editArticleModal = document.getElementById('editArticleModal');
 
         editArticleModal.addEventListener('show.bs.modal', function (event) {

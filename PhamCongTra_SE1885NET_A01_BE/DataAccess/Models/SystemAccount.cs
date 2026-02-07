@@ -16,4 +16,8 @@ public partial class SystemAccount
     public string? AccountPassword { get; set; }
 
     public virtual ICollection<NewsArticle> NewsArticles { get; set; } = new List<NewsArticle>();
+
+    public string? RefreshToken { get; set; }
+
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 }

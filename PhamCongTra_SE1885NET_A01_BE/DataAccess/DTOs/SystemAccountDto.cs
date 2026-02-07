@@ -80,7 +80,17 @@ namespace DataAccess.DTOs
     public class LoginResponseDto
     {
         public string Token { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
         public SystemAccountDto Account { get; set; } = new SystemAccountDto();
         public DateTime ExpiresAt { get; set; }
+    }
+
+    public class TokenRequestDto
+    {
+        [Required]
+        public string AccessToken { get; set; } = string.Empty;
+        
+        [Required]
+        public string RefreshToken { get; set; } = string.Empty;
     }
 }

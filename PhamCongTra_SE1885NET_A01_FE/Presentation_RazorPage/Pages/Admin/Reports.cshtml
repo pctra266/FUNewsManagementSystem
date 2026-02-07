@@ -72,6 +72,14 @@
                             <input type="date" name="EndDate" class="form-control" asp-for="EndDate" max="@today" />
                         </div>
                         <div class="col-md-4">
+                            <label class="form-label">Status</label>
+                            <select name="Status" class="form-select" asp-for="Status">
+                                <option value="">All</option>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Sort Order</label>
                             <select name="SortOrder" class="form-select" asp-for="SortOrder">
                                 <option value="desc">Newest First</option>
@@ -84,6 +92,34 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">
+                        <i class="fas fa-chart-pie me-2"></i>@(Model.GroupBy == "author" ? "Author" : "Category") Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="distributionChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold text-primary">
+                        <i class="fas fa-chart-bar me-2"></i>Status Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart" style="max-height: 300px;"></canvas>
                 </div>
             </div>
         </div>
@@ -262,3 +298,139 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        // Prepare data for Distribution Chart (Pie)
+        @if (Model.GroupBy == "author")
+        {
+            <text>
+            const distributionLabels = @Html.Raw(Json.Serialize(Model.AuthorStats.Select(a => a.AuthorName).ToList()));
+            const distributionData = @Html.Raw(Json.Serialize(Model.AuthorStats.Select(a => a.TotalArticles).ToList()));
+            </text>
+        }
+        else
+        {
+            <text>
+            const distributionLabels = @Html.Raw(Json.Serialize(Model.CategoryStats.Select(c => c.CategoryName).ToList()));
+            const distributionData = @Html.Raw(Json.Serialize(Model.CategoryStats.Select(c => c.TotalArticles).ToList()));
+            </text>
+        }
+
+        // Prepare data for Status Chart (Bar)
+        const statusLabels = ['Active', 'Inactive'];
+        const statusData = [@Model.TotalActiveArticles, @Model.TotalInactiveArticles];
+
+        // Color palette
+        const colorPalette = [
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(199, 199, 199, 0.8)',
+            'rgba(83, 102, 255, 0.8)',
+            'rgba(255, 99, 255, 0.8)',
+            'rgba(99, 255, 132, 0.8)'
+        ];
+
+        // Initialize Distribution Chart (Pie)
+        const distributionCtx = document.getElementById('distributionChart');
+        if (distributionCtx && distributionData.length > 0) {
+            new Chart(distributionCtx, {
+                type: 'pie',
+                data: {
+                    labels: distributionLabels,
+                    datasets: [{
+                        label: 'Articles',
+                        data: distributionData,
+                        backgroundColor: colorPalette,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize Status Chart (Bar)
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'bar',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        label: 'Number of Articles',
+                        data: statusData,
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(255, 159, 64, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y || 0;
+                                    const total = statusData.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return 'Articles: ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

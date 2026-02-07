@@ -41,7 +41,7 @@ namespace Presentation_RazorPage.Pages.Admin.Accounts
                 return RedirectToPage("/Login");
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
@@ -95,7 +95,7 @@ namespace Presentation_RazorPage.Pages.Admin.Accounts
             try
             {
                 var token = HttpContext.Session.GetString("AuthToken");
-                _apiService.SetAuthToken(token!);
+                //_apiService.SetAuthToken(token!);
 
                 var newAccount = new SystemAccountModel
                 {
@@ -133,7 +133,7 @@ namespace Presentation_RazorPage.Pages.Admin.Accounts
         public async Task<IActionResult> OnPostDeleteAsync(short id)
         {
             var token = HttpContext.Session.GetString("AuthToken");
-            _apiService.SetAuthToken(token!);
+            //_apiService.SetAuthToken(token!);
 
             try
             {
@@ -177,7 +177,7 @@ namespace Presentation_RazorPage.Pages.Admin.Accounts
             }
 
             var token = HttpContext.Session.GetString("AuthToken");
-            _apiService.SetAuthToken(token!);
+            //_apiService.SetAuthToken(token!);
 
             try
             {

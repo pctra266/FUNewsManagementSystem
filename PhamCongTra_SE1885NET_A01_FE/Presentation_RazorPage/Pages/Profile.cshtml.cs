@@ -47,7 +47,7 @@ namespace Presentation_RazorPage.Pages
                 };
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
@@ -108,7 +108,7 @@ namespace Presentation_RazorPage.Pages
                 return RedirectToPage("/Login");
             }
 
-            _apiService.SetAuthToken(token!);
+            //_apiService.SetAuthToken(token!);
 
             try
             {
@@ -182,7 +182,7 @@ namespace Presentation_RazorPage.Pages
             }
 
             var token = HttpContext.Session.GetString("AuthToken");
-            _apiService.SetAuthToken(token!);
+            //_apiService.SetAuthToken(token!);
 
             try
             {

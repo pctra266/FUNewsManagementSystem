@@ -3,6 +3,9 @@ using System.Text.Json;
 using System.Text;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BusinessLogic.Services
 {
@@ -16,20 +19,25 @@ namespace BusinessLogic.Services
         Task<T?> PostAsync<T>(string endpoint, object data);
         Task<T?> PutAsync<T>(string endpoint, object id, object data);
         Task<bool> DeleteAsync(string endpoint, object id);
-        void SetAuthToken(string token);
-        void ClearAuthToken();
+        Task<string?> UploadImageAsync(string endpoint, Stream fileStream, string fileName);
+        Task<byte[]?> DownloadFileAsync(string endpoint);
+        Task<bool> RefreshTokenAsync();
     }
 
     public class ApiService : IApiService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public ApiService(HttpClient httpClient, IConfiguration configuration)
+        public ApiService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
+            _memoryCache = memoryCache;
             
             _jsonOptions = new JsonSerializerOptions
             {
@@ -37,11 +45,24 @@ namespace BusinessLogic.Services
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            // Set base address from configuration
-            var baseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7215";
-            _httpClient.BaseAddress = new Uri(baseUrl);
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            
+            // _httpClient configuration moved to Program.cs
+        }
+
+        private HttpClient GetClient(string name = "CoreClient")
+        {
+            var client = _httpClientFactory.CreateClient(name);
+            // Attach token if exists
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null)
+            {
+                var token = context.Session.GetString("AuthToken");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+            }
+            return client;
         }
 
         public async Task<LoginResponseModel?> LoginAsync(LoginViewModel loginModel)
@@ -51,7 +72,8 @@ namespace BusinessLogic.Services
                 var json = JsonSerializer.Serialize(loginModel, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync("/api/Auth/login", content);
+                var client = GetClient();
+                var response = await client.PostAsync("/api/Auth/login", content);
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -71,7 +93,8 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync(endpoint);
+                var client = GetClient();
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -93,6 +116,11 @@ namespace BusinessLogic.Services
             }
             catch
             {
+                // Offline Fallback
+                if (_memoryCache.TryGetValue($"OFFLINE_CACHE_{endpoint}", out List<T>? cachedData))
+                {
+                    return cachedData;
+                }
                 return null;
             }
         }
@@ -101,7 +129,8 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{endpoint}({id})");
+                var client = GetClient();
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync($"{endpoint}({id})"));
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -113,6 +142,7 @@ namespace BusinessLogic.Services
             }
             catch
             {
+                // Fallback attempt?
                 return default(T);
             }
         }
@@ -120,8 +150,9 @@ namespace BusinessLogic.Services
         {
             try
             {
+                var client = GetClient();
                 var url = $"{endpoint}({id}){query}";
-                var response = await _httpClient.GetAsync(url);
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(url));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -146,7 +177,8 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{endpoint}");
+                var client = GetClient();
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync($"{endpoint}"));
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -169,7 +201,13 @@ namespace BusinessLogic.Services
                 var json = JsonSerializer.Serialize(data, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync(endpoint, content);
+                var client = GetClient();
+                var response = await SendRequestWithAuthRetryAsync(client, async () => 
+                {
+                    var innerJson = JsonSerializer.Serialize(data, _jsonOptions);
+                    var innerContent = new StringContent(innerJson, Encoding.UTF8, "application/json");
+                    return await client.PostAsync(endpoint, innerContent);
+                });
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -189,35 +227,29 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var json = JsonSerializer.Serialize(data, _jsonOptions);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
                 var url = $"{endpoint}({id})";
-                Console.WriteLine($"============== API PUT REQUEST ==============");
-                Console.WriteLine($"URL: {url}");
-                Console.WriteLine($"Data: {json}");
-                Console.WriteLine($"Auth Header: {_httpClient.DefaultRequestHeaders.Authorization?.ToString() ?? "NULL"}");
-
-                var response = await _httpClient.PutAsync(url, content);
+                var client = GetClient();
                 
-                Console.WriteLine($"Response Status: {response.StatusCode}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Response Content: {responseContent}");
-                Console.WriteLine($"=============================================");
+                var response = await SendRequestWithAuthRetryAsync(client, async () => 
+                {
+                    var innerJson = JsonSerializer.Serialize(data, _jsonOptions);
+                    var innerContent = new StringContent(innerJson, Encoding.UTF8, "application/json");
+                    return await client.PutAsync(url, innerContent);
+                });
                 
                 if (response.IsSuccessStatusCode)
                 {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    if (string.IsNullOrEmpty(responseContent)) return default(T); // NoContent
                     return JsonSerializer.Deserialize<T>(responseContent, _jsonOptions);
                 }
                 else
                 {
-                    Console.WriteLine($"? PUT request failed with status {response.StatusCode}");
                     return default(T);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"? PUT request exception: {ex.Message}");
                 return default(T);
             }
         }
@@ -226,7 +258,8 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var response = await _httpClient.DeleteAsync($"{endpoint}({id})");
+                var client = GetClient();
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.DeleteAsync($"{endpoint}({id})"));
                 return response.IsSuccessStatusCode;
             }
             catch
@@ -235,15 +268,174 @@ namespace BusinessLogic.Services
             }
         }
 
-        public void SetAuthToken(string token)
+        public async Task<string?> UploadImageAsync(string endpoint, Stream fileStream, string fileName)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = 
-                new AuthenticationHeaderValue("Bearer", token);
+            try
+            {
+                var content = new MultipartFormDataContent();
+                var fileContent = new StreamContent(fileStream);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg"); // Adjust based on file type if needed, or let API handle validation
+                content.Add(fileContent, "file", fileName);
+
+                var client = GetClient();
+                var response = await client.PostAsync(endpoint, content);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                     // Check if response is JSON object with "url" property
+                    try 
+                    {
+                        var json = JsonSerializer.Deserialize<JsonElement>(responseContent);
+                        if (json.TryGetProperty("url", out var urlProperty))
+                        {
+                            return urlProperty.GetString();
+                        }
+                    }
+                    catch
+                    {
+                        // Fallback if plain string
+                        return responseContent;
+                    }
+                }
+                
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public void ClearAuthToken()
+
+
+        public async Task<byte[]?> DownloadFileAsync(string endpoint)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = null;
+            try
+            {
+                var client = GetClient();
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsByteArrayAsync();
+                }
+                
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<bool> RefreshTokenAsync()
+        {
+            var context = _httpContextAccessor.HttpContext;
+            if (context == null) return false;
+
+            var accessToken = context.Session.GetString("AuthToken");
+            var refreshToken = context.Session.GetString("RefreshToken");
+
+            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+                return false;
+
+            var request = new TokenRequestModel
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+
+            try
+            {
+                var json = JsonSerializer.Serialize(request, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // We need to call refresh without Authorization header or with it? 
+                // Usually refresh endpoint allows anonymous or validation ofexpired token. 
+                // Existing client has expired token in header, which is fine.
+                
+                // Important: Avoid infinite loop if this call returns 401.
+                // We use a separate fresh client or ensure no interception for this specific call? 
+                // Since our retry logic is manual in methods, we are safe if we don't call retry here.
+                
+                var client = GetClient();
+                var response = await client.PostAsync("/api/Auth/refresh", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var newTokens = JsonSerializer.Deserialize<LoginResponseModel>(responseContent, _jsonOptions);
+
+                    if (newTokens != null)
+                    {
+                        // Update session
+                        context.Session.SetString("AuthToken", newTokens.Token);
+                        context.Session.SetString("RefreshToken", newTokens.RefreshToken);
+                        context.Session.SetString("TokenExpiresAt", newTokens.ExpiresAt.ToString("o"));
+                        
+                        // Update current client - Not needed as GetClient() reads from session
+                        // But need to ensure session is updated
+                        
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                // Log error
+            }
+
+            return false;
+        }
+
+        private async Task<HttpResponseMessage> SendRequestWithAuthRetryAsync(HttpClient client, Func<Task<HttpResponseMessage>> requestFunc)
+        {
+            // PROACTIVE REFRESH CHECK
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null)
+            {
+                var expiresAtStr = context.Session.GetString("TokenExpiresAt");
+                if (DateTime.TryParse(expiresAtStr, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime expiresAt))
+                {
+                    // Check if token expires in less than 5 minutes
+                    if (expiresAt < DateTime.UtcNow.AddMinutes(5))
+                    {
+                        // Try to refresh proactively
+                        if (await RefreshTokenAsync())
+                        {
+                            // Update client with new token
+                            var newToken = context.Session.GetString("AuthToken");
+                            if (!string.IsNullOrEmpty(newToken))
+                            {
+                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", newToken);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var response = await requestFunc();
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                // Token might be expired, try to refresh
+                if (await RefreshTokenAsync())
+                {
+                    // Update the current client's token from session
+                    var context2 = _httpContextAccessor.HttpContext;
+                    if (context2 != null)
+                    {
+                        var token = context2.Session.GetString("AuthToken");
+                        if (!string.IsNullOrEmpty(token))
+                        {
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                        }
+                    }
+                    // Retry request
+                    return await requestFunc();
+                }
+            }
+            return response;
         }
 
         private class ODataResponse<T>

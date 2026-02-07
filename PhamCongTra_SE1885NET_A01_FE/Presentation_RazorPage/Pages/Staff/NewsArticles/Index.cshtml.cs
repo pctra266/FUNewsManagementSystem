@@ -79,14 +79,14 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage("/Index");
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             await LoadPageDataAsync();
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostCreateAsync()
+        public async Task<IActionResult> OnPostCreateAsync(IFormFile? imageFile)
         {
             var token = HttpContext.Session.GetString("AuthToken");
             var userRole = HttpContext.Session.GetString("UserRole");
@@ -97,8 +97,9 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
+            // Manual binding is not needed for file if passed as param, but we need to check ModelState for other fields
             ModelState.Clear();
             if (!TryValidateModel(CreateArticle, nameof(CreateArticle)))
             {
@@ -109,6 +110,19 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
             try
             {
+                // Handle Image Upload
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    using (var stream = imageFile.OpenReadStream())
+                    {
+                        var imageUrl = await _apiService.UploadImageAsync("/api/NewsArticles/upload-image", stream, imageFile.FileName);
+                        if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            CreateArticle.NewsSource = imageUrl;
+                        }
+                    }
+                }
+
                 var createData = new
                 {
                     NewsTitle = CreateArticle.NewsTitle,
@@ -140,7 +154,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
             return Page();
         }
 
-        public async Task<IActionResult> OnPostEditAsync()
+        public async Task<IActionResult> OnPostEditAsync(IFormFile? imageFile)
         {
             var token = HttpContext.Session.GetString("AuthToken");
             var userRole = HttpContext.Session.GetString("UserRole");
@@ -151,7 +165,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             ModelState.Clear();
             if (!TryValidateModel(EditArticle, nameof(EditArticle)))
@@ -163,6 +177,19 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
             try
             {
+                 // Handle Image Upload
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    using (var stream = imageFile.OpenReadStream())
+                    {
+                        var imageUrl = await _apiService.UploadImageAsync("/api/NewsArticles/upload-image", stream, imageFile.FileName);
+                        if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            EditArticle.NewsSource = imageUrl;
+                        }
+                    }
+                }
+
                 var updateData = new
                 {
                     NewsTitle = EditArticle.NewsTitle,
@@ -330,7 +357,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
@@ -363,7 +390,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
@@ -420,12 +447,12 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
                 var duplicateData = new { ArticleId = articleId };
-                var result = await _apiService.PostAsync<object>("/odata/NewsArticlesFunctions/Duplicate", duplicateData);
+                var result = await _apiService.PostAsync<object>("/api/NewsArticlesFunctions/Duplicate", duplicateData);
 
                 if (result != null)
                 {
@@ -487,6 +514,25 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 article.HydrateMetadata();
             }
         }
+        public async Task<IActionResult> OnPostSuggestTagsAsync([FromBody] TagSuggestionRequest request)
+        {
+            var token = HttpContext.Session.GetString("AuthToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                 //_apiService.SetAuthToken(token);
+            }
+
+            try 
+            {
+                // Call Backend API
+                var suggestions = await _apiService.PostAsync<Dictionary<string, double>>("/api/AI/suggest-tags", request);
+                return new JsonResult(suggestions ?? new Dictionary<string, double>());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 
     public class NewsArticleCreateInput
@@ -517,5 +563,10 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
     {
         [Required(ErrorMessage = "Article ID is required")]
         public string NewsArticleId { get; set; } = string.Empty;
+    }
+
+    public class TagSuggestionRequest
+    {
+        public string Content { get; set; } = string.Empty;
     }
 }

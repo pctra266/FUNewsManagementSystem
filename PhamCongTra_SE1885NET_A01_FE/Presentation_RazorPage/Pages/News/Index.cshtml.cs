@@ -59,7 +59,7 @@ namespace Presentation_RazorPage.Pages.News
 
             try
             {
-                var categoriesResponse = await _apiService.GetAsync<CategoryModel>("/odata/CategoriesFunctions/Active");
+                var categoriesResponse = await _apiService.GetAsync<CategoryModel>("/api/CategoriesFunctions/Active");
                 Categories = categoriesResponse ?? new List<CategoryModel>();
 
                 HasFilters = !string.IsNullOrEmpty(SearchTerm) ||
@@ -124,12 +124,12 @@ namespace Presentation_RazorPage.Pages.News
         {
             if (HasFilters)
             {
-                var searchUrl = $"/odata/NewsArticlesFunctions/Search?{BuildSearchQuery()}&{ExpandClause}";
+                var searchUrl = $"/api/NewsArticlesFunctions/Search?{BuildSearchQuery()}&{ExpandClause}";
                 var searchResponse = await _apiService.GetAsync<NewsArticleModel>(searchUrl);
                 return searchResponse ?? new List<NewsArticleModel>();
             }
 
-            var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/Active?{ExpandClause}");
+            var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/api/NewsArticlesFunctions/Active?{ExpandClause}");
             return articlesResponse ?? new List<NewsArticleModel>();
         }
 

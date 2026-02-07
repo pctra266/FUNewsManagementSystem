@@ -96,7 +96,7 @@
                         </div>
                     </div>
 
-                    <form method="post" asp-page-handler="UpdateProfile">
+                    <form method="post" asp-page-handler="UpdateProfile" onsubmit="return confirm('Save changes to your profile?')">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small text-uppercase fw-bold text-muted">Full Name</label>
@@ -130,7 +130,7 @@
                         </div>
                     </div>
 
-                    <form method="post" asp-page-handler="ChangePassword">
+                    <form method="post" asp-page-handler="ChangePassword" onsubmit="return confirm('Update your password?')">
                         <div class="mb-3">
                             <label asp-for="ChangePassword.CurrentPassword" class="form-label small text-uppercase fw-bold text-muted">Current Password</label>
                             <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control form-control-lg bg-light border-0" placeholder="••••••••" />

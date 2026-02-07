@@ -160,7 +160,7 @@
                 <h5 class="modal-title fw-bold">New Category</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" asp-page-handler="Create">
+            <form method="post" asp-page-handler="Create" onsubmit="return confirm('Create this new category?')">
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-1" role="alert"></div>
 
@@ -211,7 +211,7 @@
                 <h5 class="modal-title fw-bold">Edit Category</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editCategoryForm" method="post" asp-page-handler="Update">
+            <form id="editCategoryForm" method="post" asp-page-handler="Update" onsubmit="return confirm('Save changes to this category?')">
                 <div class="modal-body">
                     <input type="hidden" id="editCategoryId" name="CategoryId" />
 

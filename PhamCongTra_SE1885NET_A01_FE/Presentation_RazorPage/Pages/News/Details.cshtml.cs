@@ -52,14 +52,16 @@ namespace Presentation_RazorPage.Pages.News
 
                 try
                 {
-                    var relatedResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/Related?articleId={id}&limit=3&{ExpandClause}");
+                    // Use new Recommendation API
+                    var relatedResponse = await _apiService.GetAsync<NewsArticleModel>($"/api/NewsArticles/Recommend/{id}");
                     RelatedArticles = relatedResponse ?? new List<NewsArticleModel>();
                     HydrateArticles(RelatedArticles);
                 }
                 catch
                 {
-                    if (Article.CategoryId.HasValue)
-                    {
+                     // Fallback to Category if API fails (though API handles its own logic now)
+                     if (Article.CategoryId.HasValue)
+                     {
                         var sameCategoryResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/ByCategory?categoryId={Article.CategoryId}&{ExpandClause}");
                         SameCategoryArticles = sameCategoryResponse?
                             .Where(a => a.NewsArticleId != id && a.NewsStatus == true)
@@ -67,7 +69,7 @@ namespace Presentation_RazorPage.Pages.News
                             .ToList() ?? new List<NewsArticleModel>();
 
                         HydrateArticles(SameCategoryArticles);
-                    }
+                     }
                 }
             }
             catch (Exception)

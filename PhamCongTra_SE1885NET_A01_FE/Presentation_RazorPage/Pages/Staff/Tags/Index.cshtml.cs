@@ -42,7 +42,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
             }
 
             SearchTerm = searchTerm ?? string.Empty;
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
@@ -99,7 +99,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
                 return Page();
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
@@ -139,7 +139,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
                 return RedirectToPage("/Access/Denied");
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
@@ -177,7 +177,7 @@ namespace Presentation_RazorPage.Pages.Staff.Tags
                 return RedirectToPage("/Access/Denied");
             }
 
-            _apiService.SetAuthToken(token);
+            //_apiService.SetAuthToken(token);
 
             try
             {
