@@ -1,16 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
 using DataAccess.Repositories;
+using System.Text.Json;
 
 namespace BussinessLogic.Services
 {
     public class TagService : ITagService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuditService _auditService;
 
-        public TagService(IUnitOfWork unitOfWork)
+        public TagService(IUnitOfWork unitOfWork, IAuditService auditService)
         {
             _unitOfWork = unitOfWork;
+            _auditService = auditService;
         }
 
         public async Task<IEnumerable<Tag>> GetAllTagsAsync()
@@ -40,7 +43,7 @@ namespace BussinessLogic.Services
             return await query.OrderBy(t => t.TagName).ToListAsync();
         }
 
-        public async Task<Tag> CreateTagAsync(Tag tag)
+        public async Task<Tag> CreateTagAsync(Tag tag, short? userId = null)
         {
             // Validate required fields
             if (string.IsNullOrEmpty(tag.TagName))
@@ -54,23 +57,33 @@ namespace BussinessLogic.Services
                 throw new InvalidOperationException("Tag name already exists");
             }
 
-            // Generate new ID
-            var allTags = await _unitOfWork.TagRepository.GetAllAsync();
-            tag.TagId = allTags.Any() ? allTags.Max(t => t.TagId) + 1 : 1;
-
+            // Assign default active status
+            tag.IsActive = true;
+            
             await _unitOfWork.TagRepository.AddAsync(tag);
             await _unitOfWork.SaveChangesAsync();
+
+            // Audit Log
+            if (userId.HasValue)
+            {
+                await _auditService.LogAsync(userId.Value, "Create", "Tag", tag.TagId.ToString(), null, tag);
+            }
 
             return tag;
         }
 
-        public async Task<Tag> UpdateTagAsync(Tag tag)
+        public async Task<Tag> UpdateTagAsync(Tag tag, short? userId = null)
         {
             var existingTag = await _unitOfWork.TagRepository.GetByIdAsync(tag.TagId);
             if (existingTag == null)
             {
                 throw new InvalidOperationException("Tag not found");
             }
+
+            // Keep a copy of old values for logging
+            var oldTagState = await _unitOfWork.TagRepository.Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.TagId == tag.TagId);
 
             // Check for duplicate name (excluding current tag)
             if (await IsTagNameExistAsync(tag.TagName!, tag.TagId))
@@ -85,10 +98,16 @@ namespace BussinessLogic.Services
             _unitOfWork.TagRepository.Update(existingTag);
             await _unitOfWork.SaveChangesAsync();
 
+            // Audit Log
+            if (userId.HasValue)
+            {
+                await _auditService.LogAsync(userId.Value, "Update", "Tag", tag.TagId.ToString(), oldTagState, existingTag);
+            }
+
             return existingTag;
         }
 
-        public async Task<bool> DeleteTagAsync(int id)
+        public async Task<bool> DeleteTagAsync(int id, short? userId = null)
         {
             if (!await CanDeleteTagAsync(id))
             {
@@ -101,8 +120,23 @@ namespace BussinessLogic.Services
                 return false;
             }
 
+            // Keep a copy for log
+            var tagToLog = new Tag
+            {
+                TagId = tag.TagId,
+                TagName = tag.TagName,
+                Note = tag.Note,
+                IsActive = tag.IsActive
+            };
+
             _unitOfWork.TagRepository.Delete(tag);
             await _unitOfWork.SaveChangesAsync();
+
+            // Audit Log
+            if (userId.HasValue)
+            {
+                await _auditService.LogAsync(userId.Value, "Delete", "Tag", id.ToString(), tagToLog, null);
+            }
 
             return true;
         }

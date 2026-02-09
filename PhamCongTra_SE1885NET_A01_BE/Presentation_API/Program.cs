@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using DataAccess.Data;
 using Presentation_API.Hubs;
+using DataAccess.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +27,67 @@ modelBuilder.EntitySet<Tag>("Tags");
 var systemAccountEntity = modelBuilder.EntitySet<SystemAccount>("SystemAccounts");
 systemAccountEntity.EntityType.HasKey(x => x.AccountId);
 
+var auditLogEntity = modelBuilder.EntitySet<AuditLog>("AuditLogs");
+auditLogEntity.EntityType.HasKey(x => x.LogId);
+
+// Register Report DTOs as Complex Types
+modelBuilder.ComplexType<PeriodDto>();
+modelBuilder.ComplexType<CategoryStatisticDto>();
+modelBuilder.ComplexType<CategoryReportDto>();
+modelBuilder.ComplexType<AuthorStatisticDto>();
+modelBuilder.ComplexType<AuthorReportDto>();
+modelBuilder.ComplexType<StatusStatisticDto>();
+modelBuilder.ComplexType<StatusReportDto>();
+
+// Register Report Functions
+// var reportsEntity = modelBuilder.EntitySet<NewsArticle>("Reports"); // REMOVED: Redundant and causing CRUD routes for Reports
+
+var dashboardFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("Dashboard");
+dashboardFunc.Returns<string>(); 
+
+var categoryReportFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("ArticlesByCategory");
+categoryReportFunc.Parameter<DateTime?>("startDate");
+categoryReportFunc.Parameter<DateTime?>("endDate");
+categoryReportFunc.Parameter<bool?>("status");
+categoryReportFunc.Returns<CategoryReportDto>();
+
+var authorReportFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("ArticlesByAuthor");
+authorReportFunc.Parameter<DateTime?>("startDate");
+authorReportFunc.Parameter<DateTime?>("endDate");
+authorReportFunc.Parameter<bool?>("status");
+authorReportFunc.Returns<AuthorReportDto>();
+
+var statusReportFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("ArticlesByStatus");
+statusReportFunc.Parameter<DateTime?>("startDate");
+statusReportFunc.Parameter<DateTime?>("endDate");
+statusReportFunc.Returns<StatusReportDto>();
+
+var trendingFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("Trending");
+trendingFunc.Parameter<int?>("top");
+trendingFunc.ReturnsCollectionFromEntitySet<NewsArticle>("NewsArticles");
+
+var exportFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("Export");
+exportFunc.Returns<byte[]>();
+
+var recommendFunc = modelBuilder.EntityType<NewsArticle>().Function("Recommend");
+recommendFunc.ReturnsCollectionFromEntitySet<NewsArticle>("NewsArticles");
+
+var byCategoryFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("ByCategory");
+byCategoryFunc.Parameter<short>("categoryId");
+byCategoryFunc.ReturnsCollectionFromEntitySet<NewsArticle>("NewsArticles");
+
+var duplicateAction = modelBuilder.EntityType<NewsArticle>().Action("Duplicate");
+duplicateAction.ReturnsFromEntitySet<NewsArticle>("NewsArticles");
+
+var edmModel = modelBuilder.GetEdmModel();
+
 builder.Services.AddControllers()
     .AddOData(options =>
     {
         options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(100);
-        options.AddRouteComponents("odata", modelBuilder.GetEdmModel());
+        // Set maximum expansion depth to prevent depth-related reflection/token errors
+        options.SetMaxTop(100); 
+        options.AddRouteComponents("odata", edmModel);
     })
     .AddJsonOptions(options =>
     {
@@ -65,11 +122,11 @@ builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 // JWT Authentication
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var key = jwtSection.GetValue<string>("Key");
+var jwtKey = jwtSection.GetValue<string>("Key") ?? "YourSuperSecretDefaultKeyForDevelopmentOnly123!";
 var issuer = jwtSection.GetValue<string>("Issuer");
 var audience = jwtSection.GetValue<string>("Audience");
 
-var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -142,7 +199,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/hub/notifications");
-app.MapHealthChecks("/api/health")
-   .WithMetadata(new HttpMethodMetadata(new[] { "GET", "HEAD" }));
+//app.MapHealthChecks("/api/health")
+//   .WithMetadata(new HttpMethodMetadata(new[] { "GET", "HEAD" }));
 
 app.Run();

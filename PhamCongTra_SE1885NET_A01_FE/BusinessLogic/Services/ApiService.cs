@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json.Serialization;
 
 namespace BusinessLogic.Services
 {
@@ -22,6 +23,7 @@ namespace BusinessLogic.Services
         Task<string?> UploadImageAsync(string endpoint, Stream fileStream, string fileName);
         Task<byte[]?> DownloadFileAsync(string endpoint);
         Task<bool> RefreshTokenAsync();
+        Task<ODataResponse<T>?> GetODataAsync<T>(string endpoint);
     }
 
     public class ApiService : IApiService
@@ -100,16 +102,19 @@ namespace BusinessLogic.Services
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     
-                    // Handle OData response format
-                    if (content.Contains("\"value\":"))
+                    if (string.IsNullOrWhiteSpace(content)) return new List<T>();
+
+                    // More robust check for OData wrapper
+                    using var doc = JsonDocument.Parse(content);
+                    if (doc.RootElement.ValueKind == JsonValueKind.Object && doc.RootElement.TryGetProperty("value", out var valueProp))
                     {
-                        var odataResponse = JsonSerializer.Deserialize<ODataResponse<T>>(content, _jsonOptions);
-                        return odataResponse?.Value;
+                        if (valueProp.ValueKind == JsonValueKind.Array)
+                        {
+                            return JsonSerializer.Deserialize<List<T>>(valueProp.GetRawText(), _jsonOptions);
+                        }
                     }
-                    else
-                    {
-                        return JsonSerializer.Deserialize<List<T>>(content, _jsonOptions);
-                    }
+                    
+                    return JsonSerializer.Deserialize<List<T>>(content, _jsonOptions);
                 }
                 
                 return null;
@@ -125,6 +130,29 @@ namespace BusinessLogic.Services
             }
         }
 
+        public async Task<ODataResponse<T>?> GetODataAsync<T>(string endpoint)
+        {
+            try
+            {
+                var client = GetClient();
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(content)) return new ODataResponse<T>();
+
+                    return JsonSerializer.Deserialize<ODataResponse<T>>(content, _jsonOptions);
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<T?> GetByIdAsync<T>(string endpoint, object id)
         {
             try
@@ -135,14 +163,13 @@ namespace BusinessLogic.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<T>(content, _jsonOptions);
+                    return DeserializeODataResult<T>(content);
                 }
                 
                 return default(T);
             }
             catch
             {
-                // Fallback attempt?
                 return default(T);
             }
         }
@@ -157,13 +184,7 @@ namespace BusinessLogic.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-
-                    if (string.IsNullOrWhiteSpace(content))
-                    {
-                        return default(T);
-                    }
-
-                    return JsonSerializer.Deserialize<T>(content, _jsonOptions);
+                    return DeserializeODataResult<T>(content);
                 }
 
                 return default(T);
@@ -183,7 +204,7 @@ namespace BusinessLogic.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<T>(content, _jsonOptions);
+                    return DeserializeODataResult<T>(content);
                 }
                 
                 return default(T);
@@ -192,6 +213,22 @@ namespace BusinessLogic.Services
             {
                 return default(T);
             }
+        }
+
+        private T? DeserializeODataResult<T>(string content)
+        {
+            if (string.IsNullOrWhiteSpace(content)) return default(T);
+
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            // If OData wraps the result in a "value" property (common for functions)
+            if (root.TryGetProperty("value", out var valueProp))
+            {
+                return JsonSerializer.Deserialize<T>(valueProp.GetRawText(), _jsonOptions);
+            }
+
+            return JsonSerializer.Deserialize<T>(content, _jsonOptions);
         }
 
         public async Task<T?> PostAsync<T>(string endpoint, object data)
@@ -438,10 +475,12 @@ namespace BusinessLogic.Services
             return response;
         }
 
-        private class ODataResponse<T>
-        {
-            public List<T>? Value { get; set; }
-            public int Count { get; set; }
-        }
+    }
+
+    public class ODataResponse<T>
+    {
+        public List<T>? Value { get; set; }
+        [JsonPropertyName("@odata.count")]
+        public int Count { get; set; }
     }
 }

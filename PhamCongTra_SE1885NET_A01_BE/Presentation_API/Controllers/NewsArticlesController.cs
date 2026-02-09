@@ -62,10 +62,9 @@ namespace Presentation_API.Controllers
             }
         }
 
-        [HttpGet("Recommend/{key}")]
+        [HttpGet]
         [EnableQuery]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetRecommended([FromRoute] string key)
+        public async Task<IActionResult> Recommend([FromRoute] string key)
         {
             try
             {
@@ -75,6 +74,91 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while retrieving recommended articles", error = ex.Message });
+            }
+        }
+
+        [HttpGet("odata/NewsArticlesFunctions/Active")]
+        [EnableQuery(PageSize = 99, MaxTop = 99)]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetActive()
+        {
+            try
+            {
+                var activeArticles = await _newsArticleService.GetActiveNewsArticlesSummaryAsync();
+                return Ok(activeArticles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving active news articles", error = ex.Message });
+            }
+        }
+
+        [HttpGet("odata/NewsArticlesFunctions/Search")]
+        [EnableQuery(PageSize = 20, MaxTop = 50)]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search(
+            [FromQuery] string? title,
+            [FromQuery] string? authorName,
+            [FromQuery] string? categoryName,
+            [FromQuery] bool? status,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate)
+        {
+            try
+            {
+                var articles = await _newsArticleService.SearchNewsArticlesSummaryAsync(
+                    title, authorName, categoryName, status, startDate, endDate);
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while searching news articles", error = ex.Message });
+            }
+        }
+
+        [HttpGet("odata/NewsArticlesFunctions/ByAuthor")]
+        [EnableQuery(PageSize = 20, MaxTop = 50)]
+        public async Task<IActionResult> GetByAuthor([FromQuery] int authorId)
+        {
+            try
+            {
+                var articles = await _newsArticleService.GetNewsArticlesByAuthorSummaryAsync((short)authorId);
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving articles by author", error = ex.Message });
+            }
+        }
+
+        [HttpGet("odata/NewsArticlesFunctions/ByCategory")]
+        [EnableQuery(PageSize = 20, MaxTop = 50)]
+        public async Task<IActionResult> ByCategory([FromQuery] short categoryId)
+        {
+            try
+            {
+                var articles = await _newsArticleService.GetNewsArticlesByCategorySummaryAsync(categoryId);
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving articles by category", error = ex.Message });
+            }
+        }
+
+        [HttpGet("odata/NewsArticlesFunctions/Related")]
+        [EnableQuery(PageSize = 20, MaxTop = 20)]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetRelated([FromQuery] string articleId, [FromQuery] int limit = 5)
+        {
+            try
+            {
+                var relatedArticles = await _newsArticleService.GetRelatedNewsSummaryAsync(articleId, limit);
+                return Ok(relatedArticles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving related articles", error = ex.Message });
             }
         }
 
@@ -193,6 +277,32 @@ namespace Presentation_API.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the news article", error = ex.Message });
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> Duplicate([FromRoute] string key)
+        {
+            try
+            {
+                // Get current user ID from claims
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!short.TryParse(userIdClaim, out short userId))
+                {
+                    return Unauthorized(new { message = "Invalid user identification" });
+                }
+
+                var duplicatedArticle = await _newsArticleService.DuplicateArticleAsync(key, userId);
+
+                return Ok(duplicatedArticle);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while duplicating the article", error = ex.Message });
+            }
+        }
+
         [HttpPost("/api/NewsArticles/upload-image")]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {

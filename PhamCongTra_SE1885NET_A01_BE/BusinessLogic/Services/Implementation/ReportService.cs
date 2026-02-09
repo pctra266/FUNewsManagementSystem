@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
 using DataAccess.Repositories;
 using ClosedXML.Excel;
+using DataAccess.DTOs;
 
 namespace BussinessLogic.Services
 {
@@ -43,7 +44,7 @@ namespace BussinessLogic.Services
             return statistics;
         }
 
-        public async Task<object> GetArticleStatisticsByCategoryAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null)
+        public async Task<CategoryReportDto> GetArticleStatisticsByCategoryAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null)
         {
             IQueryable<NewsArticle> query = _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.Category);
@@ -73,14 +74,22 @@ namespace BussinessLogic.Services
                 .OrderByDescending(s => s.TotalArticles)
                 .ToList();
 
-            return new
+            return new CategoryReportDto
             {
-                Period = new { StartDate = startDate, EndDate = endDate },
-                CategoryStatistics = categoryStats
+                Period = new PeriodDto { StartDate = startDate, EndDate = endDate },
+                CategoryStatistics = categoryStats.Select(s => new CategoryStatisticDto
+                {
+                    CategoryId = (int?)s.CategoryId,
+                    CategoryName = s.CategoryName,
+                    TotalArticles = s.TotalArticles,
+                    ActiveArticles = s.ActiveArticles,
+                    InactiveArticles = s.InactiveArticles,
+                    LatestArticle = s.LatestArticle
+                }).ToList()
             };
         }
 
-        public async Task<object> GetArticleStatisticsByAuthorAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null)
+        public async Task<AuthorReportDto> GetArticleStatisticsByAuthorAsync(DateTime? startDate = null, DateTime? endDate = null, bool? status = null)
         {
             IQueryable<NewsArticle> query = _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.CreatedBy);
@@ -111,14 +120,23 @@ namespace BussinessLogic.Services
                 .OrderByDescending(s => s.TotalArticles)
                 .ToList();
 
-            return new
+            return new AuthorReportDto
             {
-                Period = new { StartDate = startDate, EndDate = endDate },
-                AuthorStatistics = authorStats
+                Period = new PeriodDto { StartDate = startDate, EndDate = endDate },
+                AuthorStatistics = authorStats.Select(s => new AuthorStatisticDto
+                {
+                    AuthorId = (int?)s.AuthorId,
+                    AuthorName = s.AuthorName,
+                    TotalArticles = s.TotalArticles,
+                    ActiveArticles = s.ActiveArticles,
+                    InactiveArticles = s.InactiveArticles,
+                    LatestArticle = s.LatestArticle,
+                    FirstArticle = s.FirstArticle
+                }).ToList()
             };
         }
 
-        public async Task<object> GetArticleStatisticsByStatusAsync(DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<StatusReportDto> GetArticleStatisticsByStatusAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
             IQueryable<NewsArticle> query = _unitOfWork.NewsArticleRepository.Query();
 
@@ -141,10 +159,17 @@ namespace BussinessLogic.Services
                     Math.Round((double)articles.Count(a => a.NewsStatus == false) / articles.Count * 100, 2) : 0
             };
 
-            return new
+            return new StatusReportDto
             {
-                Period = new { StartDate = startDate, EndDate = endDate },
-                StatusStatistics = statusStats
+                Period = new PeriodDto { StartDate = startDate, EndDate = endDate },
+                StatusStatistics = new StatusStatisticDto
+                {
+                    TotalArticles = statusStats.TotalArticles,
+                    ActiveArticles = statusStats.ActiveArticles,
+                    InactiveArticles = statusStats.InactiveArticles,
+                    ActivePercentage = statusStats.ActivePercentage,
+                    InactivePercentage = statusStats.InactivePercentage
+                }
             };
         }
 
@@ -285,7 +310,7 @@ namespace BussinessLogic.Services
                 {
                     c.CategoryId,
                     c.CategoryName,
-                    c.CategoryDesciption,
+                    c.CategoryDescription,
                     c.IsActive,
                     TotalArticles = c.NewsArticles.Count,
                     ActiveArticles = c.NewsArticles.Count(a => a.NewsStatus == true),

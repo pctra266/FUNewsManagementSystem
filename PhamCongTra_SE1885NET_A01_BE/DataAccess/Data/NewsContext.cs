@@ -37,7 +37,7 @@ public partial class NewsContext : DbContext
             entity.ToTable("Category");
 
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
-            entity.Property(e => e.CategoryDesciption).HasMaxLength(250);
+            entity.Property(e => e.CategoryDescription).HasMaxLength(250);
             entity.Property(e => e.CategoryName).HasMaxLength(100);
             entity.Property(e => e.ParentCategoryId).HasColumnName("ParentCategoryID");
 
@@ -102,7 +102,6 @@ public partial class NewsContext : DbContext
             entity.ToTable("SystemAccount");
 
             entity.Property(e => e.AccountId)
-                .ValueGeneratedNever()
                 .HasColumnName("AccountID");
             entity.Property(e => e.AccountEmail).HasMaxLength(70);
             entity.Property(e => e.AccountName).HasMaxLength(100);
@@ -116,10 +115,10 @@ public partial class NewsContext : DbContext
             entity.ToTable("Tag");
 
             entity.Property(e => e.TagId)
-                .ValueGeneratedNever()
                 .HasColumnName("TagID");
             entity.Property(e => e.Note).HasMaxLength(400);
             entity.Property(e => e.TagName).HasMaxLength(50);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
         });
 
         modelBuilder.Entity<AuditLog>(entity =>
@@ -130,6 +129,9 @@ public partial class NewsContext : DbContext
             entity.Property(e => e.EntityName).HasMaxLength(100);
             entity.Property(e => e.EntityId).HasMaxLength(50);
             entity.Property(e => e.Timestamp).HasColumnType("datetime");
+
+            entity.HasIndex(e => e.UserId, "IX_AuditLog_UserId");
+            entity.HasIndex(e => e.Timestamp, "IX_AuditLog_Timestamp");
             
             entity.HasOne(d => d.User)
                 .WithMany()

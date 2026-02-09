@@ -12,7 +12,7 @@ namespace DataAccess.DTOs
         
         [Required(ErrorMessage = "Category description is required")]
         [StringLength(250, ErrorMessage = "Category description cannot exceed 250 characters")]
-        public string CategoryDesciption { get; set; } = string.Empty;
+        public string CategoryDescription { get; set; } = string.Empty;
         
         public short? ParentCategoryId { get; set; }
         public bool? IsActive { get; set; }
@@ -30,7 +30,7 @@ namespace DataAccess.DTOs
         
         [Required(ErrorMessage = "Category description is required")]
         [StringLength(250, ErrorMessage = "Category description cannot exceed 250 characters")]
-        public string CategoryDesciption { get; set; } = string.Empty;
+        public string CategoryDescription { get; set; } = string.Empty;
         
         public short? ParentCategoryId { get; set; }
         public bool? IsActive { get; set; } = true;
@@ -44,7 +44,7 @@ namespace DataAccess.DTOs
         
         [Required(ErrorMessage = "Category description is required")]
         [StringLength(250, ErrorMessage = "Category description cannot exceed 250 characters")]
-        public string CategoryDesciption { get; set; } = string.Empty;
+        public string CategoryDescription { get; set; } = string.Empty;
         
         public short? ParentCategoryId { get; set; }
         public bool? IsActive { get; set; }

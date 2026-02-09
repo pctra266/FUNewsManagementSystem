@@ -62,7 +62,8 @@ namespace Presentation_API.Controllers
 
             try
             {
-                var createdCategory = await _categoryService.CreateCategoryAsync(category);
+                var userId = GetUserId();
+                var createdCategory = await _categoryService.CreateCategoryAsync(category, userId);
                 return Created($"/odata/Categories({createdCategory.CategoryId})", createdCategory);
             }
             catch (ArgumentException ex)
@@ -89,8 +90,9 @@ namespace Presentation_API.Controllers
 
             try
             {
+                var userId = GetUserId();
                 category.CategoryId = key;
-                var updatedCategory = await _categoryService.UpdateCategoryAsync(category);
+                var updatedCategory = await _categoryService.UpdateCategoryAsync(category, userId);
                 return Ok(updatedCategory);
             }
             catch (InvalidOperationException ex)
@@ -114,7 +116,8 @@ namespace Presentation_API.Controllers
                     return Conflict(new { message = "Cannot delete category because it is used by news articles" });
                 }
 
-                var success = await _categoryService.DeleteCategoryAsync(key);
+                var userId = GetUserId();
+                var success = await _categoryService.DeleteCategoryAsync(key, userId);
                 if (!success)
                 {
                     return NotFound(new { message = $"Category with ID {key} not found" });
@@ -125,6 +128,48 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the category", error = ex.Message });
+            }
+        }
+
+        private short? GetUserId()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (short.TryParse(userIdClaim, out short userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+
+        [HttpGet("odata/CategoriesFunctions/Active")]
+        [EnableQuery(PageSize = 50, MaxTop = 200)]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetActive()
+        {
+            try
+            {
+                var activeCategories = await _categoryService.GetActiveCategoriesAsync();
+                return Ok(activeCategories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving active categories", error = ex.Message });
+            }
+        }
+
+        [HttpGet("odata/CategoriesFunctions/Search")]
+        [EnableQuery(PageSize = 50, MaxTop = 200)]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search([FromQuery] string? name, [FromQuery] string? description)
+        {
+            try
+            {
+                var categories = await _categoryService.SearchCategoriesAsync(name, description);
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while searching categories", error = ex.Message });
             }
         }
     }

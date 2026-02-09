@@ -68,7 +68,8 @@ namespace Presentation_API.Controllers
                     Note = createDto.Note
                 };
 
-                var createdTag = await _tagService.CreateTagAsync(tag);
+                var userId = GetUserId();
+                var createdTag = await _tagService.CreateTagAsync(tag, userId);
                 return Created($"/odata/Tags({createdTag.TagId})", createdTag);
             }
             catch (ArgumentException ex)
@@ -104,7 +105,8 @@ namespace Presentation_API.Controllers
                 existingTag.TagName = updateDto.TagName;
                 existingTag.Note = updateDto.Note;
 
-                var updatedTag = await _tagService.UpdateTagAsync(existingTag);
+                var userId = GetUserId();
+                var updatedTag = await _tagService.UpdateTagAsync(existingTag, userId);
                 return Ok(updatedTag);
             }
             catch (InvalidOperationException ex)
@@ -128,7 +130,8 @@ namespace Presentation_API.Controllers
                     return Conflict(new { message = "Cannot delete tag because it is used by news articles" });
                 }
 
-                var success = await _tagService.DeleteTagAsync(key);
+                var userId = GetUserId();
+                var success = await _tagService.DeleteTagAsync(key, userId);
                 if (!success)
                 {
                     return NotFound(new { message = $"Tag with ID {key} not found" });
@@ -139,6 +142,48 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the tag", error = ex.Message });
+            }
+        }
+
+        private short? GetUserId()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (short.TryParse(userIdClaim, out short userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+
+        [HttpGet("odata/TagsFunctions/Search")]
+        [EnableQuery]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search([FromQuery] string? tagName)
+        {
+            try
+            {
+                var tags = await _tagService.SearchTagsAsync(tagName);
+                return Ok(tags);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while searching tags", error = ex.Message });
+            }
+        }
+
+        [HttpGet("odata/TagsFunctions/ArticlesByTag")]
+        [EnableQuery]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetArticlesByTag([FromQuery] int tagId)
+        {
+            try
+            {
+                var articles = await _tagService.GetArticlesByTagAsync(tagId);
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving articles by tag", error = ex.Message });
             }
         }
     }

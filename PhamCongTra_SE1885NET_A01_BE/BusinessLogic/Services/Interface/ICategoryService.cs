@@ -8,9 +8,9 @@ namespace BussinessLogic.Services
         Task<Category?> GetCategoryByIdAsync(short id);
         Task<IEnumerable<Category>> GetActiveCategoriesAsync();
         Task<IEnumerable<Category>> SearchCategoriesAsync(string? name = null, string? description = null);
-        Task<Category> CreateCategoryAsync(Category category);
-        Task<Category> UpdateCategoryAsync(Category category);
-        Task<bool> DeleteCategoryAsync(short id);
+        Task<Category> CreateCategoryAsync(Category category, short? userId = null);
+        Task<Category> UpdateCategoryAsync(Category category, short? userId = null);
+        Task<bool> DeleteCategoryAsync(short id, short? userId = null);
         Task<bool> CanDeleteCategoryAsync(short id);
         Task<IEnumerable<Category>> GetSubCategoriesAsync(short parentId);
         Task<int> GetArticleCountByCategoryAsync(short categoryId);

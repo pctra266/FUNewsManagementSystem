@@ -233,7 +233,8 @@ namespace BussinessLogic.Services
 
             if (endDate.HasValue)
             {
-                query = query.Where(n => n.CreatedDate <= endDate);
+                var endOfDate = endDate.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(n => n.CreatedDate <= endOfDate);
             }
 
             return await query.OrderByDescending(n => n.CreatedDate).ToListAsync();
@@ -472,7 +473,8 @@ namespace BussinessLogic.Services
 
             if (endDate.HasValue)
             {
-                query = query.Where(n => n.CreatedDate <= endDate);
+                var endOfDate = endDate.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(n => n.CreatedDate <= endOfDate);
             }
 
             return await query

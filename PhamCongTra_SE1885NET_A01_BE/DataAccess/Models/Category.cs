@@ -9,7 +9,7 @@ public partial class Category
 
     public string CategoryName { get; set; } = null!;
 
-    public string CategoryDesciption { get; set; } = null!;
+    public string CategoryDescription { get; set; } = null!;
 
     public short? ParentCategoryId { get; set; }
 

@@ -10,7 +10,7 @@ namespace DataAccess.Models
     {
         public short CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
-        public string CategoryDesciption { get; set; } = string.Empty;
+        public string CategoryDescription { get; set; } = string.Empty;
         public short? ParentCategoryId { get; set; }
         public bool? IsActive { get; set; }
         public string? ParentCategoryName { get; set; }

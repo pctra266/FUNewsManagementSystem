@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using BussinessLogic.Services;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace Presentation_API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")]
-    public class AuditLogController : ControllerBase
+    [Authorize(Policy = "AdminOnly")]
+    public class AuditLogsController : ODataController
     {
         private readonly IAuditService _auditService;
-
-        public AuditLogController(IAuditService auditService)
+        public AuditLogsController(IAuditService auditService)
         {
             _auditService = auditService;
         }
@@ -23,14 +22,13 @@ namespace Presentation_API.Controllers
         /// <param name="entityType">Optional: Filter by entity type (e.g., "NewsArticle", "Category", "Tag")</param>
         /// <returns>List of audit log entries</returns>
         [HttpGet]
-        public async Task<IActionResult> GetAuditLogs(
-            [FromQuery] short? userId,
-            [FromQuery] string? entityType)
+        [EnableQuery]
+        public IActionResult Get()
         {
             try
             {
-                var logs = await _auditService.GetAuditLogsAsync(userId, entityType);
-                return Ok(logs);
+                var query = _auditService.GetAuditLogsQueryable();
+                return Ok(query);
             }
             catch (Exception ex)
             {

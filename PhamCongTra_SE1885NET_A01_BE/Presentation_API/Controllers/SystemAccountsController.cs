@@ -104,7 +104,12 @@ namespace Presentation_API.Controllers
                     AccountRole = createDto.AccountRole
                 };
 
-                var createdAccount = await _accountService.CreateAccountAsync(account);
+                var userId = GetUserId();
+                 // If userId is null (shouldn't be since Authorize), we might want to handle it.
+                 // But GetUserId() returns null if parsing fails. 
+                 // Let's rely on nullable short? which service accepts.
+                
+                var createdAccount = await _accountService.CreateAccountAsync(account, userId);
                 return Created($"/odata/SystemAccounts({createdAccount.AccountId})", createdAccount);
             }
             catch (InvalidOperationException ex)
@@ -165,7 +170,7 @@ namespace Presentation_API.Controllers
                 existingAccount.AccountRole = isAdmin ? updateDto.AccountRole : existingAccount.AccountRole;
 
                 Console.WriteLine($"Calling UpdateAccountAsync...");
-                var updatedAccount = await _accountService.UpdateAccountAsync(existingAccount);
+                var updatedAccount = await _accountService.UpdateAccountAsync(existingAccount, userId);
                 Console.WriteLine($"? Account updated successfully: {updatedAccount.AccountName}");
                 Console.WriteLine("======================================================");
                 
@@ -198,7 +203,8 @@ namespace Presentation_API.Controllers
                     return Conflict(new { message = "Cannot delete account because it has created news articles" });
                 }
 
-                var success = await _accountService.DeleteAccountAsync(key);
+                var userId = GetUserId();
+                var success = await _accountService.DeleteAccountAsync(key, userId);
                 if (!success)
                 {
                     return NotFound(new { message = $"Account with ID {key} not found" });
@@ -209,6 +215,93 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the account", error = ex.Message });
+            }
+        }
+
+        private short? GetUserId()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (short.TryParse(userIdClaim, out short userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+
+        [HttpGet("odata/SystemAccountsFunctions/Search")]
+        [Authorize(Policy = "AdminOnly")]
+        [EnableQuery]
+        public async Task<IActionResult> Search([FromQuery] string? name, [FromQuery] string? email, [FromQuery] int? role)
+        {
+            try
+            {
+                var query = _accountService.GetAccountsQueryable();
+
+                if (!string.IsNullOrEmpty(name))
+                {
+                    query = query.Where(a => a.AccountName!.Contains(name));
+                }
+
+                if (!string.IsNullOrEmpty(email))
+                {
+                    query = query.Where(a => a.AccountEmail!.Contains(email));
+                }
+
+                if (role.HasValue)
+                {
+                    query = query.Where(a => a.AccountRole == role);
+                }
+
+                var accounts = await query
+                    .Select(a => new SystemAccountDto
+                    {
+                        AccountId = a.AccountId,
+                        AccountName = a.AccountName,
+                        AccountEmail = a.AccountEmail,
+                        AccountRole = a.AccountRole,
+                        ArticleCount = a.NewsArticles.Count
+                    })
+                    .ToListAsync();
+
+                return Ok(accounts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while searching accounts", error = ex.Message });
+            }
+        }
+
+        [HttpPost("odata/SystemAccountsFunctions/ChangePassword")]
+        [Authorize(Policy = "StaffOnly")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Get current user ID from claims
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!short.TryParse(userIdClaim, out short userId))
+                {
+                    return Unauthorized(new { message = "Invalid user identification" });
+                }
+
+                var success = await _accountService.ChangePasswordAsync(userId, 
+                    changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
+                
+                if (!success)
+                {
+                    return BadRequest(new { message = "Current password is incorrect" });
+                }
+
+                return Ok(new { message = "Password changed successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while changing the password", error = ex.Message });
             }
         }
 

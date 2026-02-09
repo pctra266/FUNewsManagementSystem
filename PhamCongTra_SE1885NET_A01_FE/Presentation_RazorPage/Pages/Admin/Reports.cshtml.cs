@@ -23,6 +23,7 @@ namespace Presentation_RazorPage.Pages.Admin
         public int TotalArticles { get; set; }
         public int TotalActiveArticles { get; set; }
         public int TotalInactiveArticles { get; set; }
+        public int DebugTotalCount { get; set; } // For debugging
 
         [BindProperty(SupportsGet = true)]
         public DateTime? StartDate { get; set; }
@@ -56,7 +57,7 @@ namespace Presentation_RazorPage.Pages.Admin
             if (!StartDate.HasValue || !EndDate.HasValue)
             {
                 EndDate = DateTime.Today;
-                StartDate = DateTime.Today.AddDays(-30);
+                StartDate = new DateTime(2020, 1, 1); // Expand range to include sample data
             }
 
             try
@@ -92,7 +93,7 @@ namespace Presentation_RazorPage.Pages.Admin
             if (!StartDate.HasValue || !EndDate.HasValue)
             {
                 EndDate = DateTime.Today;
-                StartDate = DateTime.Today.AddDays(-30);
+                StartDate = new DateTime(2020, 1, 1);
             }
 
             try
@@ -125,6 +126,10 @@ namespace Presentation_RazorPage.Pages.Admin
         private async Task LoadReportDataAsync()
         {
             await LoadArticleDetailsAsync();
+            
+            // Debug check: Get total articles without any filter
+            var rawArticles = await _apiService.GetAsync<NewsArticleModel>("/odata/NewsArticles");
+            DebugTotalCount = rawArticles?.Count ?? 0;
 
             if (GroupBy.Equals("author", StringComparison.OrdinalIgnoreCase))
             {
@@ -158,16 +163,21 @@ namespace Presentation_RazorPage.Pages.Admin
         {
             try
             {
-                var queryParts = new List<string>();
+                var filters = new List<string>();
 
                 if (StartDate.HasValue)
-                    queryParts.Add($"startDate={StartDate:yyyy-MM-dd}");
+                {
+                    filters.Add($"CreatedDate ge {StartDate:yyyy-MM-dd}T00:00:00Z");
+                }
 
                 if (EndDate.HasValue)
-                    queryParts.Add($"endDate={EndDate:yyyy-MM-dd}");
+                {
+                    filters.Add($"CreatedDate le {EndDate:yyyy-MM-dd}T23:59:59Z");
+                }
 
-                var query = string.Join("&", queryParts);
-                var searchUrl = $"/odata/NewsArticlesFunctions/Search?{query}{(string.IsNullOrEmpty(query) ? string.Empty : "&")}{ExpandClause}";
+                var filterQuery = filters.Any() ? $"$filter={string.Join(" and ", filters)}" : "";
+                var searchUrl = $"/odata/NewsArticles?{filterQuery}{(string.IsNullOrEmpty(filterQuery) ? "" : "&")}{ExpandClause}";
+                
                 var searchResponse = await _apiService.GetAsync<NewsArticleModel>(searchUrl);
 
                 ArticleDetails = (searchResponse ?? new List<NewsArticleModel>());
@@ -191,25 +201,15 @@ namespace Presentation_RazorPage.Pages.Admin
         {
             try
             {
-                var query = "";
-                if (StartDate.HasValue && EndDate.HasValue)
-                {
-                    query = $"?startDate={StartDate:yyyy-MM-dd}&endDate={EndDate:yyyy-MM-dd}";
-                }
-                else if (StartDate.HasValue || EndDate.HasValue)
-                {
-                    query = "?";
-                    if (StartDate.HasValue) query += $"startDate={StartDate:yyyy-MM-dd}";
-                    if (EndDate.HasValue) query += $"endDate={EndDate:yyyy-MM-dd}";
-                }
+                var queryParams = new List<string>();
+                if (StartDate.HasValue) queryParams.Add($"startDate={StartDate.Value:yyyy-MM-dd}");
+                if (EndDate.HasValue) queryParams.Add($"endDate={EndDate.Value:yyyy-MM-dd}");
+                if (Status.HasValue) queryParams.Add($"status={Status.Value.ToString().ToLower()}");
 
-                if (Status.HasValue)
-                {
-                    query += string.IsNullOrEmpty(query) ? "?" : "&";
-                    query += $"status={Status.Value.ToString().ToLower()}";
-                }
+                var query = string.Join(",", queryParams);
+                var url = $"/odata/Reports/Default.ArticlesByCategory({query})";
 
-                var categoryResponse = await _apiService.GetByIdAsync<CategoryReportModel>($"/api/Reports/ArticlesByCategory{query}");
+                var categoryResponse = await _apiService.GetByIdAsync<CategoryReportModel>(url);
 
                 if (categoryResponse != null)
                 {
@@ -231,25 +231,15 @@ namespace Presentation_RazorPage.Pages.Admin
         {
             try
             {
-                var query = "";
-                if (StartDate.HasValue && EndDate.HasValue)
-                {
-                    query = $"?startDate={StartDate:yyyy-MM-dd}&endDate={EndDate:yyyy-MM-dd}";
-                }
-                else if (StartDate.HasValue || EndDate.HasValue)
-                {
-                    query = "?";
-                    if (StartDate.HasValue) query += $"startDate={StartDate:yyyy-MM-dd}";
-                    if (EndDate.HasValue) query += $"endDate={EndDate:yyyy-MM-dd}";
-                }
+                var queryParams = new List<string>();
+                if (StartDate.HasValue) queryParams.Add($"startDate={StartDate.Value:yyyy-MM-dd}");
+                if (EndDate.HasValue) queryParams.Add($"endDate={EndDate.Value:yyyy-MM-dd}");
+                if (Status.HasValue) queryParams.Add($"status={Status.Value.ToString().ToLower()}");
 
-                if (Status.HasValue)
-                {
-                    query += string.IsNullOrEmpty(query) ? "?" : "&";
-                    query += $"status={Status.Value.ToString().ToLower()}";
-                }
+                var query = string.Join(",", queryParams);
+                var url = $"/odata/Reports/Default.ArticlesByAuthor({query})";
 
-                var authorResponse = await _apiService.GetByIdAsync<AuthorReportModel>($"/api/Reports/ArticlesByAuthor{query}");
+                var authorResponse = await _apiService.GetByIdAsync<AuthorReportModel>(url);
 
                 if (authorResponse != null)
                 {

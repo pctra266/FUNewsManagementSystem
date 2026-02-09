@@ -85,5 +85,10 @@ namespace BussinessLogic.Services
 
             return logs;
         }
+
+        public IQueryable<AuditLog> GetAuditLogsQueryable()
+        {
+            return _unitOfWork.AuditLogRepository.Query().Include(a => a.User);
+        }
     }
 }

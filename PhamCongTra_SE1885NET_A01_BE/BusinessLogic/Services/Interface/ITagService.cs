@@ -7,9 +7,9 @@ namespace BussinessLogic.Services
         Task<IEnumerable<Tag>> GetAllTagsAsync();
         Task<Tag?> GetTagByIdAsync(int id);
         Task<IEnumerable<Tag>> SearchTagsAsync(string? tagName = null);
-        Task<Tag> CreateTagAsync(Tag tag);
-        Task<Tag> UpdateTagAsync(Tag tag);
-        Task<bool> DeleteTagAsync(int id);
+        Task<Tag> CreateTagAsync(Tag tag, short? userId = null);
+        Task<Tag> UpdateTagAsync(Tag tag, short? userId = null);
+        Task<bool> DeleteTagAsync(int id, short? userId = null);
         Task<bool> CanDeleteTagAsync(int id);
         Task<IEnumerable<NewsArticle>> GetArticlesByTagAsync(int tagId);
         Task<bool> IsTagNameExistAsync(string tagName, int? excludeId = null);

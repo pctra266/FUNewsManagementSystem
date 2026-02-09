@@ -53,12 +53,12 @@ namespace Presentation_RazorPage.Pages.Staff
                     if (!string.IsNullOrEmpty(SearchTerm))
                     {
                         // Search by name or description with NewsArticles count
-                        query = $"/odata/Categories?$filter=contains(tolower(CategoryName), '{SearchTerm.ToLower()}') or contains(tolower(CategoryDesciption), '{SearchTerm.ToLower()}')&$expand=ParentCategory,NewsArticles($select=NewsArticleId)";
+                        query = $"/odata/Categories?$filter=contains(tolower(CategoryName), '{SearchTerm.ToLower()}') or contains(tolower(CategoryDescription), '{SearchTerm.ToLower()}')&$expand=ParentCategory,NewsArticles";
                     }
                     else
                     {
                         // Get all categories with parent info and NewsArticles count
-                        query = "/odata/Categories?$expand=ParentCategory,NewsArticles($select=NewsArticleId)";
+                        query = "/odata/Categories?$expand=ParentCategory,NewsArticles";
                     }
 
                     var response = await _apiService.GetAsync<CategoryWithArticlesModel>(query);
@@ -66,7 +66,7 @@ namespace Presentation_RazorPage.Pages.Staff
                     {
                         CategoryId = c.CategoryId,
                         CategoryName = c.CategoryName,
-                        CategoryDesciption = c.CategoryDesciption,
+                        CategoryDescription = c.CategoryDescription,
                         ParentCategoryId = c.ParentCategoryId,
                         IsActive = c.IsActive,
                         ParentCategoryName = c.ParentCategory?.CategoryName,
@@ -103,7 +103,7 @@ namespace Presentation_RazorPage.Pages.Staff
                     var result = await _apiService.PostAsync<CategoryModel>("/odata/Categories", new
                     {
                         CategoryName = CreateCategory.CategoryName,
-                        CategoryDesciption = CreateCategory.CategoryDesciption,
+                        CategoryDescription = CreateCategory.CategoryDescription,
                         ParentCategoryId = CreateCategory.ParentCategoryId > 0 ? CreateCategory.ParentCategoryId : null,
                         IsActive = CreateCategory.IsActive
                     });
@@ -164,7 +164,7 @@ namespace Presentation_RazorPage.Pages.Staff
                         var updatedCategory = new
                         {
                             CategoryName = category.CategoryName,
-                            CategoryDesciption = category.CategoryDesciption,
+                            CategoryDescription = category.CategoryDescription,
                             ParentCategoryId = category.ParentCategoryId,
                             IsActive = !currentStatus
                         };
@@ -189,9 +189,9 @@ namespace Presentation_RazorPage.Pages.Staff
                 return RedirectToPage();
             }
 
-            public async Task<IActionResult> OnPostUpdateAsync(short CategoryId, string CategoryName, string CategoryDesciption, short? ParentCategoryId, bool IsActive)
+            public async Task<IActionResult> OnPostUpdateAsync(short CategoryId, string CategoryName, string CategoryDescription, short? ParentCategoryId, bool IsActive)
             {
-                if (string.IsNullOrEmpty(CategoryName) || string.IsNullOrEmpty(CategoryDesciption))
+                if (string.IsNullOrEmpty(CategoryName) || string.IsNullOrEmpty(CategoryDescription))
                 {
                     TempData["ErrorMessage"] = "Category name and description are required.";
                     return RedirectToPage();
@@ -221,7 +221,7 @@ namespace Presentation_RazorPage.Pages.Staff
                     var updateData = new
                     {
                         CategoryName = CategoryName,
-                        CategoryDesciption = CategoryDesciption,
+                        CategoryDescription = CategoryDescription,
                         ParentCategoryId = ParentCategoryId > 0 ? ParentCategoryId : null,
                         IsActive = IsActive
                     };
@@ -254,7 +254,7 @@ namespace Presentation_RazorPage.Pages.Staff
 
             [Required(ErrorMessage = "Category description is required")]
             [StringLength(250, ErrorMessage = "Category description cannot exceed 250 characters")]
-            public string CategoryDesciption { get; set; } = string.Empty;
+            public string CategoryDescription { get; set; } = string.Empty;
 
             public short? ParentCategoryId { get; set; }
 
@@ -266,7 +266,7 @@ namespace Presentation_RazorPage.Pages.Staff
         {
             public short CategoryId { get; set; }
             public string CategoryName { get; set; } = string.Empty;
-            public string CategoryDesciption { get; set; } = string.Empty;
+            public string CategoryDescription { get; set; } = string.Empty;
             public short? ParentCategoryId { get; set; }
             public bool? IsActive { get; set; }
             public CategoryParentModel? ParentCategory { get; set; }

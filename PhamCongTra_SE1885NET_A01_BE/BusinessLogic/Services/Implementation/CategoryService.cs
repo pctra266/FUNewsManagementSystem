@@ -7,10 +7,12 @@ namespace BussinessLogic.Services
     public class CategoryService : ICategoryService
     {
             private readonly IUnitOfWork _unitOfWork;
+            private readonly IAuditService _auditService;
 
-            public CategoryService(IUnitOfWork unitOfWork)
+            public CategoryService(IUnitOfWork unitOfWork, IAuditService auditService)
             {
                 _unitOfWork = unitOfWork;
+                _auditService = auditService;
             }
 
             public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
@@ -50,18 +52,18 @@ namespace BussinessLogic.Services
 
                 if (!string.IsNullOrEmpty(description))
                 {
-                    query = query.Where(c => c.CategoryDesciption!.Contains(description));
+                    query = query.Where(c => c.CategoryDescription!.Contains(description));
                 }
 
                 return await query.OrderBy(c => c.CategoryName).ToListAsync();
             }
 
-            public async Task<Category> CreateCategoryAsync(Category category)
+            public async Task<Category> CreateCategoryAsync(Category category, short? userId = null)
             {
                 if (string.IsNullOrEmpty(category.CategoryName))
                     throw new ArgumentException("Category name is required");
 
-                if (string.IsNullOrEmpty(category.CategoryDesciption))
+                if (string.IsNullOrEmpty(category.CategoryDescription))
                     throw new ArgumentException("Category description is required");
 
                 if (await IsCategoryNameExistAsync(category.CategoryName))
@@ -73,16 +75,27 @@ namespace BussinessLogic.Services
                 await _unitOfWork.CategoryRepository.AddAsync(category);
                 await _unitOfWork.SaveChangesAsync();
 
+                // Audit Log
+                if (userId.HasValue)
+                {
+                    await _auditService.LogAsync(userId.Value, "Create", "Category", category.CategoryId.ToString(), null, category);
+                }
+
                 return category;
             }
 
-            public async Task<Category> UpdateCategoryAsync(Category category)
+            public async Task<Category> UpdateCategoryAsync(Category category, short? userId = null)
             {
                 var existingCategory = await _unitOfWork.CategoryRepository.GetByIdAsync(category.CategoryId);
                 if (existingCategory == null)
                 {
                     throw new InvalidOperationException("Category not found");
                 }
+
+                // Keep a copy of old values for logging
+                var oldCategoryState = await _unitOfWork.CategoryRepository.Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId);
 
                 // Check if ParentCategoryID can be changed
                 if (existingCategory.ParentCategoryId != category.ParentCategoryId)
@@ -104,17 +117,23 @@ namespace BussinessLogic.Services
 
                 // Update properties
                 existingCategory.CategoryName = category.CategoryName;
-                existingCategory.CategoryDesciption = category.CategoryDesciption;
+                existingCategory.CategoryDescription = category.CategoryDescription;
                 existingCategory.ParentCategoryId = category.ParentCategoryId;
                 existingCategory.IsActive = category.IsActive;
 
                 _unitOfWork.CategoryRepository.Update(existingCategory);
                 await _unitOfWork.SaveChangesAsync();
 
+                // Audit Log
+                if (userId.HasValue)
+                {
+                    await _auditService.LogAsync(userId.Value, "Update", "Category", category.CategoryId.ToString(), oldCategoryState, existingCategory);
+                }
+
                 return existingCategory;
             }
 
-            public async Task<bool> DeleteCategoryAsync(short id)
+            public async Task<bool> DeleteCategoryAsync(short id, short? userId = null)
             {
                 if (!await CanDeleteCategoryAsync(id))
                 {
@@ -127,8 +146,23 @@ namespace BussinessLogic.Services
                     return false;
                 }
 
+                // Keep a copy for log
+                var categoryToLog = new Category 
+                { 
+                    CategoryId = category.CategoryId, 
+                    CategoryName = category.CategoryName,
+                    CategoryDescription = category.CategoryDescription,
+                    IsActive = category.IsActive
+                };
+
                 _unitOfWork.CategoryRepository.Delete(category);
                 await _unitOfWork.SaveChangesAsync();
+
+                // Audit Log
+                if (userId.HasValue)
+                {
+                    await _auditService.LogAsync(userId.Value, "Delete", "Category", id.ToString(), categoryToLog, null);
+                }
 
                 return true;
             }
@@ -167,9 +201,7 @@ namespace BussinessLogic.Services
 
             public IQueryable<Category> GetCategoriesQueryable()
             {
-                return _unitOfWork.CategoryRepository.Query()
-                    .Include(c => c.ParentCategory)
-                    .Include(c => c.InverseParentCategory);
+                return _unitOfWork.CategoryRepository.Query();
             }
-        }
     }
+}

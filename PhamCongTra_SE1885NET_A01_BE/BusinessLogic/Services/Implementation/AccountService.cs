@@ -2,16 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
 using DataAccess.Repositories;
 using BussinessLogic.Services;
+using System.Text.Json;
 
 namespace BussinessLogic.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuditService _auditService;
 
-        public AccountService(IUnitOfWork unitOfWork)
+        public AccountService(IUnitOfWork unitOfWork, IAuditService auditService)
         {
             _unitOfWork = unitOfWork;
+            _auditService = auditService;
         }
 
         public async Task<IEnumerable<SystemAccount>> GetAllAccountsAsync()
@@ -37,7 +40,7 @@ namespace BussinessLogic.Services
             return account;
         }
 
-        public async Task<SystemAccount> CreateAccountAsync(SystemAccount account)
+        public async Task<SystemAccount> CreateAccountAsync(SystemAccount account, short? userId = null)
         {
             // Check if email already exists
             if (await IsEmailExistAsync(account.AccountEmail!))
@@ -51,11 +54,26 @@ namespace BussinessLogic.Services
 
             await _unitOfWork.AccountRepository.AddAsync(account);
             await _unitOfWork.SaveChangesAsync();
+
+            // Audit Log
+            if (userId.HasValue)
+            {
+                // Mask password before logging
+                var accountToLog = new SystemAccount
+                {
+                    AccountId = account.AccountId,
+                    AccountName = account.AccountName,
+                    AccountEmail = account.AccountEmail,
+                    AccountRole = account.AccountRole,
+                    AccountPassword = "***"
+                };
+                await _auditService.LogAsync(userId.Value, "Create", "SystemAccount", account.AccountId.ToString(), null, accountToLog);
+            }
             
             return account;
         }
 
-        public async Task<SystemAccount> UpdateAccountAsync(SystemAccount account)
+        public async Task<SystemAccount> UpdateAccountAsync(SystemAccount account, short? userId = null)
         {
             // Check if email already exists for other accounts
             if (await IsEmailExistAsync(account.AccountEmail!, account.AccountId))
@@ -63,13 +81,50 @@ namespace BussinessLogic.Services
                 throw new InvalidOperationException("Email already exists");
             }
 
-            _unitOfWork.AccountRepository.Update(account);
+            var existingAccount = await _unitOfWork.AccountRepository.GetByIdAsync(account.AccountId);
+            if (existingAccount == null)
+            {
+                 throw new InvalidOperationException("Account not found");
+            }
+
+            // Keep a copy of old values for logging
+            var oldAccountState = new SystemAccount
+            {
+                AccountId = existingAccount.AccountId,
+                AccountName = existingAccount.AccountName,
+                AccountEmail = existingAccount.AccountEmail,
+                AccountRole = existingAccount.AccountRole,
+                AccountPassword = "***"
+            };
+
+            existingAccount.AccountName = account.AccountName;
+            existingAccount.AccountEmail = account.AccountEmail;
+            existingAccount.AccountRole = account.AccountRole;
+            // Password update is handled separately, or here if passed. 
+            // The controller update logic for PUT implies full update, but usually password change is separate.
+            // Let's assume standard properties update here.
+
+            _unitOfWork.AccountRepository.Update(existingAccount);
             await _unitOfWork.SaveChangesAsync();
+
+             // Audit Log
+            if (userId.HasValue)
+            {
+                var newAccountState = new SystemAccount
+                {
+                    AccountId = existingAccount.AccountId,
+                    AccountName = existingAccount.AccountName,
+                    AccountEmail = existingAccount.AccountEmail,
+                    AccountRole = existingAccount.AccountRole,
+                    AccountPassword = "***"
+                };
+                await _auditService.LogAsync(userId.Value, "Update", "SystemAccount", account.AccountId.ToString(), oldAccountState, newAccountState);
+            }
             
-            return account;
+            return existingAccount;
         }
 
-        public async Task<bool> DeleteAccountAsync(short id)
+        public async Task<bool> DeleteAccountAsync(short id, short? userId = null)
         {
             if (!await CanDeleteAccountAsync(id))
             {
@@ -82,8 +137,24 @@ namespace BussinessLogic.Services
                 return false;
             }
 
+            // Keep a copy for log
+            var accountToLog = new SystemAccount
+            {
+                AccountId = account.AccountId,
+                AccountName = account.AccountName,
+                AccountEmail = account.AccountEmail,
+                AccountRole = account.AccountRole,
+                AccountPassword = "***"
+            };
+
             _unitOfWork.AccountRepository.Delete(account);
             await _unitOfWork.SaveChangesAsync();
+
+            // Audit Log
+            if (userId.HasValue)
+            {
+                await _auditService.LogAsync(userId.Value, "Delete", "SystemAccount", id.ToString(), accountToLog, null);
+            }
             
             return true;
         }

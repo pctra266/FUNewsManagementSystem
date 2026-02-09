@@ -451,8 +451,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
             try
             {
-                var duplicateData = new { ArticleId = articleId };
-                var result = await _apiService.PostAsync<object>("/api/NewsArticlesFunctions/Duplicate", duplicateData);
+                var result = await _apiService.PostAsync<object>($"/odata/NewsArticles('{articleId}')/Default.Duplicate", new { });
 
                 if (result != null)
                 {

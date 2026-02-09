@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Authorization;
 using DataAccess.Models;
 using BussinessLogic.Services;
 using DataAccess.DTOs;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.Formatter;
 
 namespace Presentation_API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ReportsController : ControllerBase
+    [Authorize(Policy = "AdminOnly")]
+    public class ReportsController : ODataController
     {
         private readonly IReportService _reportService;
         private readonly INewsArticleService _newsArticleService;
@@ -20,8 +21,8 @@ namespace Presentation_API.Controllers
             _newsArticleService = newsArticleService;
         }
 
-        [HttpGet("Dashboard")]
-        public async Task<IActionResult> GetDashboardStatistics()
+        [HttpGet]
+        public async Task<IActionResult> Dashboard()
         {
             try
             {
@@ -55,68 +56,66 @@ namespace Presentation_API.Controllers
             }
         }
 
-        [HttpGet("ArticlesByCategory")]
-        public async Task<IActionResult> GetArticleStatisticsByCategory(
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate,
-            [FromQuery] bool? status)
+        [HttpGet]
+        public async Task<CategoryReportDto> ArticlesByCategory(
+            [FromODataUri] DateTime? startDate,
+            [FromODataUri] DateTime? endDate,
+            [FromODataUri] bool? status)
         {
             try
             {
                 if (startDate.HasValue && endDate.HasValue && startDate > endDate)
                 {
-                    return BadRequest(new { message = "Start date cannot be greater than end date" });
+                    // For OData simplicity, we might want to return empty report or throw
+                    return new CategoryReportDto();
                 }
 
-                var statistics = await _reportService.GetArticleStatisticsByCategoryAsync(startDate, endDate, status);
-                return Ok(statistics);
+                return await _reportService.GetArticleStatisticsByCategoryAsync(startDate, endDate, status);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving article statistics by category", error = ex.Message });
+                return new CategoryReportDto();
             }
         }
 
-        [HttpGet("ArticlesByAuthor")]
-        public async Task<IActionResult> GetArticleStatisticsByAuthor(
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate,
-            [FromQuery] bool? status)
+        [HttpGet]
+        public async Task<AuthorReportDto> ArticlesByAuthor(
+            [FromODataUri] DateTime? startDate,
+            [FromODataUri] DateTime? endDate,
+            [FromODataUri] bool? status)
         {
             try
             {
                 if (startDate.HasValue && endDate.HasValue && startDate > endDate)
                 {
-                    return BadRequest(new { message = "Start date cannot be greater than end date" });
+                    return new AuthorReportDto();
                 }
 
-                var statistics = await _reportService.GetArticleStatisticsByAuthorAsync(startDate, endDate, status);
-                return Ok(statistics);
+                return await _reportService.GetArticleStatisticsByAuthorAsync(startDate, endDate, status);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving article statistics by author", error = ex.Message });
+                return new AuthorReportDto();
             }
         }
 
-        [HttpGet("ArticlesByStatus")]
-        public async Task<IActionResult> GetArticleStatisticsByStatus(
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate)
+        [HttpGet]
+        public async Task<StatusReportDto> ArticlesByStatus(
+            [FromODataUri] DateTime? startDate,
+            [FromODataUri] DateTime? endDate)
         {
             try
             {
                 if (startDate.HasValue && endDate.HasValue && startDate > endDate)
                 {
-                    return BadRequest(new { message = "Start date cannot be greater than end date" });
+                    return new StatusReportDto();
                 }
 
-                var statistics = await _reportService.GetArticleStatisticsByStatusAsync(startDate, endDate);
-                return Ok(statistics);
+                return await _reportService.GetArticleStatisticsByStatusAsync(startDate, endDate);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving article statistics by status", error = ex.Message });
+                return new StatusReportDto();
             }
         }
 
@@ -211,12 +210,12 @@ namespace Presentation_API.Controllers
         }
 
 
-        [HttpGet("Trending")]
-        public async Task<IActionResult> GetTrendingArticles([FromQuery] int top = 5)
+        [HttpGet]
+        public async Task<IActionResult> Trending([FromODataUri] int? top)
         {
             try
             {
-                var articles = await _newsArticleService.GetTrendingArticlesAsync(top);
+                var articles = await _newsArticleService.GetTrendingArticlesAsync(top ?? 5);
                 return Ok(articles);
             }
             catch (Exception ex)
@@ -225,17 +224,13 @@ namespace Presentation_API.Controllers
             }
         }
 
-        [HttpGet("Export")]
-        public async Task<IActionResult> ExportToExcel(
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate)
+        [HttpGet]
+        public async Task<IActionResult> Export()
         {
             try
             {
-                var content = await _reportService.ExportToExcelAsync(startDate, endDate);
-                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                var fileName = $"ArticleReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                return File(content, contentType, fileName);
+                var content = await _reportService.ExportToExcelAsync(null, null);
+                return Ok(content);
             }
             catch (Exception ex)
             {
