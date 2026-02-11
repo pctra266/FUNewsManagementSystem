@@ -17,6 +17,7 @@ namespace DataAccess.DTOs
         public int ActiveArticles { get; set; }
         public int InactiveArticles { get; set; }
         public DateTime? LatestArticle { get; set; }
+        public double Percentage { get; set; }
     }
 
     public class CategoryReportDto
@@ -34,6 +35,8 @@ namespace DataAccess.DTOs
         public int InactiveArticles { get; set; }
         public DateTime? LatestArticle { get; set; }
         public DateTime? FirstArticle { get; set; }
+        public string LastArticleDate => LatestArticle?.ToString("MMM dd, yyyy") ?? "Never";
+
     }
 
     public class AuthorReportDto

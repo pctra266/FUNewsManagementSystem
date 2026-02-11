@@ -14,7 +14,7 @@
                     <h1 class="h3 mb-0">Reports</h1>
                 </div>
                 <div class="d-flex gap-2">
-                    <form method="post" asp-page-handler="Export" class="d-inline">
+                    <form method="post" asp-page-handler="Export" class="d-inline" data-skip-loading="true">
                         <input type="hidden" name="GroupBy" value="@Model.GroupBy" />
                         <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
                         <input type="hidden" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
@@ -70,14 +70,6 @@
                         <div class="col-md-4">
                             <label class="form-label">End Date</label>
                             <input type="date" name="EndDate" class="form-control" asp-for="EndDate" max="@today" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Status</label>
-                            <select name="Status" class="form-select" asp-for="Status">
-                                <option value="">All</option>
-                                <option value="true">Active</option>
-                                <option value="false">Inactive</option>
-                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Sort Order</label>

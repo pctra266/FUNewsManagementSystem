@@ -74,6 +74,8 @@ namespace BussinessLogic.Services
                 .OrderByDescending(s => s.TotalArticles)
                 .ToList();
 
+            var totalArticles = categoryStats.Sum(s => s.TotalArticles);
+
             return new CategoryReportDto
             {
                 Period = new PeriodDto { StartDate = startDate, EndDate = endDate },
@@ -84,7 +86,8 @@ namespace BussinessLogic.Services
                     TotalArticles = s.TotalArticles,
                     ActiveArticles = s.ActiveArticles,
                     InactiveArticles = s.InactiveArticles,
-                    LatestArticle = s.LatestArticle
+                    LatestArticle = s.LatestArticle,
+                    Percentage = totalArticles == 0 ? 0 : Math.Round((double)s.TotalArticles / totalArticles * 100, 2)
                 }).ToList()
             };
         }

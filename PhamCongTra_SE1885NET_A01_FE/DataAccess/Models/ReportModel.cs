@@ -95,12 +95,10 @@ public class AuthorStatisticModel
 {
     public int AuthorId { get; set; }
     public string AuthorName { get; set; } = string.Empty;
-    public string AuthorEmail { get; set; } = string.Empty;
     public int TotalArticles { get; set; }
     public int ActiveArticles { get; set; }
     public int InactiveArticles { get; set; }
     public DateTime? LatestArticle { get; set; }
     public DateTime? FirstArticle { get; set; }
-    public int Role => 1; // Default to Staff for display
     public string LastArticleDate => LatestArticle?.ToString("MMM dd, yyyy") ?? "Never";
 }

@@ -15,7 +15,6 @@ namespace Presentation_RazorPage.Pages.Admin.AuditLog
         }
 
         public List<AuditLogModel> AuditLogs { get; set; } = new List<AuditLogModel>();
-        public List<UserFilterModel> Users { get; set; } = new List<UserFilterModel>();
         public List<string> EntityTypes { get; set; } = new List<string>();
 
         // Pagination properties
@@ -82,13 +81,6 @@ namespace Presentation_RazorPage.Pages.Admin.AuditLog
                     }
                 }
 
-                // Get unique users for filter via OData
-                // Optimization: Limit to top 100 users to prevent performance issues with large datasets
-                var allUsers = await _apiService.GetAsync<UserFilterModel>("/odata/SystemAccounts?$select=AccountId,AccountName,AccountEmail&$orderby=AccountName&$top=100");
-                Users = (allUsers ?? new List<UserFilterModel>())
-                    .OrderBy(u => u.AccountName)
-                    .ToList();
-
                 // Get unique entity types from logs (Ideally this should be a separate API call to get distinct types, 
                 // but for now we might rely on loaded logs or a hardcoded list if performance is key. 
                 // For simplicity properly sticking to current logic but strictly it only shows types in current page)
@@ -107,7 +99,6 @@ namespace Presentation_RazorPage.Pages.Admin.AuditLog
             {
                 TempData["ErrorMessage"] = $"Error loading audit logs: {ex.Message}";
                 AuditLogs = new List<AuditLogModel>();
-                Users = new List<UserFilterModel>();
                 EntityTypes = new List<string>();
             }
 
@@ -160,12 +151,5 @@ namespace Presentation_RazorPage.Pages.Admin.AuditLog
                 return json;
             }
         }
-    }
-
-    public class UserFilterModel
-    {
-        public short AccountId { get; set; }
-        public string AccountName { get; set; } = string.Empty;
-        public string AccountEmail { get; set; } = string.Empty;
     }
 }

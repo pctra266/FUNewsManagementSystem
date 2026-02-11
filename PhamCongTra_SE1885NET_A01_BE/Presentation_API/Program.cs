@@ -42,24 +42,27 @@ modelBuilder.ComplexType<StatusReportDto>();
 // Register Report Functions
 // var reportsEntity = modelBuilder.EntitySet<NewsArticle>("Reports"); // REMOVED: Redundant and causing CRUD routes for Reports
 
+var getActiveFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("GetActive");
+getActiveFunc.ReturnsCollectionFromEntitySet<NewsArticle>("NewsArticles");
+
 var dashboardFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("Dashboard");
 dashboardFunc.Returns<string>(); 
 
 var categoryReportFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("ArticlesByCategory");
-categoryReportFunc.Parameter<DateTime?>("startDate");
-categoryReportFunc.Parameter<DateTime?>("endDate");
-categoryReportFunc.Parameter<bool?>("status");
+categoryReportFunc.Parameter<string>("startDate");
+categoryReportFunc.Parameter<string>("endDate");
+categoryReportFunc.Parameter<bool?>("status").Optional();
 categoryReportFunc.Returns<CategoryReportDto>();
 
 var authorReportFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("ArticlesByAuthor");
-authorReportFunc.Parameter<DateTime?>("startDate");
-authorReportFunc.Parameter<DateTime?>("endDate");
-authorReportFunc.Parameter<bool?>("status");
+authorReportFunc.Parameter<string>("startDate");
+authorReportFunc.Parameter<string>("endDate");
+authorReportFunc.Parameter<bool?>("status").Optional();
 authorReportFunc.Returns<AuthorReportDto>();
 
 var statusReportFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("ArticlesByStatus");
-statusReportFunc.Parameter<DateTime?>("startDate");
-statusReportFunc.Parameter<DateTime?>("endDate");
+statusReportFunc.Parameter<string>("startDate");
+statusReportFunc.Parameter<string>("endDate");
 statusReportFunc.Returns<StatusReportDto>();
 
 var trendingFunc = modelBuilder.EntityType<NewsArticle>().Collection.Function("Trending");

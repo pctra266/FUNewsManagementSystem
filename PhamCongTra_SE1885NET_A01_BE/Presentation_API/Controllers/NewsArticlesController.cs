@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
-
+using Microsoft.AspNetCore.OData.Formatter; // Cần thiết cho [FromODataUri]
 using Microsoft.AspNetCore.Authorization;
 using DataAccess.Models;
 using BussinessLogic.Services;
 using DataAccess.DTOs;
 using Microsoft.AspNetCore.SignalR;
 using Presentation_API.Hubs;
+using System.IO;
 
 namespace Presentation_API.Controllers
 {
@@ -15,22 +16,199 @@ namespace Presentation_API.Controllers
     public class NewsArticlesController : ODataController
     {
         private readonly INewsArticleService _newsArticleService;
+        private readonly IReportService _reportService; // Đã thêm service báo cáo
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly INotificationService _notificationService;
 
         public NewsArticlesController(
             INewsArticleService newsArticleService,
+            IReportService reportService, // Inject vào constructor
             IHubContext<NotificationHub> hubContext,
             INotificationService notificationService)
         {
             _newsArticleService = newsArticleService;
+            _reportService = reportService;
             _hubContext = hubContext;
             _notificationService = notificationService;
         }
 
+        // =================================================================================
+        // ODATA STANDARD FUNCTIONS (Sửa lỗi 404 cho Reports)
+        // Các hàm này khớp với khai báo trong Program.cs: builder.EntityType<NewsArticle>().Collection.Function(...)
+        // =================================================================================
+
+        [HttpGet]
         [EnableQuery]
-        [AllowAnonymous] // Allow public access for viewing active news
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> ArticlesByCategory(
+            [FromODataUri] string startDate,
+            [FromODataUri] string endDate,
+            [FromODataUri] bool? status)
+        {
+            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
+            {
+                return BadRequest("Start date and End date are required.");
+            }
+
+            if (!DateOnly.TryParse(startDate, out DateOnly start) || !DateOnly.TryParse(endDate, out DateOnly end))
+            {
+                return BadRequest("Invalid date format. Use YYYY-MM-DD.");
+            }
+
+            try
+            {
+                var result = await _reportService
+                    .GetArticleStatisticsByCategoryAsync(
+                        start.ToDateTime(TimeOnly.MinValue), 
+                        end.ToDateTime(TimeOnly.MaxValue));
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while retrieving category report",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        public async Task<IActionResult> ArticlesByAuthor(
+            [FromODataUri] string startDate,
+            [FromODataUri] string endDate,
+            [FromODataUri] bool? status)
+        {
+            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
+            {
+                return BadRequest("Start date and End date are required.");
+            }
+
+            if (!DateOnly.TryParse(startDate, out DateOnly start) || !DateOnly.TryParse(endDate, out DateOnly end))
+            {
+                return BadRequest("Invalid date format. Use YYYY-MM-DD.");
+            }
+
+            try
+            {
+                var result = await _reportService
+                    .GetArticleStatisticsByAuthorAsync(
+                        start.ToDateTime(TimeOnly.MinValue), 
+                        end.ToDateTime(TimeOnly.MaxValue));
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while retrieving author report",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        public async Task<IActionResult> ArticlesByStatus(
+            [FromODataUri] string startDate,
+            [FromODataUri] string endDate)
+        {
+            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
+            {
+                return BadRequest("Start date and End date are required.");
+            }
+
+            if (!DateOnly.TryParse(startDate, out DateOnly start) || !DateOnly.TryParse(endDate, out DateOnly end))
+            {
+                return BadRequest("Invalid date format. Use YYYY-MM-DD.");
+            }
+
+            try
+            {
+                var result = await _reportService
+                    .GetArticleStatisticsByStatusAsync(
+                        start.ToDateTime(TimeOnly.MinValue), 
+                        end.ToDateTime(TimeOnly.MaxValue));
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while retrieving status report",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        public async Task<IActionResult> Trending([FromODataUri] int? top)
+        {
+            try
+            {
+                var result = await _newsArticleService.GetTrendingArticlesAsync(top ?? 10);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while retrieving trending articles",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Export()
+        {
+            try
+            {
+                var fileContent = await _reportService.ExportToExcelAsync();
+                var fileName = $"report-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
+
+                return File(
+                    fileContent,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while exporting report",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        public async Task<IActionResult> Dashboard()
+        {
+            try
+            {
+                var dashboard = await _reportService.GetDashboardStatisticsAsync();
+                return Ok(dashboard);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while retrieving dashboard data",
+                    error = ex.Message
+                });
+            }
+        }
+
+        // =================================================================================
+        // BASIC CRUD & EXISTING METHODS
+        // =================================================================================
+
+        [EnableQuery]
+        [AllowAnonymous]
+        public IActionResult Get()
         {
             try
             {
@@ -44,7 +222,7 @@ namespace Presentation_API.Controllers
         }
 
         [EnableQuery]
-        [AllowAnonymous] // Allow public access for viewing specific article
+        [AllowAnonymous]
         public async Task<IActionResult> Get([FromRoute] string key)
         {
             try
@@ -64,8 +242,9 @@ namespace Presentation_API.Controllers
 
         [HttpGet]
         [EnableQuery]
-        public async Task<IActionResult> Recommend([FromRoute] string key)
+        public async Task<IActionResult> Recommend([FromODataUri] string key)
         {
+            // Note: OData Function bound to Entity uses [FromODataUri] key
             try
             {
                 var articles = await _newsArticleService.GetRecommendedArticlesAsync(key);
@@ -77,7 +256,9 @@ namespace Presentation_API.Controllers
             }
         }
 
-        [HttpGet("odata/NewsArticlesFunctions/Active")]
+        // --- Custom Routes (Giữ lại để tương thích code cũ nếu Frontend còn dùng) ---
+
+        [HttpGet]
         [EnableQuery(PageSize = 99, MaxTop = 99)]
         [AllowAnonymous]
         public async Task<IActionResult> GetActive()
@@ -116,6 +297,31 @@ namespace Presentation_API.Controllers
             }
         }
 
+        // Hàm này nên đổi thành OData Function chuẩn "ByCategory" nếu muốn dùng OData syntax
+        [HttpGet("odata/NewsArticlesFunctions/ByCategory")]
+        [EnableQuery(PageSize = 20, MaxTop = 50)]
+        public async Task<IActionResult> GetByCategoryLegacy([FromQuery] short categoryId)
+        {
+            try
+            {
+                var articles = await _newsArticleService.GetNewsArticlesByCategorySummaryAsync(categoryId);
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving articles by category", error = ex.Message });
+            }
+        }
+
+        // Hàm OData chuẩn cho ByCategory (để khớp với Program.cs)
+        [HttpGet]
+        [EnableQuery]
+        public async Task<IActionResult> ByCategory([FromODataUri] int categoryId)
+        {
+            // Overload cho OData route chuẩn
+            return await GetByCategoryLegacy((short)categoryId);
+        }
+
         [HttpGet("odata/NewsArticlesFunctions/ByAuthor")]
         [EnableQuery(PageSize = 20, MaxTop = 50)]
         public async Task<IActionResult> GetByAuthor([FromQuery] int authorId)
@@ -128,21 +334,6 @@ namespace Presentation_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while retrieving articles by author", error = ex.Message });
-            }
-        }
-
-        [HttpGet("odata/NewsArticlesFunctions/ByCategory")]
-        [EnableQuery(PageSize = 20, MaxTop = 50)]
-        public async Task<IActionResult> ByCategory([FromQuery] short categoryId)
-        {
-            try
-            {
-                var articles = await _newsArticleService.GetNewsArticlesByCategorySummaryAsync(categoryId);
-                return Ok(articles);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while retrieving articles by category", error = ex.Message });
             }
         }
 
@@ -162,22 +353,19 @@ namespace Presentation_API.Controllers
             }
         }
 
+        // =================================================================================
+        // WRITE OPERATIONS (POST, PUT, DELETE, ACTION)
+        // =================================================================================
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] NewsArticleCreateDto createDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
-                // Get current user ID from claims
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!short.TryParse(userIdClaim, out short userId))
-                {
-                    return Unauthorized(new { message = "Invalid user identification" });
-                }
+                if (!short.TryParse(userIdClaim, out short userId)) return Unauthorized(new { message = "Invalid user identification" });
 
                 var article = new NewsArticle
                 {
@@ -192,14 +380,11 @@ namespace Presentation_API.Controllers
                 };
 
                 var createdArticle = await _newsArticleService.CreateNewsArticleAsync(article, createDto.TagIds);
-                
-                // Send real-time notification via SignalR
+
                 var notificationMessage = $"📰 New article published: {createdArticle.NewsTitle}";
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", notificationMessage);
-                
-                // Store notification in service
                 _notificationService.AddNotification(notificationMessage);
-                
+
                 return Created($"/odata/NewsArticles('{createdArticle.NewsArticleId}')", createdArticle);
             }
             catch (Exception ex)
@@ -211,19 +396,12 @@ namespace Presentation_API.Controllers
         [HttpPut]
         public async Task<IActionResult> Put([FromRoute] string key, [FromBody] NewsArticleUpdateDto updateDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
-                // Get current user ID for UpdatedById
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!short.TryParse(userIdClaim, out short userId))
-                {
-                    return Unauthorized(new { message = "Invalid user identification" });
-                }
+                if (!short.TryParse(userIdClaim, out short userId)) return Unauthorized(new { message = "Invalid user identification" });
 
                 var article = new NewsArticle
                 {
@@ -256,19 +434,12 @@ namespace Presentation_API.Controllers
         {
             try
             {
-                // Get current user ID for audit log
                 short? userId = null;
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (short.TryParse(userIdClaim, out short parsedId))
-                {
-                    userId = parsedId;
-                }
+                if (short.TryParse(userIdClaim, out short parsedId)) userId = parsedId;
 
                 var success = await _newsArticleService.DeleteNewsArticleAsync(key, userId);
-                if (!success)
-                {
-                    return NotFound(new { message = $"News article with ID {key} not found" });
-                }
+                if (!success) return NotFound(new { message = $"News article with ID {key} not found" });
 
                 return NoContent();
             }
@@ -277,20 +448,16 @@ namespace Presentation_API.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the news article", error = ex.Message });
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Duplicate([FromRoute] string key)
         {
             try
             {
-                // Get current user ID from claims
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!short.TryParse(userIdClaim, out short userId))
-                {
-                    return Unauthorized(new { message = "Invalid user identification" });
-                }
+                if (!short.TryParse(userIdClaim, out short userId)) return Unauthorized(new { message = "Invalid user identification" });
 
                 var duplicatedArticle = await _newsArticleService.DuplicateArticleAsync(key, userId);
-
                 return Ok(duplicatedArticle);
             }
             catch (InvalidOperationException ex)
@@ -306,24 +473,19 @@ namespace Presentation_API.Controllers
         [HttpPost("/api/NewsArticles/upload-image")]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
+            if (file == null || file.Length == 0) return BadRequest("No file uploaded.");
 
-            // 5MB limit
             const long maxFileSize = 5 * 1024 * 1024;
-            if (file.Length > maxFileSize)
-                return BadRequest("File size exceeds 5MB limit.");
+            if (file.Length > maxFileSize) return BadRequest("File size exceeds 5MB limit.");
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!allowedExtensions.Contains(extension))
-                return BadRequest("Invalid file type. Only .jpg, .jpeg, .png, .gif are allowed.");
+            if (!allowedExtensions.Contains(extension)) return BadRequest("Invalid file type.");
 
             try
             {
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
                 var uniqueFileName = Guid.NewGuid().ToString() + extension;
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);

@@ -129,7 +129,7 @@ namespace Presentation_RazorPage.Pages.News
                 return searchResponse ?? new List<NewsArticleModel>();
             }
 
-            var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticlesFunctions/Active?{ExpandClause}");
+            var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticles/Default.GetActive()?{ExpandClause}");
             return articlesResponse ?? new List<NewsArticleModel>();
         }
 

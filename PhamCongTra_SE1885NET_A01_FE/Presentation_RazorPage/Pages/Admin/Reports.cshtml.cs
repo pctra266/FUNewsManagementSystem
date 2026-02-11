@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLogic.Services;
 using DataAccess.Models;
+using System.Web;
 
 namespace Presentation_RazorPage.Pages.Admin
 {
@@ -40,7 +41,9 @@ namespace Presentation_RazorPage.Pages.Admin
         [BindProperty(SupportsGet = true)]
         public bool? Status { get; set; }
 
-        private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName)";
+        private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags";
+        private const string CategoryReportEndpoint = "/odata/NewsArticles/Default.ArticlesByCategory";
+        private const string AuthorReportEndpoint = "/odata/NewsArticles/ArticlesByAuthor";
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -57,7 +60,7 @@ namespace Presentation_RazorPage.Pages.Admin
             if (!StartDate.HasValue || !EndDate.HasValue)
             {
                 EndDate = DateTime.Today;
-                StartDate = new DateTime(2020, 1, 1); // Expand range to include sample data
+                StartDate = new DateTime(2026, 1, 1);
             }
 
             try
@@ -126,7 +129,7 @@ namespace Presentation_RazorPage.Pages.Admin
         private async Task LoadReportDataAsync()
         {
             await LoadArticleDetailsAsync();
-            
+
             // Debug check: Get total articles without any filter
             var rawArticles = await _apiService.GetAsync<NewsArticleModel>("/odata/NewsArticles");
             DebugTotalCount = rawArticles?.Count ?? 0;
@@ -163,30 +166,14 @@ namespace Presentation_RazorPage.Pages.Admin
         {
             try
             {
-                var filters = new List<string>();
+                var (endpoint, query) = BuildArticleEndpoint();
+                var url = $"{endpoint}?{query}&{ExpandClause}".TrimEnd('?');
 
-                if (StartDate.HasValue)
-                {
-                    filters.Add($"CreatedDate ge {StartDate:yyyy-MM-dd}T00:00:00Z");
-                }
+                var response = await _apiService.GetAsync<NewsArticleModel>(url);
+                ArticleDetails = response?.ToList() ?? new List<NewsArticleModel>();
+                ArticleDetails.ForEach(a => a.HydrateMetadata());
 
-                if (EndDate.HasValue)
-                {
-                    filters.Add($"CreatedDate le {EndDate:yyyy-MM-dd}T23:59:59Z");
-                }
-
-                var filterQuery = filters.Any() ? $"$filter={string.Join(" and ", filters)}" : "";
-                var searchUrl = $"/odata/NewsArticles?{filterQuery}{(string.IsNullOrEmpty(filterQuery) ? "" : "&")}{ExpandClause}";
-                
-                var searchResponse = await _apiService.GetAsync<NewsArticleModel>(searchUrl);
-
-                ArticleDetails = (searchResponse ?? new List<NewsArticleModel>());
-                foreach (var article in ArticleDetails)
-                {
-                    article.HydrateMetadata();
-                }
-
-                ArticleDetails = SortOrder == "asc"
+                ArticleDetails = SortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
                     ? ArticleDetails.OrderBy(a => a.CreatedDate).ToList()
                     : ArticleDetails.OrderByDescending(a => a.CreatedDate).ToList();
             }
@@ -197,28 +184,43 @@ namespace Presentation_RazorPage.Pages.Admin
             }
         }
 
+        private (string Endpoint, string Query) BuildArticleEndpoint()
+        {
+            var filters = new List<string>();
+
+            if (StartDate.HasValue)
+            {
+                filters.Add($"startDate={StartDate:yyyy-MM-dd}");
+            }
+
+            if (EndDate.HasValue)
+            {
+                filters.Add($"endDate={EndDate:yyyy-MM-dd}");
+            }
+
+            if (Status.HasValue)
+            {
+                filters.Add($"status={(Status.Value ? "true" : "false")}");
+            }
+
+            if (filters.Count == 0)
+            {
+                return ("/odata/NewsArticles/Default.GetActive()", string.Empty);
+            }
+
+            return ("/odata/NewsArticlesFunctions/Search", string.Join("&", filters));
+        }
+
+        // Helper to build query-string filters for REST endpoints (Search)
+        // 3. fetch category stats via /odata/NewsArticlesFunctions/ByCategory
         private async Task LoadCategoryStatsAsync()
         {
             try
             {
-                var queryParams = new List<string>();
-                if (StartDate.HasValue) queryParams.Add($"startDate={StartDate.Value:yyyy-MM-dd}");
-                if (EndDate.HasValue) queryParams.Add($"endDate={EndDate.Value:yyyy-MM-dd}");
-                if (Status.HasValue) queryParams.Add($"status={Status.Value.ToString().ToLower()}");
+                var url = BuildODataFunctionUrl(CategoryReportEndpoint);
+                var report = await _apiService.GetByIdAsync<CategoryReportModel>(url);
 
-                var query = string.Join(",", queryParams);
-                var url = $"/odata/Reports/Default.ArticlesByCategory({query})";
-
-                var categoryResponse = await _apiService.GetByIdAsync<CategoryReportModel>(url);
-
-                if (categoryResponse != null)
-                {
-                    CategoryStats = categoryResponse.CategoryStatistics ?? new List<CategoryStatisticModel>();
-                }
-                else
-                {
-                    CategoryStats = new List<CategoryStatisticModel>();
-                }
+                CategoryStats = report?.CategoryStatistics ?? new List<CategoryStatisticModel>();
             }
             catch (Exception ex)
             {
@@ -227,34 +229,31 @@ namespace Presentation_RazorPage.Pages.Admin
             }
         }
 
+        // 4. fetch author stats via /odata/NewsArticles/ArticlesByAuthor
         private async Task LoadAuthorStatsAsync()
         {
             try
             {
-                var queryParams = new List<string>();
-                if (StartDate.HasValue) queryParams.Add($"startDate={StartDate.Value:yyyy-MM-dd}");
-                if (EndDate.HasValue) queryParams.Add($"endDate={EndDate.Value:yyyy-MM-dd}");
-                if (Status.HasValue) queryParams.Add($"status={Status.Value.ToString().ToLower()}");
+                var url = BuildODataFunctionUrl(AuthorReportEndpoint);
+                var report = await _apiService.GetByIdAsync<AuthorReportModel>(url);
 
-                var query = string.Join(",", queryParams);
-                var url = $"/odata/Reports/Default.ArticlesByAuthor({query})";
-
-                var authorResponse = await _apiService.GetByIdAsync<AuthorReportModel>(url);
-
-                if (authorResponse != null)
-                {
-                    AuthorStats = authorResponse.AuthorStatistics ?? new List<AuthorStatisticModel>();
-                }
-                else
-                {
-                    AuthorStats = new List<AuthorStatisticModel>();
-                }
+                AuthorStats = report?.AuthorStatistics ?? new List<AuthorStatisticModel>();
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Error loading author statistics: {ex.Message}";
                 AuthorStats = new List<AuthorStatisticModel>();
             }
+        }
+
+        private string BuildODataFunctionUrl(string baseEndpoint)
+        {
+            var start = StartDate?.ToString("yyyy-MM-dd") ?? DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd");
+            var end = EndDate?.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd");
+            var statusValue = Status.HasValue ? Status.Value.ToString().ToLowerInvariant() : "true";
+
+            // Result: /odata/NewsArticles/Default.ArticlesByCategory(startDate='2026-01-01',endDate='2026-01-31',status=true)
+            return $"{baseEndpoint}(startDate='{start}',endDate='{end}',status={statusValue})";
         }
     }
 }

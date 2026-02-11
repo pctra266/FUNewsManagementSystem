@@ -37,17 +37,7 @@
                 </div>
                 <div class="card-body">
                     <form method="get" class="row g-3">
-                        <div class="col-md-5">
-                            <label class="form-label">User</label>
-                            <select name="FilterUserId" class="form-select" asp-for="FilterUserId">
-                                <option value="">All Users</option>
-                                @foreach (var user in Model.Users)
-                                {
-                                    <option value="@user.AccountId">@user.AccountName (@user.AccountEmail)</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-5">
+                        <div class="col-md">
                             <label class="form-label">Entity Type</label>
                             <select name="FilterEntityType" class="form-select" asp-for="FilterEntityType">
                                 <option value="">All Entity Types</option>
@@ -57,8 +47,9 @@
                                 }
                             </select>
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">
+
+                        <div class="col-md-auto d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>Apply
                             </button>
                         </div>

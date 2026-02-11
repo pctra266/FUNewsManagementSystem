@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.Authorization;
-using DataAccess.Models;
 using BussinessLogic.Services;
-using DataAccess.DTOs;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Formatter;
 
@@ -56,68 +54,68 @@ namespace Presentation_API.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<CategoryReportDto> ArticlesByCategory(
-            [FromODataUri] DateTime? startDate,
-            [FromODataUri] DateTime? endDate,
-            [FromODataUri] bool? status)
-        {
-            try
-            {
-                if (startDate.HasValue && endDate.HasValue && startDate > endDate)
-                {
-                    // For OData simplicity, we might want to return empty report or throw
-                    return new CategoryReportDto();
-                }
+        //[HttpGet]
+        //public async Task<CategoryReportDto> ArticlesByCategory(
+        //    [FromODataUri] DateTime? startDate,
+        //    [FromODataUri] DateTime? endDate,
+        //    [FromODataUri] bool? status)
+        //{
+        //    try
+        //    {
+        //        if (startDate.HasValue && endDate.HasValue && startDate > endDate)
+        //        {
+        //            // For OData simplicity, we might want to return empty report or throw
+        //            return new CategoryReportDto();
+        //        }
 
-                return await _reportService.GetArticleStatisticsByCategoryAsync(startDate, endDate, status);
-            }
-            catch (Exception)
-            {
-                return new CategoryReportDto();
-            }
-        }
+        //        return await _reportService.GetArticleStatisticsByCategoryAsync(startDate, endDate, status);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return new CategoryReportDto();
+        //    }
+        //}
 
-        [HttpGet]
-        public async Task<AuthorReportDto> ArticlesByAuthor(
-            [FromODataUri] DateTime? startDate,
-            [FromODataUri] DateTime? endDate,
-            [FromODataUri] bool? status)
-        {
-            try
-            {
-                if (startDate.HasValue && endDate.HasValue && startDate > endDate)
-                {
-                    return new AuthorReportDto();
-                }
+        //[HttpGet]
+        //public async Task<AuthorReportDto> ArticlesByAuthor(
+        //    [FromODataUri] DateTime? startDate,
+        //    [FromODataUri] DateTime? endDate,
+        //    [FromODataUri] bool? status)
+        //{
+        //    try
+        //    {
+        //        if (startDate.HasValue && endDate.HasValue && startDate > endDate)
+        //        {
+        //            return new AuthorReportDto();
+        //        }
 
-                return await _reportService.GetArticleStatisticsByAuthorAsync(startDate, endDate, status);
-            }
-            catch (Exception)
-            {
-                return new AuthorReportDto();
-            }
-        }
+        //        return await _reportService.GetArticleStatisticsByAuthorAsync(startDate, endDate, status);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return new AuthorReportDto();
+        //    }
+        //}
 
-        [HttpGet]
-        public async Task<StatusReportDto> ArticlesByStatus(
-            [FromODataUri] DateTime? startDate,
-            [FromODataUri] DateTime? endDate)
-        {
-            try
-            {
-                if (startDate.HasValue && endDate.HasValue && startDate > endDate)
-                {
-                    return new StatusReportDto();
-                }
+        //[HttpGet]
+        //public async Task<StatusReportDto> ArticlesByStatus(
+        //    [FromODataUri] DateTime? startDate,
+        //    [FromODataUri] DateTime? endDate)
+        //{
+        //    try
+        //    {
+        //        if (startDate.HasValue && endDate.HasValue && startDate > endDate)
+        //        {
+        //            return new StatusReportDto();
+        //        }
 
-                return await _reportService.GetArticleStatisticsByStatusAsync(startDate, endDate);
-            }
-            catch (Exception)
-            {
-                return new StatusReportDto();
-            }
-        }
+        //        return await _reportService.GetArticleStatisticsByStatusAsync(startDate, endDate);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return new StatusReportDto();
+        //    }
+        //}
 
         [HttpGet("CategoryUsage")]
         public async Task<IActionResult> GetCategoryUsageStatistics()
@@ -208,7 +206,6 @@ namespace Presentation_API.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving top categories", error = ex.Message });
             }
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Trending([FromODataUri] int? top)
