@@ -1,6 +1,6 @@
 // notification.js
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:7215/hub/notifications") // Adjust port if Backend is different
+    .withUrl("https://localhost:7196/hub/notifications") // Adjust port if Backend is different
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
@@ -69,7 +69,7 @@ function getTimeAgo(date) {
 // Load initial notifications from API
 async function loadInitialNotifications() {
     try {
-        const response = await fetch('https://localhost:7215/api/notifications');
+        const response = await fetch('https://localhost:7196/api/notifications');
         if (response.ok) {
             const data = await response.json();
             notifications = data.map(n => ({
