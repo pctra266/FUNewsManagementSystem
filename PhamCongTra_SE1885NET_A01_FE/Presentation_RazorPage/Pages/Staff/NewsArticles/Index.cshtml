@@ -103,10 +103,39 @@
                             {
                                 <tr>
                                     <td class="ps-4">
-                                        <div style="width: 60px; height: 60px; overflow: hidden; border-radius: 8px;" class="bg-light border d-flex align-items-center justify-content-center">
-                                            @if (article.NewsArticleImages != null && article.NewsArticleImages.Any())
+                                        @{
+                                            var images = article.NewsArticleImages?.ToList();
+                                            var carouselId = $"article-thumb-carousel-{article.NewsArticleId}";
+                                        }
+                                        <div class="article-thumb-wrapper bg-light border rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; overflow: hidden;">
+                                            @if (images is { Count: > 0 })
                                             {
-                                                <img src="@article.NewsArticleImages.First().ImageUrl" alt="Article thumbnail" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/image/default-news.png'" />
+                                                <div id="@carouselId" class="carousel slide article-thumb-carousel w-100 h-100" data-bs-ride="false" data-bs-interval="false">
+                                                    <div class="carousel-inner w-100 h-100">
+                                                        @for (var i = 0; i < images.Count; i++)
+                                                        {
+                                                            var activeClass = i == 0 ? "active" : string.Empty;
+                                                            <div class="carousel-item @activeClass w-100 h-100">
+                                                                <img src="@images[i].ImageUrl"
+                                                                     alt="Article thumbnail"
+                                                                     class="d-block w-100 h-100"
+                                                                     onerror="this.src='/image/default-news.png'" />
+                                                            </div>
+                                                        }
+                                                    </div>
+
+                                                    @if (images.Count > 1)
+                                                    {
+                                                        <button class="carousel-control-prev article-thumb-control" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                            <span class="visually-hidden">Previous</span>
+                                                        </button>
+                                                        <button class="carousel-control-next article-thumb-control" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                            <span class="visually-hidden">Next</span>
+                                                        </button>
+                                                    }
+                                                </div>
                                             }
                                             else
                                             {
@@ -279,6 +308,26 @@
                 background-color: #f8f9fa;
                 border-color: #dee2e6;
                 color: #212529;
+            }
+
+        .article-thumb-wrapper img {
+            object-fit: cover;
+        }
+
+        .article-thumb-carousel .carousel-item {
+            width: 100%;
+            height: 100%;
+        }
+
+        .article-thumb-control {
+            width: 18px;
+        }
+
+            .article-thumb-control .carousel-control-prev-icon,
+            .article-thumb-control .carousel-control-next-icon {
+                width: 12px;
+                height: 12px;
+                filter: invert(1);
             }
     </style>
 
