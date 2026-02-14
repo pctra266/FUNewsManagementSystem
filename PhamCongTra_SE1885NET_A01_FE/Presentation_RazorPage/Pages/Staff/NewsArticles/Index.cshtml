@@ -2,6 +2,7 @@
 @model Presentation_RazorPage.Pages.Staff.NewsArticles.IndexModel
 @{
     ViewData["Title"] = "News Articles Management";
+    var currentListingUrl = $"{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
 }
 
 <div class="container-fluid py-4">
@@ -32,9 +33,9 @@
                 <i class="fas fa-filter me-1"></i> Filters
             </button>
 
-            <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal" data-crud-action="create">
+            <a class="btn btn-sm btn-primary" asp-page="Create" asp-route-returnUrl="@currentListingUrl" data-crud-action="create">
                 <i class="fas fa-plus me-1"></i> New Article
-            </button>
+            </a>
         </div>
     </div>
 
@@ -158,19 +159,13 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group btn-group-sm shadow-sm" role="group">
-                                            <button type="button" class="btn btn-white border text-primary" title="Edit article"
-                                                    data-bs-toggle="modal" data-bs-target="#editArticleModal"
-                                                    data-crud-action="edit"
-                                                    data-article-id="@article.NewsArticleId"
-                                                    data-title="@System.Net.WebUtility.HtmlEncode(article.NewsTitle ?? "")"
-                                                    data-headline="@System.Net.WebUtility.HtmlEncode(article.Headline ?? "")"
-                                                    data-content="@System.Net.WebUtility.HtmlEncode(article.NewsContent ?? "")"
-                                                    data-source="@System.Net.WebUtility.HtmlEncode(article.NewsSource ?? "")"
-                                                    data-category-id="@article.CategoryId"
-                                                    data-status="@(article.NewsStatus == true ? "true" : "false")"
-                                                    data-tag-ids="@string.Join(",", article.Tags?.Select(t => t.TagId) ?? new List<int>())">
+                                            <a class="btn btn-white border text-primary" title="Edit article"
+                                               asp-page="Edit"
+                                               asp-route-id="@article.NewsArticleId"
+                                               asp-route-returnUrl="@currentListingUrl"
+                                               data-crud-action="edit">
                                                 <i class="fas fa-pencil-alt"></i>
-                                            </button>
+                                            </a>
 
                                             <button type="button" class="btn btn-white border text-secondary" title="Duplicate Draft" onclick="duplicateArticle('@article.NewsArticleId')" data-crud-action="modify">
                                                 <i class="fas fa-copy"></i>
@@ -243,246 +238,12 @@
                     }
                     else
                     {
-                        <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createArticleModal" data-crud-action="create">
+                        <a class="btn btn-sm btn-primary" asp-page="Create" asp-route-returnUrl="@currentListingUrl" data-crud-action="create">
                             <i class="fas fa-plus me-1"></i> Create First Article
-                        </button>
+                        </a>
                     }
                 </div>
             }
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="createArticleModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-xl">
-        <div class="modal-content">
-            <form method="post" asp-page-handler="Create" enctype="multipart/form-data" onsubmit="return confirm('Create this news article?')">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create Article</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
-                    <input type="hidden" name="CategoryFilter" value="@Model.CategoryFilter" />
-                    <input type="hidden" name="StatusFilter" value="@Model.StatusFilter" />
-                    <input type="hidden" name="AuthorFilter" value="@Model.AuthorFilter" />
-                    <input type="hidden" name="StartDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
-                    <input type="hidden" name="EndDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
-                    <input type="hidden" name="SortBy" value="@Model.SortBy" />
-                    <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
-                    <input type="hidden" name="CurrentPage" value="@Model.CurrentPage" />
-                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
-
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <div class="mb-3">
-                                <label asp-for="CreateArticle.NewsTitle" class="form-label">Article Title *</label>
-                                <input asp-for="CreateArticle.NewsTitle" class="form-control" />
-                                <span asp-validation-for="CreateArticle.NewsTitle" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="CreateArticle.Headline" class="form-label">Headline *</label>
-                                <input asp-for="CreateArticle.Headline" class="form-control" />
-                                <span asp-validation-for="CreateArticle.Headline" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="CreateArticle.NewsContent" class="form-label">Content</label>
-                                <textarea asp-for="CreateArticle.NewsContent" class="form-control" rows="8"></textarea>
-                                <span asp-validation-for="CreateArticle.NewsContent" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="CreateArticle.NewsSource" class="form-label">News Source</label>
-                                <input asp-for="CreateArticle.NewsSource" class="form-control" placeholder="Source or Image URL" />
-                                <span asp-validation-for="CreateArticle.NewsSource" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Upload Image</label>
-                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                                <div class="form-text small">Max 5MB. Uploading will replace the News Source URL.</div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label asp-for="CreateArticle.CategoryId" class="form-label">Category *</label>
-                                <select asp-for="CreateArticle.CategoryId" class="form-select">
-                                    <option value="">Select Category</option>
-                                    @foreach (var category in Model.Categories)
-                                    {
-                                        <option value="@category.CategoryId">@category.CategoryName</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="CreateArticle.CategoryId" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Tags</label>
-                                <button type="button" class="btn btn-sm btn-outline-primary float-end mb-1" onclick="suggestTags('create')">
-                                    <i class="fas fa-magic me-1"></i> Suggest Tags (AI)
-                                </button>
-                                
-                                <!-- AI Suggested Tags as Chips/Badges -->
-                                <div id="createSuggestedTagsArea" class="mb-2" style="display: none;">
-                                    <small class="text-muted d-block mb-1">
-                                        <i class="fas fa-lightbulb text-warning me-1"></i>AI Suggested Tags (click to select):
-                                    </small>
-                                    <div id="createSuggestedTagsChips" class="d-flex flex-wrap gap-1"></div>
-                                </div>
-                                
-                                <div class="border rounded p-2 overflow-auto" style="max-height: 220px;">
-                                    @foreach (var tag in Model.Tags)
-                                    {
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                   name="CreateArticle.SelectedTagIds" value="@tag.TagId"
-                                                   id="createTag_@tag.TagId">
-                                            <label class="form-check-label" for="createTag_@tag.TagId">
-                                                @tag.TagName
-                                            </label>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Publication Status</label>
-                                <div class="form-check">
-                                    <input asp-for="CreateArticle.NewsStatus" type="checkbox" class="form-check-input" id="createStatus">
-                                    <label class="form-check-label" for="createStatus">Publish immediately</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editArticleModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-xl">
-        <div class="modal-content">
-            <form method="post" asp-page-handler="Edit" enctype="multipart/form-data" onsubmit="return confirm('Save changes to this article?')">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Article</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
-                    <input type="hidden" name="CategoryFilter" value="@Model.CategoryFilter" />
-                    <input type="hidden" name="StatusFilter" value="@Model.StatusFilter" />
-                    <input type="hidden" name="AuthorFilter" value="@Model.AuthorFilter" />
-                    <input type="hidden" name="StartDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
-                    <input type="hidden" name="EndDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
-                    <input type="hidden" name="SortBy" value="@Model.SortBy" />
-                    <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
-                    <input type="hidden" name="CurrentPage" value="@Model.CurrentPage" />
-                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
-
-                    <input asp-for="EditArticle.NewsArticleId" type="hidden" />
-
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <div class="mb-3">
-                                <label asp-for="EditArticle.NewsTitle" class="form-label">Article Title *</label>
-                                <input asp-for="EditArticle.NewsTitle" class="form-control" />
-                                <span asp-validation-for="EditArticle.NewsTitle" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="EditArticle.Headline" class="form-label">Headline *</label>
-                                <input asp-for="EditArticle.Headline" class="form-control" />
-                                <span asp-validation-for="EditArticle.Headline" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="EditArticle.NewsContent" class="form-label">Content</label>
-                                <textarea asp-for="EditArticle.NewsContent" class="form-control" rows="8"></textarea>
-                                <span asp-validation-for="EditArticle.NewsContent" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="EditArticle.NewsSource" class="form-label">News Source</label>
-                                <input asp-for="EditArticle.NewsSource" class="form-control" />
-                                <span asp-validation-for="EditArticle.NewsSource" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Upload Image</label>
-                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                                <div class="form-text small">Max 5MB. Uploading will update the News Source URL.</div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label asp-for="EditArticle.CategoryId" class="form-label">Category *</label>
-                                <select asp-for="EditArticle.CategoryId" class="form-select">
-                                    <option value="">Select Category</option>
-                                    @foreach (var category in Model.Categories)
-                                    {
-                                        <option value="@category.CategoryId">@category.CategoryName</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="EditArticle.CategoryId" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Tags</label>
-                                <button type="button" class="btn btn-sm btn-outline-primary float-end mb-1" onclick="suggestTags('edit')">
-                                    <i class="fas fa-magic me-1"></i> Suggest Tags (AI)
-                                </button>
-                                
-                                <!-- AI Suggested Tags as Chips/Badges -->
-                                <div id="editSuggestedTagsArea" class="mb-2" style="display: none;">
-                                    <small class="text-muted d-block mb-1">
-                                        <i class="fas fa-lightbulb text-warning me-1"></i>AI Suggested Tags (click to select):
-                                    </small>
-                                    <div id="editSuggestedTagsChips" class="d-flex flex-wrap gap-1"></div>
-                                </div>
-                                
-                                <div class="border rounded p-2 overflow-auto" style="max-height: 220px;">
-                                    @foreach (var tag in Model.Tags)
-                                    {
-                                        <div class="form-check">
-                                            <input class="form-check-input edit-tag-checkbox" type="checkbox"
-                                                   name="EditArticle.SelectedTagIds" value="@tag.TagId"
-                                                   id="editTag_@tag.TagId">
-                                            <label class="form-check-label" for="editTag_@tag.TagId">
-                                                @tag.TagName
-                                            </label>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Publication Status</label>
-                                <div class="form-check">
-                                    <input asp-for="EditArticle.NewsStatus" type="checkbox" class="form-check-input" id="editStatus">
-                                    <label class="form-check-label" for="editStatus">Published</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -495,244 +256,35 @@
             color: #495057;
         }
 
-        .btn-white:hover {
-            background-color: #f8f9fa;
-            border-color: #dee2e6;
-            color: #212529;
-        }
-
-        #createArticleModal .modal-content,
-        #editArticleModal .modal-content {
-            max-height: calc(100vh - 2rem);
-            display: flex;
-            flex-direction: column;
-        }
-
-        #createArticleModal .modal-body,
-        #editArticleModal .modal-body {
-            overflow-y: auto;
-        }
-
-        #createArticleModal .modal-footer,
-        #editArticleModal .modal-footer {
-            position: sticky;
-            bottom: 0;
-            background-color: #fff;
-            border-top: 1px solid #dee2e6;
-            z-index: 1;
-        }
+            .btn-white:hover {
+                background-color: #f8f9fa;
+                border-color: #dee2e6;
+                color: #212529;
+            }
     </style>
 
-    <partial name="_ValidationScriptsPartial" />
-
     <script>
-        async function suggestTags(mode) {
-            const prefix = mode === 'create' ? 'CreateArticle' : 'EditArticle';
-            const title = document.getElementById(`${prefix}_NewsTitle`).value;
-            const headline = document.getElementById(`${prefix}_Headline`).value;
-            const content = document.getElementById(`${prefix}_NewsContent`).value;
-
-            const fullText = `${title} ${headline} ${content}`.trim();
-
-            if (!fullText) {
-                alert("Please enter some content first.");
-                return;
-            }
-
-            const btn = event.target.closest('button');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> A.I. Thinking...';
-            btn.disabled = true;
-
-            try {
-                const response = await fetch(`?handler=SuggestTags`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    },
-                    body: JSON.stringify({ content: fullText })
-                });
-
-                if (response.ok) {
-                    const suggestions = await response.json();
-                    const suggestedTags = Object.keys(suggestions);
-                    
-                    if (suggestedTags.length === 0) {
-                        alert("No specific tags suggested. Try adding more content.");
-                        // Hide chips area
-                        document.getElementById(`${mode}SuggestedTagsArea`).style.display = 'none';
-                    } else {
-                        // Show and populate chips/badges area
-                        const chipsContainer = document.getElementById(`${mode}SuggestedTagsChips`);
-                        const areaContainer = document.getElementById(`${mode}SuggestedTagsArea`);
-                        
-                        chipsContainer.innerHTML = ''; // Clear previous suggestions
-                        
-                        // Sort by confidence score (highest first)
-                        const sortedTags = Object.entries(suggestions)
-                            .sort((a, b) => b[1] - a[1])
-                            .slice(0, 8); // Show top 8 suggestions
-                        
-                        sortedTags.forEach(([tagName, confidence]) => {
-                            // Find matching checkbox
-                            const checkboxes = mode === 'create' 
-                                ? document.querySelectorAll('input[name="CreateArticle.SelectedTagIds"]')
-                                : document.querySelectorAll('.edit-tag-checkbox');
-                            
-                            let matchingCheckbox = null;
-                            checkboxes.forEach(cb => {
-                                const label = cb.nextElementSibling.innerText.trim();
-                                if (label.toLowerCase() === tagName.toLowerCase()) {
-                                    matchingCheckbox = cb;
-                                }
-                            });
-                            
-                            if (matchingCheckbox) {
-                                // Create chip/badge
-                                const chip = document.createElement('span');
-                                chip.className = matchingCheckbox.checked 
-                                    ? 'badge bg-primary text-white' 
-                                    : 'badge bg-light text-dark border';
-                                chip.style.cursor = 'pointer';
-                                chip.style.fontSize = '0.85rem';
-                                chip.style.padding = '0.4rem 0.6rem';
-                                chip.style.transition = 'all 0.2s';
-                                
-                                // Confidence indicator
-                                const confidencePercent = Math.round(confidence * 100);
-                                let confidenceIcon = '';
-                                if (confidence >= 0.8) {
-                                    confidenceIcon = '<i class="fas fa-star text-warning me-1" style="font-size: 0.7rem;"></i>';
-                                } else if (confidence >= 0.5) {
-                                    confidenceIcon = '<i class="fas fa-check-circle text-success me-1" style="font-size: 0.7rem;"></i>';
-                                }
-                                
-                                chip.innerHTML = `${confidenceIcon}${tagName} <small class="opacity-75">(${confidencePercent}%)</small>`;
-                                
-                                // Click to toggle
-                                chip.addEventListener('click', function() {
-                                    matchingCheckbox.checked = !matchingCheckbox.checked;
-                                    
-                                    if (matchingCheckbox.checked) {
-                                        chip.className = 'badge bg-primary text-white';
-                                    } else {
-                                        chip.className = 'badge bg-light text-dark border';
-                                    }
-                                });
-                                
-                                // Hover effect
-                                chip.addEventListener('mouseenter', function() {
-                                    chip.style.transform = 'scale(1.05)';
-                                    chip.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-                                });
-                                chip.addEventListener('mouseleave', function() {
-                                    chip.style.transform = 'scale(1)';
-                                    chip.style.boxShadow = 'none';
-                                });
-                                
-                                chipsContainer.appendChild(chip);
-                            }
-                        });
-                        
-                        // Show the chips area
-                        areaContainer.style.display = 'block';
-                        
-                        // Auto-select high confidence tags
-                        let autoSelectedCount = 0;
-                        const checkboxes = mode === 'create' 
-                            ? document.querySelectorAll('input[name="CreateArticle.SelectedTagIds"]')
-                            : document.querySelectorAll('.edit-tag-checkbox');
-
-                        checkboxes.forEach(cb => {
-                            const label = cb.nextElementSibling.innerText.trim();
-                            const match = sortedTags.find(([st]) => st.toLowerCase() === label.toLowerCase());
-                            
-                            if (match && match[1] >= 0.7 && !cb.checked) {
-                                cb.checked = true;
-                                autoSelectedCount++;
-                                
-                                // Brief highlight effect
-                                cb.nextElementSibling.style.fontWeight = "bold";
-                                cb.nextElementSibling.classList.add("text-primary");
-                                setTimeout(() => {
-                                    cb.nextElementSibling.style.fontWeight = "";
-                                    cb.nextElementSibling.classList.remove("text-primary");
-                                }, 3000);
-                            }
-                        });
-                    }
-                } else {
-                    console.error("AI Error", response);
-                    alert("Failed to get suggestions.");
-                }
-
-            } catch (error) {
-                console.error("AI Error", error);
-                alert("Error connecting to AI service.");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        const editArticleModal = document.getElementById('editArticleModal');
-
-        editArticleModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            if (!button) {
-                return;
-            }
-
-            document.getElementById('EditArticle_NewsArticleId').value = button.getAttribute('data-article-id') || '';
-            document.getElementById('EditArticle_NewsTitle').value = button.getAttribute('data-title') || '';
-            document.getElementById('EditArticle_Headline').value = button.getAttribute('data-headline') || '';
-            document.getElementById('EditArticle_NewsContent').value = button.getAttribute('data-content') || '';
-            document.getElementById('EditArticle_NewsSource').value = button.getAttribute('data-source') || '';
-            document.getElementById('EditArticle_CategoryId').value = button.getAttribute('data-category-id') || '';
-            document.getElementById('editStatus').checked = (button.getAttribute('data-status') === 'true');
-
-            const tagIds = (button.getAttribute('data-tag-ids') || '')
-                .split(',')
-                .map(x => x.trim())
-                .filter(x => x.length);
-
-            document.querySelectorAll('.edit-tag-checkbox').forEach(cb => {
-                cb.checked = tagIds.includes(cb.value);
-            });
-        });
-
-        @if (Model.ShowCreateModal)
-        {
-            <text>new bootstrap.Modal(document.getElementById('createArticleModal')).show();</text>
-        }
-
-        @if (Model.ShowEditModal)
-        {
-            <text>new bootstrap.Modal(document.getElementById('editArticleModal')).show();</text>
-        }
-
-        // Keep the exact same logic for duplication
         function duplicateArticle(articleId) {
             if (confirm('Create a draft copy of this article?')) {
-                var form = document.createElement('form');
+                const form = document.createElement('form');
                 form.method = 'post';
                 form.action = '/Staff/NewsArticles?handler=Duplicate';
 
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'articleId';
-                input.value = articleId;
-                form.appendChild(input);
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'articleId';
+                idInput.value = articleId;
+                form.appendChild(idInput);
 
-                var token = document.querySelector('input[name="__RequestVerificationToken"]');
+                const token = document.querySelector('input[name="__RequestVerificationToken"]');
                 if (token) {
-                    var tokenInput = document.createElement('input');
+                    const tokenInput = document.createElement('input');
                     tokenInput.type = 'hidden';
                     tokenInput.name = '__RequestVerificationToken';
                     tokenInput.value = token.value;
                     form.appendChild(tokenInput);
                 }
+
                 document.body.appendChild(form);
                 form.submit();
             }
