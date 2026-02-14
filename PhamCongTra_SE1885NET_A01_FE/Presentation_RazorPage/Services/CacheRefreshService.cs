@@ -54,17 +54,17 @@ namespace Presentation_RazorPage.Services
                 try
                 {
                     // 1. Fetch Categories
-                    var categories = await apiService.GetAsync<CategoryModel>("/api/Categories");
+                    var categories = await apiService.GetAsync<CategoryModel>("/odata/Categories");
                     if (categories != null)
                     {
-                        _memoryCache.Set("OFFLINE_CACHE_/api/Categories", categories);
+                        _memoryCache.Set("OFFLINE_CACHE_/odata/Categories", categories);
                     }
 
                     // 2. Fetch NewsArticles
-                    var articles = await apiService.GetAsync<NewsArticleModel>("/api/NewsArticles");
+                    var articles = await apiService.GetAsync<NewsArticleModel>("/odata/NewsArticles");
                     if (articles != null)
                     {
-                        _memoryCache.Set("OFFLINE_CACHE_/api/NewsArticles", articles);
+                        _memoryCache.Set("OFFLINE_CACHE_/odata/NewsArticles", articles);
                     }
 
                     // 3. Save to File
@@ -92,8 +92,8 @@ namespace Presentation_RazorPage.Services
 
                         if (offlineData != null)
                         {
-                            _memoryCache.Set("OFFLINE_CACHE_/api/Categories", offlineData.Categories);
-                            _memoryCache.Set("OFFLINE_CACHE_/api/NewsArticles", offlineData.NewsArticles);
+                            _memoryCache.Set("OFFLINE_CACHE_/odata/Categories", offlineData.Categories);
+                            _memoryCache.Set("OFFLINE_CACHE_/odata/NewsArticles", offlineData.NewsArticles);
                             _logger.LogInformation("Loaded data from offline file. Last updated: {time}", offlineData.LastUpdated);
                         }
                     }

@@ -26,6 +26,8 @@ public partial class NewsContext : DbContext
 
     public virtual DbSet<AuditLog> AuditLogs { get; set; }
 
+    public virtual DbSet<NewsArticleImage> NewsArticleImages { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=localhost;Database=FUNewsManagement;User Id=sa;Password=123456;Encrypt=True;TrustServerCertificate=True");
@@ -137,6 +139,22 @@ public partial class NewsContext : DbContext
                 .WithMany()
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<NewsArticleImage>(entity =>
+        {
+            entity.ToTable("NewsArticleImage");
+
+            entity.Property(e => e.ImageId).HasColumnName("ImageID");
+            entity.Property(e => e.NewsArticleId).HasColumnName("NewsArticleID").HasMaxLength(20);
+            entity.Property(e => e.ImageUrl).HasColumnName("ImageURL").HasMaxLength(400);
+            entity.Property(e => e.Caption).HasMaxLength(250);
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())").HasColumnType("datetime");
+
+            entity.HasOne(d => d.NewsArticle).WithMany(p => p.NewsArticleImages)
+                .HasForeignKey(d => d.NewsArticleId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_NewsArticleImage_NewsArticle");
         });
 
         OnModelCreatingPartial(modelBuilder);

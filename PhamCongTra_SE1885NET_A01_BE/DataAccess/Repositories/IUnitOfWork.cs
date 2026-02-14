@@ -9,6 +9,7 @@ namespace DataAccess.Repositories
         IRepository<NewsArticle> NewsArticleRepository { get; }
         ITagRepository TagRepository { get; }
         IRepository<AuditLog> AuditLogRepository { get; }
+        IRepository<NewsArticleImage> NewsArticleImageRepository { get; }
         
         Task<int> SaveChangesAsync();
         Task BeginTransactionAsync();

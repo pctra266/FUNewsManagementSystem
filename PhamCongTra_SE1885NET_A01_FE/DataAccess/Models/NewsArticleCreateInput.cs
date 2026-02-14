@@ -35,6 +35,8 @@ namespace DataAccess.Models
     {
         [Required(ErrorMessage = "Article ID is required")]
         public string NewsArticleId { get; set; } = string.Empty;
+
+        public List<NewsArticleImageModel> NewsArticleImages { get; set; } = new();
     }
 
     public class TagSuggestionRequest

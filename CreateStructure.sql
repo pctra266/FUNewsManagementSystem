@@ -141,7 +141,28 @@ GO
 ALTER TABLE [dbo].[AuditLog] CHECK CONSTRAINT [FK_AuditLog_SystemAccount]
 GO
 
+-- 7. Table: NewsArticleImage
+CREATE TABLE [dbo].[NewsArticleImage](
+	[ImageID] [int] IDENTITY(1,1) NOT NULL,
+	[NewsArticleID] [nvarchar](20) NOT NULL,
+	[ImageURL] [nvarchar](400) NOT NULL,
+	[Caption] [nvarchar](250) NULL,
+    [CreatedDate] [datetime] DEFAULT GETDATE() NULL,
+ CONSTRAINT [PK_NewsArticleImage] PRIMARY KEY CLUSTERED ([ImageID] ASC)
+) ON [PRIMARY]
+GO
+
+-- Constraint for NewsArticleImage
+ALTER TABLE [dbo].[NewsArticleImage] WITH CHECK ADD CONSTRAINT [FK_NewsArticleImage_NewsArticle] FOREIGN KEY([NewsArticleID])
+REFERENCES [dbo].[NewsArticle] ([NewsArticleID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[NewsArticleImage] CHECK CONSTRAINT [FK_NewsArticleImage_NewsArticle]
+GO
+
 USE [master]
 GO
 ALTER DATABASE [FUNewsManagement] SET  READ_WRITE 
 GO
+

@@ -22,7 +22,8 @@ var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<NewsArticle>("NewsArticles");
 modelBuilder.EntitySet<Category>("Categories");
 modelBuilder.EntitySet<Tag>("Tags");
-
+modelBuilder.EntitySet<SystemAccount>("SystemAccounts");
+modelBuilder.EntitySet<NewsArticleImage>("NewsArticleImages");
 // Explicitly configure SystemAccount key
 var systemAccountEntity = modelBuilder.EntitySet<SystemAccount>("SystemAccounts");
 systemAccountEntity.EntityType.HasKey(x => x.AccountId);
@@ -116,6 +117,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
+builder.Services.AddScoped<INewsArticleImageService, NewsArticleImageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IAuditService, AuditService>();

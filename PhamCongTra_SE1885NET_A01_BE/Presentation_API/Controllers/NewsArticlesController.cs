@@ -242,6 +242,7 @@ namespace Presentation_API.Controllers
 
         [HttpGet]
         [EnableQuery]
+        [AllowAnonymous]
         public async Task<IActionResult> Recommend([FromODataUri] string key)
         {
             // Note: OData Function bound to Entity uses [FromODataUri] key

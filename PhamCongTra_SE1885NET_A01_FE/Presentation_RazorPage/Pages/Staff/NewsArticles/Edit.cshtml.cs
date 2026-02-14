@@ -44,7 +44,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
             await PopulateLookupsAsync();
 
-            var article = await _apiService.GetByIdAsync<NewsArticleModel>("/odata/NewsArticles", $"'{Id}'", "?$expand=Tags");
+            var article = await _apiService.GetByIdAsync<NewsArticleModel>("/odata/NewsArticles", $"'{id}'", "?$expand=Category,Tags,NewsArticleImages");
             if (article == null)
             {
                 TempData["ErrorMessage"] = "Article not found.";
@@ -60,19 +60,15 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 NewsSource = article.NewsSource,
                 CategoryId = article.CategoryId ?? 0,
                 NewsStatus = article.NewsStatus ?? false,
-                SelectedTagIds = article.Tags?.Select(t => t.TagId).ToList() ?? new List<int>()
+                SelectedTagIds = article.Tags?.Select(t => t.TagId).ToList() ?? new List<int>(),
+                NewsArticleImages = article.NewsArticleImages?.ToList() ?? new List<NewsArticleImageModel>()
             };
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(IFormFile? imageFile)
+        public async Task<IActionResult> OnPostAsync(List<IFormFile> imageFiles)
         {
-            var authResult = EnsureAuthorized();
-            if (authResult != null)
-            {
-                return authResult;
-            }
 
             if (!ModelState.IsValid)
             {
@@ -82,8 +78,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
             try
             {
-                await UploadImageIfNeededAsync(imageFile);
-
+                // Update Article
                 var payload = new
                 {
                     NewsTitle = EditArticle.NewsTitle,
@@ -95,22 +90,68 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                     TagIds = EditArticle.SelectedTagIds
                 };
 
-                var result = await _apiService.PutAsync<NewsArticleModel>("/odata/NewsArticles", $"'{EditArticle.NewsArticleId}'", payload);
-                if (result != null)
+                var updatedArticle = await _apiService.PutAsync<NewsArticleModel>("/odata/NewsArticles", $"'{EditArticle.NewsArticleId}'", payload);
+
+                if (updatedArticle != null)
                 {
+                     // Upload New Images
+                    if (imageFiles != null && imageFiles.Any())
+                    {
+                        foreach (var file in imageFiles)
+                        {
+                            if (file.Length > 0)
+                            {
+                                var imageUrl = await _apiService.UploadImageAsync("/api/NewsArticles/upload-image", file.OpenReadStream(), file.FileName);
+                                
+                                if (!string.IsNullOrEmpty(imageUrl))
+                                {
+                                    var imagePayload = new
+                                    {
+                                        NewsArticleId = EditArticle.NewsArticleId,
+                                        ImageUrl = imageUrl,
+                                        Caption = file.FileName
+                                    };
+                                    await _apiService.PostAsync<object>($"/api/NewsArticleImages/article/{updatedArticle.NewsArticleId}", imagePayload);
+                                }
+                            }
+                        }
+                    }
+
                     TempData["SuccessMessage"] = "Article updated successfully!";
                     return RedirectToSafeReturnUrl();
                 }
 
-                ModelState.AddModelError(string.Empty, "Failed to update article. Please try again.");
+                ModelState.AddModelError(string.Empty, "Failed to update article.");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                ModelState.AddModelError(string.Empty, $"Error: {ex.Message}");
             }
 
             await PopulateLookupsAsync();
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostDeleteImageAsync(int imageId, string articleId)
+        {
+             try
+             {
+                 var success = await _apiService.DeleteAsync($"/api/NewsArticleImages/{imageId}");
+                 if (success)
+                 {
+                     TempData["SuccessMessage"] = "Image deleted successfully!";
+                 }
+                 else
+                 {
+                     TempData["ErrorMessage"] = "Failed to delete image.";
+                 }
+             }
+             catch(Exception ex)
+             {
+                 TempData["ErrorMessage"] = $"Error deleting image: {ex.Message}";
+             }
+
+             return RedirectToPage(new { id = articleId });
         }
 
         public async Task<IActionResult> OnPostSuggestTagsAsync([FromBody] TagSuggestionRequest request)

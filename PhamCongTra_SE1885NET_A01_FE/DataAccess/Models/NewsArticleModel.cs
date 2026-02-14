@@ -24,6 +24,7 @@ namespace DataAccess.Models
         public string? CreatedByName { get; set; }
         public string? UpdatedByName { get; set; }
         public List<TagModel> Tags { get; set; } = new List<TagModel>();
+        public List<NewsArticleImageModel> NewsArticleImages { get; set; } = new List<NewsArticleImageModel>();
         public CategoryModel? Category { get; set; }
         public SystemAccountModel? CreatedBy { get; set; }
 

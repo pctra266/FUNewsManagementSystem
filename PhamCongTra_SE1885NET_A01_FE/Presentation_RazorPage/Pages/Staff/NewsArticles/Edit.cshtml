@@ -44,15 +44,38 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="EditArticle.NewsSource" class="form-label fw-semibold">News Source / Image URL</label>
-                            <input asp-for="EditArticle.NewsSource" class="form-control" />
+                            <label asp-for="EditArticle.NewsSource" class="form-label fw-semibold">News Source</label>
+                            <input asp-for="EditArticle.NewsSource" class="form-control" placeholder="Original outlet, e.g. Reuters" />
                             <span asp-validation-for="EditArticle.NewsSource" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Upload Image</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                            <div class="form-text small">Max 5MB. Uploading replaces the current News Source.</div>
+                            <label class="form-label fw-semibold">Current Images</label>
+                            @if (Model.EditArticle.NewsArticleImages != null && Model.EditArticle.NewsArticleImages.Any())
+                            {
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    @foreach (var image in Model.EditArticle.NewsArticleImages)
+                                    {
+                                        <div class="position-relative" style="width: 100px; height: 100px;">
+                                            <img src="@image.ImageUrl" class="img-thumbnail w-100 h-100" style="object-fit: cover;" onerror="this.src='/image/default-news.png'" />
+                                            <button type="submit" asp-page-handler="DeleteImage" asp-route-imageId="@image.ImageId" asp-route-articleId="@Model.EditArticle.NewsArticleId" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-0 d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; border-radius: 50%;" onclick="return confirm('Delete this image?');">
+                                                <i class="fas fa-times" style="font-size: 10px;"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted small fst-italic">No images uploaded.</p>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Upload New Images</label>
+                            <input type="file" id="editImageFiles" name="imageFiles" class="form-control" accept="image/*" multiple />
+                            <div class="form-text small">Max 5MB per file. You can select multiple images.</div>
+                            <div id="editImagePreview" class="d-flex flex-wrap gap-2 mt-3 d-none" aria-live="polite"></div>
                         </div>
                     </div>
 
@@ -122,6 +145,70 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        function initImagePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            if (!input || !preview) {
+                return;
+            }
+
+            input.addEventListener('change', () => renderImagePreview(input.files, preview));
+        }
+
+        function renderImagePreview(files, previewContainer) {
+            previewContainer.innerHTML = '';
+
+            if (!files?.length) {
+                previewContainer.classList.add('d-none');
+                return;
+            }
+
+            previewContainer.classList.remove('d-none');
+
+            Array.from(files)
+                .filter(file => file.type.startsWith('image/'))
+                .forEach(file => {
+                    const objectUrl = URL.createObjectURL(file);
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'border rounded position-relative overflow-hidden';
+                    wrapper.style.width = '110px';
+                    wrapper.style.height = '110px';
+
+                    const img = document.createElement('img');
+                    img.src = objectUrl;
+                    img.alt = file.name;
+                    img.className = 'w-100 h-100';
+                    img.style.objectFit = 'cover';
+                    img.onload = () => URL.revokeObjectURL(objectUrl);
+
+                    const caption = document.createElement('div');
+                    caption.className = 'position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-50 text-white text-truncate px-1';
+                    caption.innerText = `${file.name} (${formatFileSize(file.size)})`;
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(caption);
+                    previewContainer.appendChild(wrapper);
+                });
+
+            if (!previewContainer.children.length) {
+                previewContainer.classList.add('d-none');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes >= 1048576) {
+                return `${(bytes / 1048576).toFixed(1)} MB`;
+            }
+
+            return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initImagePreview('editImageFiles', 'editImagePreview');
+        });
+
         async function suggestTags() {
             const title = document.getElementById('EditArticle_NewsTitle').value;
             const headline = document.getElementById('EditArticle_Headline').value;

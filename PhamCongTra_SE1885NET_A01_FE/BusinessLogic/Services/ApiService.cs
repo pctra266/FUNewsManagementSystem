@@ -20,6 +20,7 @@ namespace BusinessLogic.Services
         Task<T?> PostAsync<T>(string endpoint, object data);
         Task<T?> PutAsync<T>(string endpoint, object id, object data);
         Task<bool> DeleteAsync(string endpoint, object id);
+        Task<bool> DeleteAsync(string endpoint);
         Task<string?> UploadImageAsync(string endpoint, Stream fileStream, string fileName);
         Task<byte[]?> DownloadFileAsync(string endpoint);
         Task<bool> RefreshTokenAsync();
@@ -303,6 +304,12 @@ namespace BusinessLogic.Services
             {
                 return false;
             }
+        }
+        public async Task<bool> DeleteAsync(string endpoint)
+        {
+            var client = GetClient();
+            var response = await SendRequestWithAuthRetryAsync(client, () => client.DeleteAsync(endpoint));
+            return response.IsSuccessStatusCode;
         }
 
         public async Task<string?> UploadImageAsync(string endpoint, Stream fileStream, string fileName)

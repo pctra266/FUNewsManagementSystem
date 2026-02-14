@@ -30,6 +30,7 @@ namespace BussinessLogic.Services
                 .Include(n => n.Category)
                 .Include(n => n.CreatedBy)
                 .Include(n => n.Tags)
+                .Include(n => n.NewsArticleImages)
                 .FirstOrDefaultAsync(n => n.NewsArticleId == id);
             
             if (article != null)
@@ -312,7 +313,8 @@ namespace BussinessLogic.Services
             return _unitOfWork.NewsArticleRepository.Query()
                 .Include(n => n.Category)
                 .Include(n => n.CreatedBy)
-                .Include(n => n.Tags);
+                .Include(n => n.Tags)
+                .Include(n => n.NewsArticleImages);
         }
 
         // Summary methods - exclude NewsContent to reduce payload size
@@ -323,6 +325,7 @@ namespace BussinessLogic.Services
                 .Include(n => n.Category)
                 .Include(n => n.CreatedBy)
                 .Include(n => n.Tags)
+                .Include(n => n.NewsArticleImages)
                 .Select(n => new NewsArticle
                 {
                     NewsArticleId = n.NewsArticleId,
@@ -337,7 +340,8 @@ namespace BussinessLogic.Services
                     UpdatedById = n.UpdatedById,
                     Category = n.Category,
                     CreatedBy = n.CreatedBy,
-                    Tags = n.Tags
+                    Tags = n.Tags,
+                    NewsArticleImages = n.NewsArticleImages
                     // NewsContent is intentionally excluded
                 })
                 .OrderByDescending(n => n.CreatedDate)

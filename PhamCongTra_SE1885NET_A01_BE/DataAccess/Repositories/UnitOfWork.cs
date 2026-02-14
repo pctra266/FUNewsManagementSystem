@@ -15,6 +15,7 @@ namespace DataAccess.Repositories
         private IRepository<NewsArticle>? _newsArticleRepository;
         private ITagRepository? _tagRepository;
         private IRepository<AuditLog>? _auditLogRepository;
+        private IRepository<NewsArticleImage>? _newsArticleImageRepository;
 
         public UnitOfWork(NewsContext context)
         {
@@ -44,6 +45,11 @@ namespace DataAccess.Repositories
         public IRepository<AuditLog> AuditLogRepository
         {
             get { return _auditLogRepository ??= new Repository<AuditLog>(_context); }
+        }
+
+        public IRepository<NewsArticleImage> NewsArticleImageRepository
+        {
+            get { return _newsArticleImageRepository ??= new Repository<NewsArticleImage>(_context); }
         }
 
         public async Task<int> SaveChangesAsync()
