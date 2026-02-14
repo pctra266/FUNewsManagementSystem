@@ -73,8 +73,9 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Upload New Images</label>
-                            <input type="file" name="imageFiles" class="form-control" accept="image/*" multiple />
+                            <input type="file" id="editImageFiles" name="imageFiles" class="form-control" accept="image/*" multiple />
                             <div class="form-text small">Max 5MB per file. You can select multiple images.</div>
+                            <div id="editImagePreview" class="d-flex flex-wrap gap-2 mt-3 d-none" aria-live="polite"></div>
                         </div>
                     </div>
 
@@ -144,6 +145,70 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        function initImagePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            if (!input || !preview) {
+                return;
+            }
+
+            input.addEventListener('change', () => renderImagePreview(input.files, preview));
+        }
+
+        function renderImagePreview(files, previewContainer) {
+            previewContainer.innerHTML = '';
+
+            if (!files?.length) {
+                previewContainer.classList.add('d-none');
+                return;
+            }
+
+            previewContainer.classList.remove('d-none');
+
+            Array.from(files)
+                .filter(file => file.type.startsWith('image/'))
+                .forEach(file => {
+                    const objectUrl = URL.createObjectURL(file);
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'border rounded position-relative overflow-hidden';
+                    wrapper.style.width = '110px';
+                    wrapper.style.height = '110px';
+
+                    const img = document.createElement('img');
+                    img.src = objectUrl;
+                    img.alt = file.name;
+                    img.className = 'w-100 h-100';
+                    img.style.objectFit = 'cover';
+                    img.onload = () => URL.revokeObjectURL(objectUrl);
+
+                    const caption = document.createElement('div');
+                    caption.className = 'position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-50 text-white text-truncate px-1';
+                    caption.innerText = `${file.name} (${formatFileSize(file.size)})`;
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(caption);
+                    previewContainer.appendChild(wrapper);
+                });
+
+            if (!previewContainer.children.length) {
+                previewContainer.classList.add('d-none');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes >= 1048576) {
+                return `${(bytes / 1048576).toFixed(1)} MB`;
+            }
+
+            return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initImagePreview('editImageFiles', 'editImagePreview');
+        });
+
         async function suggestTags() {
             const title = document.getElementById('EditArticle_NewsTitle').value;
             const headline = document.getElementById('EditArticle_Headline').value;
