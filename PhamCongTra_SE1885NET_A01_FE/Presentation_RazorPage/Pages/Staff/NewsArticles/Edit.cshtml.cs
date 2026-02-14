@@ -60,7 +60,8 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 NewsSource = article.NewsSource,
                 CategoryId = article.CategoryId ?? 0,
                 NewsStatus = article.NewsStatus ?? false,
-                SelectedTagIds = article.Tags?.Select(t => t.TagId).ToList() ?? new List<int>()
+                SelectedTagIds = article.Tags?.Select(t => t.TagId).ToList() ?? new List<int>(),
+                NewsArticleImages = article.NewsArticleImages?.ToList() ?? new List<NewsArticleImageModel>()
             };
 
             return Page();
@@ -135,7 +136,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
         {
              try
              {
-                 var success = await _apiService.DeleteAsync($"/api/NewsArticleImages/{imageId}", imageId);
+                 var success = await _apiService.DeleteAsync($"/api/NewsArticleImages/{imageId}");
                  if (success)
                  {
                      TempData["SuccessMessage"] = "Image deleted successfully!";
