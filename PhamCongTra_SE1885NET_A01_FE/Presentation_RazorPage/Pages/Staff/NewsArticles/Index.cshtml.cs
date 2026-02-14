@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLogic.Services;
 using DataAccess.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 {
@@ -15,19 +14,9 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
             _apiService = apiService;
         }
 
-        public List<NewsArticleModel> NewsArticles { get; set; } = new List<NewsArticleModel>();
-        public List<CategoryModel> Categories { get; set; } = new List<CategoryModel>();
-        public List<TagModel> Tags { get; set; } = new List<TagModel>();
-        public PaginationInfo Pagination { get; set; } = new PaginationInfo();
-
-        [BindProperty]
-        public NewsArticleCreateInput CreateArticle { get; set; } = new NewsArticleCreateInput();
-
-        [BindProperty]
-        public NewsArticleEditInput EditArticle { get; set; } = new NewsArticleEditInput();
-
-        public bool ShowCreateModal { get; set; }
-        public bool ShowEditModal { get; set; }
+        public List<NewsArticleModel> NewsArticles { get; set; } = new();
+        public List<CategoryModel> Categories { get; set; } = new();
+        public PaginationInfo Pagination { get; set; } = new();
 
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
@@ -79,144 +68,6 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage("/Index");
             }
 
-            //_apiService.SetAuthToken(token);
-
-            await LoadPageDataAsync();
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostCreateAsync(IFormFile? imageFile)
-        {
-            var token = HttpContext.Session.GetString("AuthToken");
-            var userRole = HttpContext.Session.GetString("UserRole");
-
-            if (string.IsNullOrEmpty(token) || userRole != "1")
-            {
-                TempData["ErrorMessage"] = "Access denied.";
-                return RedirectToPage();
-            }
-
-            //_apiService.SetAuthToken(token);
-
-            // Manual binding is not needed for file if passed as param, but we need to check ModelState for other fields
-            ModelState.Clear();
-            if (!TryValidateModel(CreateArticle, nameof(CreateArticle)))
-            {
-                ShowCreateModal = true;
-                await LoadPageDataAsync();
-                return Page();
-            }
-
-            try
-            {
-                // Handle Image Upload
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    using (var stream = imageFile.OpenReadStream())
-                    {
-                        var imageUrl = await _apiService.UploadImageAsync("/api/NewsArticles/upload-image", stream, imageFile.FileName);
-                        if (!string.IsNullOrEmpty(imageUrl))
-                        {
-                            CreateArticle.NewsSource = imageUrl;
-                        }
-                    }
-                }
-
-                var createData = new
-                {
-                    NewsTitle = CreateArticle.NewsTitle,
-                    Headline = CreateArticle.Headline,
-                    NewsContent = CreateArticle.NewsContent,
-                    NewsSource = CreateArticle.NewsSource,
-                    CategoryId = CreateArticle.CategoryId,
-                    NewsStatus = CreateArticle.NewsStatus,
-                    TagIds = CreateArticle.SelectedTagIds
-                };
-
-                var result = await _apiService.PostAsync<object>("/odata/NewsArticles", createData);
-
-                if (result != null)
-                {
-                    TempData["SuccessMessage"] = "Article created successfully!";
-                    return RedirectToPage(GetRedirectRouteValues());
-                }
-
-                ModelState.AddModelError(string.Empty, "Failed to create article. Please try again.");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-            }
-
-            ShowCreateModal = true;
-            await LoadPageDataAsync();
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostEditAsync(IFormFile? imageFile)
-        {
-            var token = HttpContext.Session.GetString("AuthToken");
-            var userRole = HttpContext.Session.GetString("UserRole");
-
-            if (string.IsNullOrEmpty(token) || userRole != "1")
-            {
-                TempData["ErrorMessage"] = "Access denied.";
-                return RedirectToPage();
-            }
-
-            //_apiService.SetAuthToken(token);
-
-            ModelState.Clear();
-            if (!TryValidateModel(EditArticle, nameof(EditArticle)))
-            {
-                ShowEditModal = true;
-                await LoadPageDataAsync();
-                return Page();
-            }
-
-            try
-            {
-                 // Handle Image Upload
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    using (var stream = imageFile.OpenReadStream())
-                    {
-                        var imageUrl = await _apiService.UploadImageAsync("/api/NewsArticles/upload-image", stream, imageFile.FileName);
-                        if (!string.IsNullOrEmpty(imageUrl))
-                        {
-                            EditArticle.NewsSource = imageUrl;
-                        }
-                    }
-                }
-
-                var updateData = new
-                {
-                    NewsTitle = EditArticle.NewsTitle,
-                    Headline = EditArticle.Headline,
-                    NewsContent = EditArticle.NewsContent,
-                    NewsSource = EditArticle.NewsSource,
-                    CategoryId = EditArticle.CategoryId,
-                    NewsStatus = EditArticle.NewsStatus,
-                    TagIds = EditArticle.SelectedTagIds
-                };
-
-                var result = await _apiService.PutAsync<NewsArticleModel>("/odata/NewsArticles", $"'{EditArticle.NewsArticleId}'", updateData);
-
-                if (result != null)
-                {
-                    TempData["SuccessMessage"] = "Article updated successfully!";
-                    return RedirectToPage(GetRedirectRouteValues());
-                }
-
-                ModelState.AddModelError(string.Empty, "Failed to update article. Please try again.");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-            }
-
-            ShowEditModal = true;
             await LoadPageDataAsync();
             return Page();
         }
@@ -231,9 +82,6 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
             {
                 var categoriesResponse = await _apiService.GetAsync<CategoryModel>("/odata/Categories");
                 Categories = categoriesResponse?.Where(c => c.IsActive == true).ToList() ?? new List<CategoryModel>();
-
-                var tagsResponse = await _apiService.GetAsync<TagModel>("/odata/Tags");
-                Tags = tagsResponse ?? new List<TagModel>();
 
                 var query = BuildODataQuery();
                 var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticles{query}");
@@ -271,23 +119,6 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
             {
                 TempData["ErrorMessage"] = $"Error loading articles: {ex.Message}";
             }
-        }
-
-        private object GetRedirectRouteValues()
-        {
-            return new
-            {
-                searchTerm = SearchTerm,
-                categoryFilter = CategoryFilter,
-                statusFilter = StatusFilter,
-                authorFilter = AuthorFilter,
-                startDate = StartDate?.ToString("yyyy-MM-dd"),
-                endDate = EndDate?.ToString("yyyy-MM-dd"),
-                sortBy = SortBy,
-                sortOrder = SortOrder,
-                currentPage = CurrentPage,
-                pageSize = PageSize
-            };
         }
 
         private string BuildODataQuery()
@@ -357,26 +188,31 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            //_apiService.SetAuthToken(token);
-
             try
             {
                 var success = await _apiService.DeleteAsync("/odata/NewsArticles", $"'{articleId}'");
-                if (success)
-                {
-                    TempData["SuccessMessage"] = "Article deleted successfully! Related tags have been removed.";
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Failed to delete article.";
-                }
+                TempData["SuccessMessage"] = success
+                    ? "Article deleted successfully! Related tags have been removed."
+                    : "Failed to delete article.";
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Error: {ex.Message}";
             }
 
-            return RedirectToPage(new { searchTerm = SearchTerm, categoryFilter = CategoryFilter, statusFilter = StatusFilter, authorFilter = AuthorFilter, startDate = StartDate?.ToString("yyyy-MM-dd"), endDate = EndDate?.ToString("yyyy-MM-dd"), sortBy = SortBy, sortOrder = SortOrder, currentPage = CurrentPage, pageSize = PageSize });
+            return RedirectToPage(new
+            {
+                searchTerm = SearchTerm,
+                categoryFilter = CategoryFilter,
+                statusFilter = StatusFilter,
+                authorFilter = AuthorFilter,
+                startDate = StartDate?.ToString("yyyy-MM-dd"),
+                endDate = EndDate?.ToString("yyyy-MM-dd"),
+                sortBy = SortBy,
+                sortOrder = SortOrder,
+                currentPage = CurrentPage,
+                pageSize = PageSize
+            });
         }
 
         public async Task<IActionResult> OnPostToggleStatusAsync(string articleId, bool currentStatus)
@@ -390,20 +226,15 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            //_apiService.SetAuthToken(token);
-
             try
             {
-                var articlesResponse = await _apiService.GetByIdAsync<NewsArticleModel>($"/odata/NewsArticles", $"'{articleId}'", "?$expand=Tags");
-                var article = articlesResponse;
-
+                var article = await _apiService.GetByIdAsync<NewsArticleModel>("/odata/NewsArticles", $"'{articleId}'", "?$expand=Tags");
                 if (article == null)
                 {
                     TempData["ErrorMessage"] = "Article not found.";
                     return RedirectToPage();
                 }
 
-                // Toggle status while preserving all other data including tags
                 var updateData = new
                 {
                     NewsTitle = article.NewsTitle,
@@ -417,23 +248,28 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
                 var result = await _apiService.PutAsync<NewsArticleModel>("/odata/NewsArticles", $"'{articleId}'", updateData);
 
-                if (result != null)
-                {
-                    TempData["SuccessMessage"] = currentStatus
-                        ? "Article unpublished successfully!"
-                        : "Article published successfully!";
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Failed to update article status.";
-                }
+                TempData["SuccessMessage"] = result != null
+                    ? currentStatus ? "Article unpublished successfully!" : "Article published successfully!"
+                    : "Failed to update article status.";
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Error: {ex.Message}";
             }
 
-            return RedirectToPage(new { searchTerm = SearchTerm, categoryFilter = CategoryFilter, statusFilter = StatusFilter, authorFilter = AuthorFilter, startDate = StartDate?.ToString("yyyy-MM-dd"), endDate = EndDate?.ToString("yyyy-MM-dd"), sortBy = SortBy, sortOrder = SortOrder, currentPage = CurrentPage, pageSize = PageSize });
+            return RedirectToPage(new
+            {
+                searchTerm = SearchTerm,
+                categoryFilter = CategoryFilter,
+                statusFilter = StatusFilter,
+                authorFilter = AuthorFilter,
+                startDate = StartDate?.ToString("yyyy-MM-dd"),
+                endDate = EndDate?.ToString("yyyy-MM-dd"),
+                sortBy = SortBy,
+                sortOrder = SortOrder,
+                currentPage = CurrentPage,
+                pageSize = PageSize
+            });
         }
 
         public async Task<IActionResult> OnPostDuplicateAsync(string articleId)
@@ -447,27 +283,31 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 return RedirectToPage();
             }
 
-            //_apiService.SetAuthToken(token);
-
             try
             {
                 var result = await _apiService.PostAsync<object>($"/odata/NewsArticles('{articleId}')/Default.Duplicate", new { });
-
-                if (result != null)
-                {
-                    TempData["SuccessMessage"] = "Article duplicated successfully! The copy has been created as a draft.";
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Failed to duplicate article.";
-                }
+                TempData["SuccessMessage"] = result != null
+                    ? "Article duplicated successfully! The copy has been created as a draft."
+                    : "Failed to duplicate article.";
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Error duplicating article: {ex.Message}";
             }
 
-            return RedirectToPage(new { searchTerm = SearchTerm, categoryFilter = CategoryFilter, statusFilter = StatusFilter, authorFilter = AuthorFilter, startDate = StartDate?.ToString("yyyy-MM-dd"), endDate = EndDate?.ToString("yyyy-MM-dd"), sortBy = SortBy, sortOrder = SortOrder, currentPage = CurrentPage, pageSize = PageSize });
+            return RedirectToPage(new
+            {
+                searchTerm = SearchTerm,
+                categoryFilter = CategoryFilter,
+                statusFilter = StatusFilter,
+                authorFilter = AuthorFilter,
+                startDate = StartDate?.ToString("yyyy-MM-dd"),
+                endDate = EndDate?.ToString("yyyy-MM-dd"),
+                sortBy = SortBy,
+                sortOrder = SortOrder,
+                currentPage = CurrentPage,
+                pageSize = PageSize
+            });
         }
 
         public string GetPageUrl(int pageNumber)
@@ -503,7 +343,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
             queryParams.Add($"currentPage={pageNumber}");
 
-            return $"/Staff/NewsArticles" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
+            return "/Staff/NewsArticles" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : "");
         }
 
         private static void HydrateArticles(IEnumerable<NewsArticleModel> articles)
@@ -513,59 +353,5 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 article.HydrateMetadata();
             }
         }
-        public async Task<IActionResult> OnPostSuggestTagsAsync([FromBody] TagSuggestionRequest request)
-        {
-            var token = HttpContext.Session.GetString("AuthToken");
-            if (!string.IsNullOrEmpty(token))
-            {
-                 //_apiService.SetAuthToken(token);
-            }
-
-            try 
-            {
-                // Call Backend API
-                var suggestions = await _apiService.PostAsync<Dictionary<string, double>>("/api/AI/suggest-tags", request);
-                return new JsonResult(suggestions ?? new Dictionary<string, double>());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
-        }
-    }
-
-    public class NewsArticleCreateInput
-    {
-        [Required(ErrorMessage = "News title is required")]
-        [StringLength(400, ErrorMessage = "News title cannot exceed 400 characters")]
-        public string NewsTitle { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Headline is required")]
-        [StringLength(150, ErrorMessage = "Headline cannot exceed 150 characters")]
-        public string Headline { get; set; } = string.Empty;
-
-        [StringLength(4000, ErrorMessage = "News content cannot exceed 4000 characters")]
-        public string? NewsContent { get; set; }
-
-        [StringLength(400, ErrorMessage = "News source cannot exceed 400 characters")]
-        public string? NewsSource { get; set; }
-
-        [Required(ErrorMessage = "Category is required")]
-        public short CategoryId { get; set; }
-
-        public bool NewsStatus { get; set; } = true;
-
-        public List<int> SelectedTagIds { get; set; } = new List<int>();
-    }
-
-    public class NewsArticleEditInput : NewsArticleCreateInput
-    {
-        [Required(ErrorMessage = "Article ID is required")]
-        public string NewsArticleId { get; set; } = string.Empty;
-    }
-
-    public class TagSuggestionRequest
-    {
-        public string Content { get; set; } = string.Empty;
     }
 }

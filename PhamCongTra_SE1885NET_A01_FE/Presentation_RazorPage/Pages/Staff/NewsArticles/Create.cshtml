@@ -1,0 +1,202 @@
+﻿@page
+@model Presentation_RazorPage.Pages.Staff.NewsArticles.CreateModel
+@{
+    ViewData["Title"] = "Create News Article";
+    var backLink = Model.GetSafeReturnUrl();
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-0 fw-bold text-dark">Create Article</h4>
+            <small class="text-muted">Fill in the details below to publish a new article.</small>
+        </div>
+        <a class="btn btn-sm btn-outline-secondary" href="@backLink">
+            <i class="fas fa-arrow-left me-1"></i> Back to list
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="mb-3">
+                            <label asp-for="CreateArticle.NewsTitle" class="form-label fw-semibold">Article Title *</label>
+                            <input asp-for="CreateArticle.NewsTitle" class="form-control" />
+                            <span asp-validation-for="CreateArticle.NewsTitle" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CreateArticle.Headline" class="form-label fw-semibold">Headline *</label>
+                            <input asp-for="CreateArticle.Headline" class="form-control" />
+                            <span asp-validation-for="CreateArticle.Headline" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CreateArticle.NewsContent" class="form-label fw-semibold">Content</label>
+                            <textarea asp-for="CreateArticle.NewsContent" class="form-control" rows="10" placeholder="Write the full article content here..."></textarea>
+                            <span asp-validation-for="CreateArticle.NewsContent" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CreateArticle.NewsSource" class="form-label fw-semibold">News Source / Image URL</label>
+                            <input asp-for="CreateArticle.NewsSource" class="form-control" placeholder="Source link or existing image URL" />
+                            <span asp-validation-for="CreateArticle.NewsSource" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Upload Image</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                            <div class="form-text small">Max 5MB. Uploading replaces the News Source URL.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label asp-for="CreateArticle.CategoryId" class="form-label fw-semibold">Category *</label>
+                            <select asp-for="CreateArticle.CategoryId" class="form-select">
+                                <option value="">Select Category</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CreateArticle.CategoryId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tags</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary float-end" onclick="suggestTags()" id="suggestTagsButton">
+                                <i class="fas fa-magic me-1"></i> Suggest Tags (AI)
+                            </button>
+
+                            <div id="suggestedTagsArea" class="mb-2" style="display: none;">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="fas fa-lightbulb text-warning me-1"></i>AI Suggested Tags (click to toggle):
+                                </small>
+                                <div id="suggestedTagsChips" class="d-flex flex-wrap gap-1"></div>
+                            </div>
+
+                            <div class="border rounded p-2 overflow-auto" style="max-height: 280px;">
+                                @foreach (var tag in Model.Tags)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="CreateArticle.SelectedTagIds" value="@tag.TagId"
+                                               id="createTag_@tag.TagId">
+                                        <label class="form-check-label" for="createTag_@tag.TagId">
+                                            @tag.TagName
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Publication Status</label>
+                            <div class="form-check form-switch">
+                                <input asp-for="CreateArticle.NewsStatus" class="form-check-input" type="checkbox" id="publishImmediately">
+                                <label class="form-check-label" for="publishImmediately">Publish immediately</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Article
+                            </button>
+                            <a class="btn btn-outline-secondary" href="@backLink">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        async function suggestTags() {
+            const title = document.getElementById('CreateArticle_NewsTitle').value;
+            const headline = document.getElementById('CreateArticle_Headline').value;
+            const content = document.getElementById('CreateArticle_NewsContent').value;
+            const fullText = `${title} ${headline} ${content}`.trim();
+
+            if (!fullText) {
+                alert('Please provide title/headline/content before asking for suggestions.');
+                return;
+            }
+
+            const btn = document.getElementById('suggestTagsButton');
+            const originalInner = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Generating...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`?handler=SuggestTags`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ content: fullText })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get suggestions');
+                }
+
+                const suggestions = await response.json();
+                const entries = Object.entries(suggestions).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+                const area = document.getElementById('suggestedTagsArea');
+                const chips = document.getElementById('suggestedTagsChips');
+                chips.innerHTML = '';
+
+                if (!entries.length) {
+                    area.style.display = 'none';
+                    alert('No tags detected. Please add more content.');
+                    return;
+                }
+
+                area.style.display = 'block';
+
+                const checkboxes = Array.from(document.querySelectorAll('input[name="CreateArticle.SelectedTagIds"]'));
+                entries.forEach(([tagName, confidence]) => {
+                    const checkbox = checkboxes.find(cb => cb.nextElementSibling?.innerText.trim().toLowerCase() === tagName.toLowerCase());
+                    if (!checkbox) {
+                        return;
+                    }
+
+                    const chip = document.createElement('span');
+                    chip.className = checkbox.checked ? 'badge bg-primary text-white' : 'badge bg-light text-dark border';
+                    chip.style.cursor = 'pointer';
+                    chip.style.padding = '0.35rem 0.55rem';
+                    chip.innerHTML = `${tagName} <small class="opacity-75">(${Math.round(confidence * 100)}%)</small>`;
+
+                    chip.addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                        chip.className = checkbox.checked ? 'badge bg-primary text-white' : 'badge bg-light text-dark border';
+                    });
+
+                    if (confidence >= 0.7 && !checkbox.checked) {
+                        checkbox.checked = true;
+                        chip.className = 'badge bg-primary text-white';
+                    }
+
+                    chips.appendChild(chip);
+                });
+            } catch (err) {
+                console.error(err);
+                alert('Could not fetch tag suggestions. Please try again.');
+            } finally {
+                btn.innerHTML = originalInner;
+                btn.disabled = false;
+            }
+        }
+    </script>
+}
