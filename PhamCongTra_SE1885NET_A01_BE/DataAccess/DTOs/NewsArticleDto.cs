@@ -21,6 +21,7 @@ namespace DataAccess.DTOs
         public string? CreatedByName { get; set; }
         public string? UpdatedByName { get; set; }
         public List<string> TagNames { get; set; } = new List<string>();
+        public List<NewsArticleImageDto> Images { get; set; } = new List<NewsArticleImageDto>();
     }
 
     public class NewsArticleCreateDto
