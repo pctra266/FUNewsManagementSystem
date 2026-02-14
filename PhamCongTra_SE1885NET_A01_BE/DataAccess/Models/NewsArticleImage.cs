@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models;
 
 public partial class NewsArticleImage
 {
+    [Key]
     public int ImageId { get; set; }
 
     public string NewsArticleId { get; set; } = null!;

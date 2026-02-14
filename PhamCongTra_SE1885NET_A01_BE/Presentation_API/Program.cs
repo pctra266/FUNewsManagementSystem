@@ -22,7 +22,8 @@ var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<NewsArticle>("NewsArticles");
 modelBuilder.EntitySet<Category>("Categories");
 modelBuilder.EntitySet<Tag>("Tags");
-
+modelBuilder.EntitySet<SystemAccount>("SystemAccounts");
+modelBuilder.EntitySet<NewsArticleImage>("NewsArticleImages");
 // Explicitly configure SystemAccount key
 var systemAccountEntity = modelBuilder.EntitySet<SystemAccount>("SystemAccounts");
 systemAccountEntity.EntityType.HasKey(x => x.AccountId);

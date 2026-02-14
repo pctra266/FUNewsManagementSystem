@@ -7,7 +7,7 @@ namespace Presentation_RazorPage.Pages.News
 {
     public class IndexModel : PageModel
     {
-        private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags";
+        private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags,NewsArticleImages";
         private readonly IApiService _apiService;
 
         public IndexModel(IApiService apiService)

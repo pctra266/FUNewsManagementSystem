@@ -156,7 +156,7 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                 filters.Add($"CreatedDate le {EndDate:yyyy-MM-dd}T23:59:59Z");
             }
 
-            queryParts.Add("$expand=Category,CreatedBy,Tags");
+            queryParts.Add("$expand=Category,CreatedBy,Tags,NewsArticleImages");
 
             if (filters.Any())
             {

@@ -8,7 +8,7 @@
 
 <style>
     /* 1. Background and Overlay Configuration */
-    body {                          
+    body {
         font-family: 'Poppins', sans-serif;
         background: url('@Url.Content("~/image/background.jpg")') no-repeat center center fixed;
         background-size: cover;
@@ -104,6 +104,19 @@
         background: linear-gradient(90deg, var(--bs-primary), var(--bs-info));
         width: 100%;
     }
+
+    .news-card-image {
+        height: 200px;
+        overflow: hidden;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+        .news-card-image img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
 
     /* Buttons and Form */
     .btn-primary-custom {
@@ -245,8 +258,6 @@
                         <div class="card news-card shadow-sm h-100">
                             <span class="card-category-badge shadow-sm">@article.CategoryName</span>
 
-                            <div class="card-header-decoration"></div>
-
                             <div class="card-body d-flex flex-column pt-4 px-4 pb-3">
                                 <div class="mb-2 text-muted small">
                                     <i class="far fa-calendar-alt me-1"></i> @article.CreatedDate?.ToString("dd MMM, yyyy")
@@ -259,6 +270,19 @@
                                 </h5>
 
                                 <h6 class="card-subtitle mb-3 text-primary small">@article.Headline</h6>
+
+                                @if (article.NewsArticleImages != null && article.NewsArticleImages.Any())
+                                {
+                                    <div class="news-card-image">
+                                        <img src="@article.NewsArticleImages.First().ImageUrl" alt="@article.NewsTitle" onerror="this.src='/image/default-news.png'" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="news-card-image">
+                                        <img src="/image/default-news.png" alt="@article.NewsTitle" />
+                                    </div>
+                                }
 
                                 <div class="card-text text-muted mb-4 flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
                                     @if (!string.IsNullOrEmpty(article.NewsContent) && article.NewsContent.Length > 100)
@@ -276,7 +300,13 @@
                                         <div class="bg-light rounded-circle p-2 me-2 text-secondary">
                                             <i class="fas fa-user"></i>
                                         </div>
-                                        <small class="text-dark fw-bold">@article.CreatedByName</small>
+                                        <div class="d-flex align-items-center flex-wrap small text-dark fw-bold">
+                                            <span>@article.CreatedByName</span>
+                                            @if (!string.IsNullOrWhiteSpace(article.NewsSource))
+                                            {
+                                                <span class="text-muted fw-normal ms-2">@article.NewsSource</span>
+                                            }
+                                        </div>
                                     </div>
                                     <a href="/News/Details/@article.NewsArticleId" class="btn btn-link text-decoration-none p-0 fw-bold">
                                         Read more <i class="fas fa-arrow-right ms-1"></i>

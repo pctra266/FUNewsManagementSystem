@@ -80,6 +80,17 @@
 
                     <!-- Article Body Content -->
                     <div class="article-content fs-5 lh-lg mb-5 text-break">
+                        @if (Model.Article.NewsArticleImages != null && Model.Article.NewsArticleImages.Any())
+                        {
+                            <figure class="figure w-100 mb-4">
+                                <img src="@Model.Article.NewsArticleImages.First().ImageUrl" class="figure-img img-fluid rounded w-100 shadow-sm" alt="@Model.Article.NewsTitle" onerror="this.style.display='none'">
+                                @if (!string.IsNullOrEmpty(Model.Article.NewsArticleImages.First().Caption))
+                                {
+                                    <figcaption class="figure-caption text-center fst-italic">@Model.Article.NewsArticleImages.First().Caption</figcaption>
+                                }
+                            </figure>
+                        }
+
                         @if (!string.IsNullOrEmpty(Model.Article.NewsContent))
                         {
                             @Html.Raw(Model.Article.NewsContent)
@@ -87,6 +98,31 @@
                         else
                         {
                             <p class="text-muted fst-italic p-5 text-center bg-light rounded">No content available for this article.</p>
+                        }
+
+                        <!-- Gallery Section -->
+                        @if (Model.Article.NewsArticleImages != null && Model.Article.NewsArticleImages.Count > 1)
+                        {
+                            <div class="mt-5">
+                                <h5 class="fw-bold mb-3 border-bottom pb-2">Image Gallery</h5>
+                                <div class="row g-3">
+                                    @foreach (var image in Model.Article.NewsArticleImages.Skip(1))
+                                    {
+                                        <div class="col-6 col-md-4">
+                                            <div class="card border-0 shadow-sm h-100">
+                                                <a href="@image.ImageUrl" target="_blank">
+                                                    <img src="@image.ImageUrl" class="card-img-top rounded" style="height: 150px; object-fit: cover;" alt="@image.Caption" onerror="this.style.display='none'">
+                                                </a>
+                                                @if(!string.IsNullOrEmpty(image.Caption)) {
+                                                    <div class="card-body p-2 text-center">
+                                                        <small class="text-muted">@image.Caption</small>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                         }
                     </div>
 

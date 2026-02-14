@@ -44,15 +44,37 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="EditArticle.NewsSource" class="form-label fw-semibold">News Source / Image URL</label>
-                            <input asp-for="EditArticle.NewsSource" class="form-control" />
+                            <label asp-for="EditArticle.NewsSource" class="form-label fw-semibold">News Source</label>
+                            <input asp-for="EditArticle.NewsSource" class="form-control" placeholder="Original outlet, e.g. Reuters" />
                             <span asp-validation-for="EditArticle.NewsSource" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Upload Image</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                            <div class="form-text small">Max 5MB. Uploading replaces the current News Source.</div>
+                            <label class="form-label fw-semibold">Current Images</label>
+                            @if (Model.EditArticle.NewsArticleImages != null && Model.EditArticle.NewsArticleImages.Any())
+                            {
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    @foreach (var image in Model.EditArticle.NewsArticleImages)
+                                    {
+                                        <div class="position-relative" style="width: 100px; height: 100px;">
+                                            <img src="@image.ImageUrl" class="img-thumbnail w-100 h-100" style="object-fit: cover;" onerror="this.src='/image/default-news.png'" />
+                                            <button type="submit" asp-page-handler="DeleteImage" asp-route-imageId="@image.ImageId" asp-route-articleId="@Model.EditArticle.NewsArticleId" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-0 d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; border-radius: 50%;" onclick="return confirm('Delete this image?');">
+                                                <i class="fas fa-times" style="font-size: 10px;"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted small fst-italic">No images uploaded.</p>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Upload New Images</label>
+                            <input type="file" name="imageFiles" class="form-control" accept="image/*" multiple />
+                            <div class="form-text small">Max 5MB per file. You can select multiple images.</div>
                         </div>
                     </div>
 

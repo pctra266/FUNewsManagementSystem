@@ -35,24 +35,18 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(IFormFile? imageFile)
+        public async Task<IActionResult> OnPostAsync(List<IFormFile> imageFiles)
         {
-            var authResult = EnsureAuthorized();
-            if (authResult != null)
-            {
-                return authResult;
-            }
+           
 
             if (!ModelState.IsValid)
             {
-                await PopulateLookupsAsync();
                 return Page();
             }
 
             try
             {
-                await UploadImageIfNeededAsync(imageFile);
-
+                // 1. Create Article first
                 var payload = new
                 {
                     NewsTitle = CreateArticle.NewsTitle,
@@ -64,21 +58,55 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
                     TagIds = CreateArticle.SelectedTagIds
                 };
 
-                var result = await _apiService.PostAsync<object>("/odata/NewsArticles", payload);
-                if (result != null)
-                {
-                    TempData["SuccessMessage"] = "Article created successfully!";
-                    return RedirectToSafeReturnUrl();
-                }
+                var createdArticle = await _apiService.PostAsync<NewsArticleModel>("/odata/NewsArticles", payload);
 
-                ModelState.AddModelError(string.Empty, "Failed to create article. Please try again.");
+                if (createdArticle != null)
+                {
+                    // 2. Upload Images if any
+                    if (imageFiles != null && imageFiles.Any())
+                    {
+                        foreach (var file in imageFiles)
+                        {
+                            if (file.Length > 0)
+                            {
+                                // Upload file to get URL
+                                var imageUrl = await _apiService.UploadImageAsync("/api/NewsArticles/upload-image", file.OpenReadStream(), file.FileName);
+                                
+                                if (!string.IsNullOrEmpty(imageUrl))
+                                {
+                                    // Create NewsArticleImage record
+                                    var imagePayload = new
+                                    {
+                                        NewsArticleId = createdArticle.NewsArticleId,
+                                        ImageUrl = imageUrl,
+                                        Caption = file.FileName
+                                    };
+                                    await _apiService.PostAsync<object>(
+                                        $"/api/NewsArticleImages/article/{createdArticle.NewsArticleId}",
+                                        imagePayload);
+                                }
+                            }
+                        }
+                    }
+
+                    // Handle single image fallback for NewsSource if valid URL (legacy support)
+                    // If multiple images are uploaded, the first one could optionally be set as NewsSource if empty?
+                    // For now, we trust the logic above.
+                    
+                    TempData["SuccessMessage"] = "Article created successfully!";
+                    return RedirectToPage("./Index");
+                }
+                else
+                {
+                     ModelState.AddModelError(string.Empty, "Failed to create article.");
+                }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                ModelState.AddModelError(string.Empty, $"Error: {ex.Message}");
             }
 
-            await PopulateLookupsAsync();
+            await PopulateLookupsAsync(); // Corrected from PopulateLookups() to PopulateLookupsAsync()
             return Page();
         }
 

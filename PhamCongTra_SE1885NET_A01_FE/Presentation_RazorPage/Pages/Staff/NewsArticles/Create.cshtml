@@ -43,16 +43,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="CreateArticle.NewsSource" class="form-label fw-semibold">News Source / Image URL</label>
-                            <input asp-for="CreateArticle.NewsSource" class="form-control" placeholder="Source link or existing image URL" />
+                            <label asp-for="CreateArticle.NewsSource" class="form-label fw-semibold">News Source</label>
+                            <input asp-for="CreateArticle.NewsSource" class="form-control" placeholder="Original outlet, e.g. Reuters" />
                             <span asp-validation-for="CreateArticle.NewsSource" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Upload Image</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                            <div class="form-text small">Max 5MB. Uploading replaces the News Source URL.</div>
-                        </div>
+                <label class="form-label fw-semibold">Upload Images</label>
+                <input type="file" name="imageFiles" class="form-control" accept="image/*" multiple />
+                <div class="form-text small">Max 5MB per file. You can select multiple images.</div>
+            </div>
                     </div>
 
                     <div class="col-lg-4">

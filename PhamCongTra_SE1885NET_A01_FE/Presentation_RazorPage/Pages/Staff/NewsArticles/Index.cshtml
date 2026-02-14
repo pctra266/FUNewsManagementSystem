@@ -90,7 +90,8 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light text-secondary">
                             <tr class="small text-uppercase">
-                                <th class="ps-4" style="width: 35%;">Article Info</th>
+                                <th class="ps-4" style="width: 10%;">Image</th>
+                                <th style="width: 25%;">Article Info</th>
                                 <th style="width: 15%;">Category & Tags</th>
                                 <th style="width: 20%;">Author & Date</th>
                                 <th class="text-center" style="width: 10%;">Status</th>
@@ -102,6 +103,18 @@
                             {
                                 <tr>
                                     <td class="ps-4">
+                                        <div style="width: 60px; height: 60px; overflow: hidden; border-radius: 8px;" class="bg-light border d-flex align-items-center justify-content-center">
+                                            @if (article.NewsArticleImages != null && article.NewsArticleImages.Any())
+                                            {
+                                                <img src="@article.NewsArticleImages.First().ImageUrl" alt="Article thumbnail" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/image/default-news.png'" />
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-image text-muted opacity-50 fa-lg"></i>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="fw-bold text-dark mb-1">
                                             @if (!string.IsNullOrEmpty(article.Headline))
                                             {
@@ -146,6 +159,12 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        @if (!string.IsNullOrWhiteSpace(article.NewsSource))
+                                        {
+                                            <div class="text-muted small">
+                                                <i class="fas fa-newspaper me-1"></i>@article.NewsSource
+                                            </div>
+                                        }
                                     </td>
                                     <td class="text-center">
                                         @if (article.NewsStatus == true)
