@@ -52,9 +52,11 @@ namespace BusinessLogic.Services
             // _httpClient configuration moved to Program.cs
         }
 
-        private HttpClient GetClient(string name = "CoreClient")
+        private HttpClient GetClient(string endpoint = null)
         {
+            string name = DetermineClientName(endpoint);
             var client = _httpClientFactory.CreateClient(name);
+            
             // Attach token if exists
             var context = _httpContextAccessor.HttpContext;
             if (context != null)
@@ -68,6 +70,33 @@ namespace BusinessLogic.Services
             return client;
         }
 
+        private string DetermineClientName(string endpoint)
+        {
+            if (string.IsNullOrEmpty(endpoint)) return "CoreClient";
+
+            var lowerEndpoint = endpoint.ToLowerInvariant();
+
+            // AI API
+            if (lowerEndpoint.Contains("/api/ai/") || lowerEndpoint.Contains("suggest-tags"))
+            {
+                return "AIClient";
+            }
+
+            // Analytics API
+            // Covers: /odata/NewsArticles/Default.ArticlesByCategory, ArticlesByAuthor, ArticlesByStatus, Trending
+            if (lowerEndpoint.Contains("articlesby") || 
+                lowerEndpoint.Contains("trending") || 
+                lowerEndpoint.Contains("dashboard") || 
+                lowerEndpoint.Contains("export") ||
+                lowerEndpoint.Contains("recommend"))
+            {
+                return "AnalyticsClient";
+            }
+
+            // Default to Core API
+            return "CoreClient";
+        }
+
         public async Task<LoginResponseModel?> LoginAsync(LoginViewModel loginModel)
         {
             try
@@ -75,7 +104,7 @@ namespace BusinessLogic.Services
                 var json = JsonSerializer.Serialize(loginModel, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var client = GetClient();
+                var client = GetClient("/api/Auth/login");
                 var response = await client.PostAsync("/api/Auth/login", content);
                 
                 if (response.IsSuccessStatusCode)
@@ -96,7 +125,7 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
                 
                 if (response.IsSuccessStatusCode)
@@ -135,7 +164,7 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
 
                 if (response.IsSuccessStatusCode)
@@ -158,7 +187,7 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync($"{endpoint}({id})"));
                 
                 if (response.IsSuccessStatusCode)
@@ -178,7 +207,7 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var url = $"{endpoint}({id}){query}";
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(url));
 
@@ -199,7 +228,7 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync($"{endpoint}"));
                 
                 if (response.IsSuccessStatusCode)
@@ -239,7 +268,7 @@ namespace BusinessLogic.Services
                 var json = JsonSerializer.Serialize(data, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, async () => 
                 {
                     var innerJson = JsonSerializer.Serialize(data, _jsonOptions);
@@ -266,7 +295,7 @@ namespace BusinessLogic.Services
             try
             {
                 var url = $"{endpoint}({id})";
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 
                 var response = await SendRequestWithAuthRetryAsync(client, async () => 
                 {
@@ -296,7 +325,7 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.DeleteAsync($"{endpoint}({id})"));
                 return response.IsSuccessStatusCode;
             }
@@ -307,7 +336,7 @@ namespace BusinessLogic.Services
         }
         public async Task<bool> DeleteAsync(string endpoint)
         {
-            var client = GetClient();
+            var client = GetClient(endpoint);
             var response = await SendRequestWithAuthRetryAsync(client, () => client.DeleteAsync(endpoint));
             return response.IsSuccessStatusCode;
         }
@@ -321,7 +350,7 @@ namespace BusinessLogic.Services
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg"); // Adjust based on file type if needed, or let API handle validation
                 content.Add(fileContent, "file", fileName);
 
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await client.PostAsync(endpoint, content);
                 
                 if (response.IsSuccessStatusCode)
@@ -357,7 +386,7 @@ namespace BusinessLogic.Services
         {
             try
             {
-                var client = GetClient();
+                var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
                 
                 if (response.IsSuccessStatusCode)
@@ -403,7 +432,7 @@ namespace BusinessLogic.Services
                 // We use a separate fresh client or ensure no interception for this specific call? 
                 // Since our retry logic is manual in methods, we are safe if we don't call retry here.
                 
-                var client = GetClient();
+                var client = GetClient("/api/Auth/refresh");
                 var response = await client.PostAsync("/api/Auth/refresh", content);
 
                 if (response.IsSuccessStatusCode)
