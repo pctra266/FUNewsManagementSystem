@@ -8,6 +8,7 @@ namespace Presentation_RazorPage.Pages.News
     public class IndexModel : PageModel
     {
         private const string ExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags,NewsArticleImages";
+        private const int TrendingDisplayCount = 4;
         private readonly IApiService _apiService;
 
         public IndexModel(IApiService apiService)
@@ -18,6 +19,7 @@ namespace Presentation_RazorPage.Pages.News
         public PaginatedResult<NewsArticleModel> PaginatedArticles { get; set; } = new PaginatedResult<NewsArticleModel>();
         public List<NewsArticleModel> ActiveArticles { get; set; } = new List<NewsArticleModel>();
         public List<CategoryModel> Categories { get; set; } = new List<CategoryModel>();
+        public List<NewsArticleModel> TrendingArticles { get; set; } = new List<NewsArticleModel>();
         public PaginationInfo Pagination { get; set; } = new PaginationInfo();
 
         [BindProperty(SupportsGet = true)]
@@ -61,6 +63,8 @@ namespace Presentation_RazorPage.Pages.News
             {
                 var categoriesResponse = await _apiService.GetAsync<CategoryModel>("/odata/CategoriesFunctions/Active");
                 Categories = categoriesResponse ?? new List<CategoryModel>();
+
+                TrendingArticles = await LoadTrendingArticlesAsync();
 
                 HasFilters = !string.IsNullOrEmpty(SearchTerm) ||
                              !string.IsNullOrEmpty(AuthorName) ||
@@ -115,6 +119,7 @@ namespace Presentation_RazorPage.Pages.News
                 ActiveArticles = new List<NewsArticleModel>();
                 PaginatedArticles = new PaginatedResult<NewsArticleModel>();
                 Pagination = new PaginationInfo();
+                TrendingArticles = new List<NewsArticleModel>();
             }
 
             return Page();
@@ -131,6 +136,14 @@ namespace Presentation_RazorPage.Pages.News
 
             var articlesResponse = await _apiService.GetAsync<NewsArticleModel>($"/odata/NewsArticles/Default.GetActive()?{ExpandClause}");
             return articlesResponse ?? new List<NewsArticleModel>();
+        }
+
+        private async Task<List<NewsArticleModel>> LoadTrendingArticlesAsync()
+        {
+            var trendingResponse = await _apiService.GetAsync<NewsArticleModel>(
+                $"/odata/NewsArticles/Trending(top={TrendingDisplayCount})");
+
+            return trendingResponse?.ToList() ?? new List<NewsArticleModel>();
         }
 
         private string BuildSearchQuery()

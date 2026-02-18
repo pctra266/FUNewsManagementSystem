@@ -15,8 +15,7 @@ namespace DataAccess.DTOs
         public short? CreatedById { get; set; }
         public short? UpdatedById { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        
-        // Navigation properties for display
+        public int ViewCount { get; set; }
         public string? CategoryName { get; set; }
         public string? CreatedByName { get; set; }
         public string? UpdatedByName { get; set; }

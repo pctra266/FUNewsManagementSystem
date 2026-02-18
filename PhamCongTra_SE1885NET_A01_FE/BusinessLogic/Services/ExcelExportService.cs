@@ -71,8 +71,9 @@ namespace BusinessLogic.Services
             worksheet.Cells[row, 2].Value = "Author";
             worksheet.Cells[row, 3].Value = "Category";
             worksheet.Cells[row, 4].Value = "Created Date";
-            worksheet.Cells[row, 5].Value = "Status";
-            worksheet.Cells[row, 1, row, 5].Style.Font.Bold = true;
+            worksheet.Cells[row, 5].Value = "View Count";
+            worksheet.Cells[row, 6].Value = "Status";
+            worksheet.Cells[row, 1, row, 6].Style.Font.Bold = true;
 
             foreach (var article in details)
             {
@@ -81,7 +82,8 @@ namespace BusinessLogic.Services
                 worksheet.Cells[row, 2].Value = article.CreatedByName;
                 worksheet.Cells[row, 3].Value = article.CategoryName;
                 worksheet.Cells[row, 4].Value = article.CreatedDate?.ToString("MMM dd, yyyy");
-                worksheet.Cells[row, 5].Value = article.NewsStatus == true ? "Active" : "Inactive";
+                worksheet.Cells[row, 5].Value = article.ViewCount;
+                worksheet.Cells[row, 6].Value = article.NewsStatus == true ? "Active" : "Inactive";
             }
 
             worksheet.Cells.AutoFitColumns();
@@ -140,8 +142,9 @@ namespace BusinessLogic.Services
             worksheet.Cells[row, 2].Value = "Author";
             worksheet.Cells[row, 3].Value = "Category";
             worksheet.Cells[row, 4].Value = "Created Date";
-            worksheet.Cells[row, 5].Value = "Status";
-            worksheet.Cells[row, 1, row, 5].Style.Font.Bold = true;
+            worksheet.Cells[row, 5].Value = "View Count";
+            worksheet.Cells[row, 6].Value = "Status";
+            worksheet.Cells[row, 1, row, 6].Style.Font.Bold = true;
 
             foreach (var article in details)
             {
@@ -150,7 +153,8 @@ namespace BusinessLogic.Services
                 worksheet.Cells[row, 2].Value = article.CreatedByName;
                 worksheet.Cells[row, 3].Value = article.CategoryName;
                 worksheet.Cells[row, 4].Value = article.CreatedDate?.ToString("MMM dd, yyyy");
-                worksheet.Cells[row, 5].Value = article.NewsStatus == true ? "Active" : "Inactive";
+                worksheet.Cells[row, 5].Value = article.ViewCount;
+                worksheet.Cells[row, 6].Value = article.NewsStatus == true ? "Active" : "Inactive";
             }
 
             worksheet.Cells.AutoFitColumns();

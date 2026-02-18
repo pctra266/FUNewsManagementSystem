@@ -173,9 +173,15 @@ namespace Presentation_RazorPage.Pages.Admin
                 ArticleDetails = response?.ToList() ?? new List<NewsArticleModel>();
                 ArticleDetails.ForEach(a => a.HydrateMetadata());
 
-                ArticleDetails = SortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                    ? ArticleDetails.OrderBy(a => a.CreatedDate).ToList()
-                    : ArticleDetails.OrderByDescending(a => a.CreatedDate).ToList();
+                var orderedArticles = SortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                    ? ArticleDetails
+                        .OrderBy(a => a.CreatedDate)
+                        .ThenByDescending(a => a.ViewCount)
+                    : ArticleDetails
+                        .OrderByDescending(a => a.CreatedDate)
+                        .ThenByDescending(a => a.ViewCount);
+
+                ArticleDetails = orderedArticles.ToList();
             }
             catch (Exception ex)
             {

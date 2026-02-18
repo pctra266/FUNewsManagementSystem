@@ -16,7 +16,7 @@
         padding: 0;
     }
 
-     /* Ensure the image path is correct */
+    /* Ensure the image path is correct */
 
     /* Dark overlay to highlight text */
     .page-overlay {
@@ -55,6 +55,46 @@
         border: 1px solid rgba(var(--bs-white-rgb), 0.18);
         padding: 2rem;
         margin-bottom: 2rem;
+    }
+
+    .trending-panel {
+        border: 1px dashed rgba(var(--bs-primary-rgb), 0.25);
+    }
+
+    .trending-card {
+        position: relative;
+        padding: 2.25rem 1.5rem 1.5rem 1.5rem;
+        border-radius: 18px;
+        background: rgba(var(--bs-light-rgb), 0.85);
+        border: 1px solid rgba(var(--bs-primary-rgb), 0.1);
+        min-height: 220px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+        .trending-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(var(--bs-dark-rgb), 0.18);
+        }
+
+    .trending-rank {
+        position: absolute;
+        top: -18px;
+        left: 18px;
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+        color: var(--bs-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        box-shadow: 0 15px 25px rgba(var(--bs-primary-rgb), 0.25);
+    }
+
+    .trending-metric {
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
     }
 
     /* 4. Article Card Styles */
@@ -165,6 +205,8 @@
                 </div>
             }
         </div>
+
+        
 
         <div class="row mb-5 justify-content-center">
             <div class="col-lg-10">
@@ -342,9 +384,9 @@
                                             }
                                         </div>
                                     </div>
-                                    <a href="/News/Details/@article.NewsArticleId" class="btn btn-link text-decoration-none p-0 fw-bold">
-                                        Read more <i class="fas fa-arrow-right ms-1"></i>
-                                    </a>
+                                    <span class="text-secondary fw-bold small">
+                                        <i class="fas fa-eye me-1"></i> @article.ViewCount
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -416,6 +458,52 @@
                             <a href="@Model.GetPageSizeUrl(6)" class="btn btn-sm btn-outline-secondary @(Model.PageSize == 6 ? "active" : "")">6</a>
                             <a href="@Model.GetPageSizeUrl(9)" class="btn btn-sm btn-outline-secondary @(Model.PageSize == 9 ? "active" : "")">9</a>
                             <a href="@Model.GetPageSizeUrl(12)" class="btn btn-sm btn-outline-secondary @(Model.PageSize == 12 ? "active" : "")">12</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (Model.TrendingArticles.Any())
+        {
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-12">
+                    <div class="glass-panel trending-panel">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
+                            <div>
+                                <span class="badge bg-primary bg-gradient text-uppercase small mb-2">Most View Articles</span>
+                            </div>
+                        </div>
+                        <div class="row g-4">
+                            @{
+                                var rank = 1;
+                            }
+                            @foreach (var article in Model.TrendingArticles)
+                            {
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="trending-card h-100">
+                                        <div class="trending-rank">@rank</div>
+                                        <div class="trending-metric text-muted text-uppercase mb-2">
+                                            <i class="fas fa-eye text-primary me-2"></i>@article.ViewCount.ToString("N0") views
+                                        </div>
+                                        <a href="/News/Details/@article.NewsArticleId" class="stretched-link text-dark fw-semibold d-block mb-2 text-decoration-none">
+                                            @(string.IsNullOrWhiteSpace(article.NewsTitle)
+                                                                                ? "Untitled article"
+                                                                                : Regex.Replace(article.NewsTitle, @"\s+", " ").Trim())
+                                                                                                                                   </a>
+                                                                                                                                   <p class="text-muted small mb-3">
+                                            @(string.IsNullOrWhiteSpace(article.Headline)
+                                                                                ? "No highlight provided."
+                                                                                : article.Headline.Length > 90
+                                                                                ? article.Headline[..87] + "..."
+                                                                                : article.Headline)
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center text-muted small">
+                                    <span><i class="far fa-calendar-alt me-1 text-primary"></i>@article.CreatedDate?.ToString("dd MMM")</span>
+                                </div>
+                            </div>
+                        </div>
+                                                        rank++;
+                            }
                         </div>
                     </div>
                 </div>

@@ -338,11 +338,11 @@ namespace BussinessLogic.Services
                     CreatedDate = n.CreatedDate,
                     ModifiedDate = n.ModifiedDate,
                     UpdatedById = n.UpdatedById,
+                    ViewCount = n.ViewCount,
                     Category = n.Category,
                     CreatedBy = n.CreatedBy,
                     Tags = n.Tags,
                     NewsArticleImages = n.NewsArticleImages
-                    // NewsContent is intentionally excluded
                 })
                 .OrderByDescending(n => n.CreatedDate)
                 .ToListAsync();
@@ -367,6 +367,7 @@ namespace BussinessLogic.Services
                     CreatedDate = n.CreatedDate,
                     ModifiedDate = n.ModifiedDate,
                     UpdatedById = n.UpdatedById,
+                    ViewCount = n.ViewCount,
                     Category = n.Category,
                     CreatedBy = n.CreatedBy,
                     Tags = n.Tags
@@ -394,6 +395,7 @@ namespace BussinessLogic.Services
                     CreatedDate = n.CreatedDate,
                     ModifiedDate = n.ModifiedDate,
                     UpdatedById = n.UpdatedById,
+                    ViewCount = n.ViewCount,
                     Category = n.Category,
                     CreatedBy = n.CreatedBy,
                     Tags = n.Tags
@@ -411,9 +413,9 @@ namespace BussinessLogic.Services
             }
 
             return await _unitOfWork.NewsArticleRepository.Query()
-                .Where(n => n.CategoryId == currentArticle.CategoryId && 
-                           n.NewsArticleId != articleId && 
-                           n.NewsStatus == true)
+                .Where(n => n.CategoryId == currentArticle.CategoryId &&
+                            n.NewsArticleId != articleId &&
+                            n.NewsStatus == true)
                 .Include(n => n.Category)
                 .Include(n => n.CreatedBy)
                 .Include(n => n.Tags)
@@ -429,6 +431,7 @@ namespace BussinessLogic.Services
                     CreatedDate = n.CreatedDate,
                     ModifiedDate = n.ModifiedDate,
                     UpdatedById = n.UpdatedById,
+                    ViewCount = n.ViewCount,
                     Category = n.Category,
                     CreatedBy = n.CreatedBy,
                     Tags = n.Tags
@@ -438,9 +441,9 @@ namespace BussinessLogic.Services
         }
 
         public async Task<IEnumerable<NewsArticle>> SearchNewsArticlesSummaryAsync(
-            string? title = null, 
-            string? authorName = null, 
-            string? categoryName = null, 
+            string? title = null,
+            string? authorName = null,
+            string? categoryName = null,
             bool? status = null,
             DateTime? startDate = null,
             DateTime? endDate = null)
@@ -494,6 +497,7 @@ namespace BussinessLogic.Services
                     CreatedDate = n.CreatedDate,
                     ModifiedDate = n.ModifiedDate,
                     UpdatedById = n.UpdatedById,
+                    ViewCount = n.ViewCount,
                     Category = n.Category,
                     CreatedBy = n.CreatedBy,
                     Tags = n.Tags
@@ -520,6 +524,7 @@ namespace BussinessLogic.Services
                     CreatedDate = n.CreatedDate,
                     ModifiedDate = n.ModifiedDate,
                     UpdatedById = n.UpdatedById,
+                    ViewCount = n.ViewCount,
                     Category = n.Category,
                     CreatedBy = n.CreatedBy,
                     Tags = n.Tags
