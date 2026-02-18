@@ -143,6 +143,7 @@ namespace Presentation_API.Controllers
 
         [HttpGet]
         [EnableQuery]
+        [AllowAnonymous]
         public async Task<IActionResult> Trending([FromODataUri] int? top)
         {
             try

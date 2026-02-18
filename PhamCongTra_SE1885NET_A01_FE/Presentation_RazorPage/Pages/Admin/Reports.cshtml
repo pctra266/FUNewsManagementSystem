@@ -250,6 +250,7 @@
                                         <th>Author</th>
                                         <th>Category</th>
                                         <th>Created Date</th>
+                                        <th>View Count</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -261,6 +262,7 @@
                                             <td>@article.CreatedByName</td>
                                             <td>@article.CategoryName</td>
                                             <td>@article.CreatedDate?.ToString("MMM dd, yyyy")</td>
+                                            <td>@article.ViewCount</td>
                                             <td>
                                                 @if (article.NewsStatus == true)
                                                 {
