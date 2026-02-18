@@ -256,15 +256,21 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <select asp-for="CreateAccount.AccountRole" class="form-select" id="createRole">
-                                    <option value="" selected disabled>Select Role</option>
-                                    <option value="1">Staff</option>
-                                    <option value="2">Lecturer</option>
-                                </select>
-                                <label for="createRole">Role <span class="text-danger">*</span></label>
-                                <span asp-validation-for="CreateAccount.AccountRole" class="text-danger small"></span>
+                                <input asp-for="CreateAccount.ConfirmPassword" type="password" class="form-control" id="createConfirmPass" placeholder="Confirm Password" />
+                                <label for="createConfirmPass">Confirm Password <span class="text-danger">*</span></label>
+                                <span asp-validation-for="CreateAccount.ConfirmPassword" class="text-danger small"></span>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select asp-for="CreateAccount.AccountRole" class="form-select" id="createRole">
+                            <option value="" selected disabled>Select Role</option>
+                            <option value="1">Staff</option>
+                            <option value="2">Lecturer</option>
+                        </select>
+                        <label for="createRole">Role <span class="text-danger">*</span></label>
+                        <span asp-validation-for="CreateAccount.AccountRole" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">

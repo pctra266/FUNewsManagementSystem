@@ -42,23 +42,16 @@ namespace BussinessLogic.Services
 
         public async Task<SystemAccount> CreateAccountAsync(SystemAccount account, short? userId = null)
         {
-            // Check if email already exists
             if (await IsEmailExistAsync(account.AccountEmail!))
             {
                 throw new InvalidOperationException("Email already exists");
             }
 
-            // Generate new ID
-            var allAccounts = await _unitOfWork.AccountRepository.GetAllAsync();
-            account.AccountId = (short)(allAccounts.Any() ? allAccounts.Max(a => a.AccountId) + 1 : 1);
-
             await _unitOfWork.AccountRepository.AddAsync(account);
             await _unitOfWork.SaveChangesAsync();
 
-            // Audit Log
             if (userId.HasValue)
             {
-                // Mask password before logging
                 var accountToLog = new SystemAccount
                 {
                     AccountId = account.AccountId,
@@ -67,9 +60,15 @@ namespace BussinessLogic.Services
                     AccountRole = account.AccountRole,
                     AccountPassword = "***"
                 };
-                await _auditService.LogAsync(userId.Value, "Create", "SystemAccount", account.AccountId.ToString(), null, accountToLog);
+                await _auditService.LogAsync(
+                    userId.Value,
+                    "Create",
+                    "SystemAccount",
+                    account.AccountId.ToString(),
+                    null,
+                    accountToLog);
             }
-            
+
             return account;
         }
 
