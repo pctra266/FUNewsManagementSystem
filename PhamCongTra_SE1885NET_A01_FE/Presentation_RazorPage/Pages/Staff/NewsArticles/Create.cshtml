@@ -52,6 +52,7 @@
                             <label class="form-label fw-semibold">Upload Images</label>
                             <input type="file" id="createImageFiles" name="imageFiles" class="form-control" accept="image/*" multiple />
                             <div class="form-text small">Max 5MB per file. You can select multiple images.</div>
+                            <div id="createImageError" class="text-danger small mt-1 d-none" role="alert"></div>
                             <div id="createImagePreview" class="d-flex flex-wrap gap-2 mt-3 d-none" aria-live="polite"></div>
                         </div>
                     </div>
@@ -121,15 +122,76 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        function initImagePreview(inputId, previewId) {
+        const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024;
+        const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg']);
+        const ALLOWED_IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp']);
+
+        function initImagePreview(inputId, previewId, errorId) {
             const input = document.getElementById(inputId);
             const preview = document.getElementById(previewId);
+            const error = document.getElementById(errorId);
 
             if (!input || !preview) {
                 return;
             }
 
-            input.addEventListener('change', () => renderImagePreview(input.files, preview));
+            input.addEventListener('change', () => {
+                if (!validateImageFiles(input, preview, error)) {
+                    return;
+                }
+
+                renderImagePreview(input.files, preview);
+            });
+        }
+
+        function validateImageFiles(input, preview, errorContainer) {
+            const files = Array.from(input.files ?? []);
+            const invalidTypes = files.filter(file => !hasAllowedImageType(file));
+            const oversized = files.filter(file => file.size > MAX_IMAGE_FILE_SIZE);
+            const messages = [];
+
+            if (invalidTypes.length) {
+                messages.push(`Only JPEG, PNG, GIF or WEBP images are allowed: ${invalidTypes.map(file => file.name).join(', ')}.`);
+            }
+
+            if (oversized.length) {
+                messages.push(`Each file must be smaller than 5 MB: ${oversized.map(file => file.name).join(', ')}.`);
+            }
+
+            if (messages.length) {
+                input.value = '';
+                if (preview) {
+                    preview.innerHTML = '';
+                    preview.classList.add('d-none');
+                }
+
+                if (errorContainer) {
+                    errorContainer.innerHTML = messages.join('<br />');
+                    errorContainer.classList.remove('d-none');
+                }
+
+                return false;
+            }
+
+            if (errorContainer) {
+                errorContainer.innerHTML = '';
+                errorContainer.classList.add('d-none');
+            }
+
+            return true;
+        }
+
+        function hasAllowedImageType(file) {
+            if (!file) {
+                return false;
+            }
+
+            if (file.type && ALLOWED_IMAGE_TYPES.has(file.type.toLowerCase())) {
+                return true;
+            }
+
+            const extension = file.name?.split('.').pop()?.toLowerCase();
+            return extension ? ALLOWED_IMAGE_EXTENSIONS.has(extension) : false;
         }
 
         function renderImagePreview(files, previewContainer) {
@@ -143,7 +205,7 @@
             previewContainer.classList.remove('d-none');
 
             Array.from(files)
-                .filter(file => file.type.startsWith('image/'))
+                .filter(file => hasAllowedImageType(file))
                 .forEach(file => {
                     const objectUrl = URL.createObjectURL(file);
 
@@ -182,7 +244,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initImagePreview('createImageFiles', 'createImagePreview');
+            initImagePreview('createImageFiles', 'createImagePreview', 'createImageError');
         });
 
         async function suggestTags() {
