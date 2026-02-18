@@ -197,8 +197,12 @@ if (app.Environment.IsDevelopment())
 
     app.UseCors("MyCors");
 
+
 // Critical: Authentication MUST come before custom middleware
 app.UseAuthentication();
+
+// Function Request Logging Middleware
+app.UseMiddleware<Presentation_API.Middleware.RequestLoggingMiddleware>();
 
 app.UseAuthorization();
 
