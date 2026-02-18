@@ -12,7 +12,7 @@ namespace BussinessLogic.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Dictionary<string, double>> SuggestTagsAsync(string content)
+        public async Task<Dictionary<string, double>> SuggestTagsAsync(string content, int? userId = null)
         {
             var suggestions = new Dictionary<string, double>();
             if (string.IsNullOrWhiteSpace(content)) return suggestions;
@@ -36,7 +36,28 @@ namespace BussinessLogic.Services
                 suggestions[word] = 0.8; 
             }
 
-            // 2. Learning Cache (Popular Tags)
+            // 2. Learning Cache (User Specific Tags)
+            if (userId.HasValue)
+            {
+                var userTags = await _unitOfWork.TagRepository.GetMostUsedTagsByUserAsync(userId.Value, 5);
+                foreach (var tag in userTags)
+                {
+                    if (tag.TagName != null)
+                    {
+                        string tagNameLower = tag.TagName.ToLower();
+                        if (suggestions.ContainsKey(tagNameLower))
+                        {
+                            suggestions[tagNameLower] = 0.95; // Boost existing
+                        }
+                        else
+                        {
+                            suggestions[tagNameLower] = 0.85; // High confidence for user preference
+                        }
+                    }
+                }
+            }
+
+            // 3. Learning Cache (Global Popular Tags)
             // Get top 5 popular tags from DB
             var popularTags = await _unitOfWork.TagRepository.GetMostPopularTagsAsync(5);
             
@@ -50,9 +71,15 @@ namespace BussinessLogic.Services
                     if (content.Contains(tagNameLower, StringComparison.OrdinalIgnoreCase))
                     {
                         if (suggestions.ContainsKey(tagNameLower))
-                            suggestions[tagNameLower] = 0.95; // Boost existing
+                        {
+                            // Keep the highest confidence if already set by user preference
+                            if (suggestions[tagNameLower] < 0.95) 
+                                suggestions[tagNameLower] = 0.95; 
+                        }
                         else
+                        {
                             suggestions[tagNameLower] = 0.9; // New high confidence match
+                        }
                     }
                     else if (!suggestions.ContainsKey(tagNameLower))
                     {

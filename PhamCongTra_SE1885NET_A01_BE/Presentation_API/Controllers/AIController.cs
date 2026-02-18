@@ -1,6 +1,7 @@
 using BussinessLogic.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Presentation_API.Controllers
 {
@@ -26,7 +27,15 @@ namespace Presentation_API.Controllers
 
             try
             {
-                var suggestions = await _aiService.SuggestTagsAsync(request.Content);
+                // Extract UserId from claims
+                int? userId = null;
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedId))
+                {
+                    userId = parsedId;
+                }
+
+                var suggestions = await _aiService.SuggestTagsAsync(request.Content, userId);
                 return Ok(suggestions);
             }
             catch (Exception ex)

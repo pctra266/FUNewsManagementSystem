@@ -20,5 +20,14 @@ namespace DataAccess.Repositories
                 .Take(count)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Tag>> GetMostUsedTagsByUserAsync(int userId, int count)
+        {
+            return await _dbSet
+                .Where(t => t.NewsArticles.Any(na => na.CreatedById == userId))
+                .OrderByDescending(t => t.NewsArticles.Count(na => na.CreatedById == userId))
+                .Take(count)
+                .ToListAsync();
+        }
     }
 }
