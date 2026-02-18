@@ -39,7 +39,7 @@ namespace BussinessLogic.Services
     IQueryable<NewsArticle> GetNewsArticlesSummaryQueryable();
         
         // Analytics Methods
-        Task<IEnumerable<NewsArticle>> GetTrendingArticlesAsync(int top = 3);
+        Task<IEnumerable<NewsArticle>> GetTrendingArticlesAsync(int top = 5);
         Task<IEnumerable<NewsArticle>> GetRecommendedArticlesAsync(string articleId, int top = 3);
     }
 }
