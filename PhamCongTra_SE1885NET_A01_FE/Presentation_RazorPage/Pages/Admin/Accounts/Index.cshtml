@@ -168,6 +168,12 @@
                                                 <i class="fas fa-edit"></i>
                                             </button>
 
+                                            <button type="button" class="btn btn-link text-warning p-2"
+                                                    onclick="openChangePasswordModal(@account.AccountId, '@account.AccountName')"
+                                                    title="Change Password">
+                                                <i class="fas fa-key"></i>
+                                            </button>
+
                                             @if (account.ArticleCount == 0)
                                             {
                                                 <form method="post" asp-page-handler="Delete" asp-route-id="@account.AccountId" class="d-inline"
@@ -311,6 +317,56 @@
     </div>
 </div>
 
+</div>
+
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form method="post" asp-page-handler="ChangePassword" onsubmit="return confirm('Change password for this user?')">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="changePasswordLabel">
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-info small mb-3">
+                        <i class="fas fa-info-circle me-1"></i>
+                        You are changing password for <strong id="cpAccountName">User</strong>.
+                        You must verify the <strong>current password</strong> to proceed.
+                    </div>
+
+                    <input type="hidden" asp-for="ChangePassword.AccountId" id="cpAccountId" />
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control" id="cpCurrentPass" placeholder="Current Password" />
+                        <label for="cpCurrentPass">Current Password <span class="text-danger">*</span></label>
+                        <span asp-validation-for="ChangePassword.CurrentPassword" class="text-danger small"></span>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="ChangePassword.NewPassword" type="password" class="form-control" id="cpNewPass" placeholder="New Password" />
+                        <label for="cpNewPass">New Password <span class="text-danger">*</span></label>
+                        <span asp-validation-for="ChangePassword.NewPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="ChangePassword.ConfirmPassword" type="password" class="form-control" id="cpConfirmPass" placeholder="Confirm Password" />
+                        <label for="cpConfirmPass">Confirm New Password <span class="text-danger">*</span></label>
+                        <span asp-validation-for="ChangePassword.ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-link text-secondary text-decoration-none" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning px-4">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
@@ -320,6 +376,18 @@
             document.getElementById('editAccountName').value = name;
             document.getElementById('editAccountEmail').value = email;
             document.getElementById('editAccountRole').value = role;
+        }
+
+        function openChangePasswordModal(id, name) {
+            document.getElementById('cpAccountId').value = id;
+            document.getElementById('cpAccountName').innerText = name;
+            // Clear inputs
+            document.getElementById('cpCurrentPass').value = '';
+            document.getElementById('cpNewPass').value = '';
+            document.getElementById('cpConfirmPass').value = '';
+            
+            var modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            modal.show();
         }
     </script>
 }

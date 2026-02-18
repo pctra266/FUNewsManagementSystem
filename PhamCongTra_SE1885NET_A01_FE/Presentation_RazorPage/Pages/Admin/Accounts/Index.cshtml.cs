@@ -26,6 +26,9 @@ namespace Presentation_RazorPage.Pages.Admin.Accounts
         [BindProperty]
         public SystemAccountCreateModel CreateAccount { get; set; } = new SystemAccountCreateModel();
 
+        [BindProperty]
+        public AdminChangePasswordViewModel ChangePassword { get; set; } = new AdminChangePasswordViewModel();
+
         public int TotalAccounts { get; set; }
         public int StaffAccounts { get; set; }
         public int LecturerAccounts { get; set; }
@@ -211,6 +214,53 @@ namespace Presentation_RazorPage.Pages.Admin.Accounts
 
             return RedirectToPage();
         }
+        public async Task<IActionResult> OnPostChangePasswordAsync()
+        {
+            ModelState.Clear();
+
+            if (!TryValidateModel(ChangePassword, nameof(ChangePassword)))
+            {
+                Console.WriteLine("--------------------------------------------");
+                Console.WriteLine("----------------FailRui03----------------------------");
+                Console.WriteLine("--------------------------------------------");
+                await OnGetAsync();
+                return Page();
+            }
+
+            if (ChangePassword.NewPassword != ChangePassword.ConfirmPassword)
+            {
+                TempData["ErrorMessage"] = "New password and confirmation do not match.";
+                return RedirectToPage();
+            }
+
+            try
+            {
+                var changePasswordData = new
+                {
+                    AccountId = ChangePassword.AccountId,
+                    CurrentPassword = ChangePassword.CurrentPassword,
+                    NewPassword = ChangePassword.NewPassword,
+                    ConfirmPassword = ChangePassword.ConfirmPassword
+                };
+
+                var result = await _apiService.PostAsync<object>("/odata/SystemAccountsFunctions/AdminChangePassword", changePasswordData);
+
+                if (result != null)
+                {
+                    TempData["SuccessMessage"] = "Password changed successfully!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to change password. Current password may be incorrect.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+            }
+
+            return RedirectToPage();
+        }
     }
 
     public class SystemAccountCreateModel
@@ -231,5 +281,22 @@ namespace Presentation_RazorPage.Pages.Admin.Accounts
         [Required(ErrorMessage = "Role is required")]
         [Range(1, 2, ErrorMessage = "Role must be 1 (Staff) or 2 (Lecturer)")]
         public int AccountRole { get; set; }
+    }
+
+    public class AdminChangePasswordViewModel
+    {
+        [Required]
+        public short AccountId { get; set; }
+
+        [Required(ErrorMessage = "Current password is required")]
+        public string CurrentPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "New password is required")]
+        [StringLength(70, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 70 characters")]
+        public string NewPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Confirm password is required")]
+        [Compare("NewPassword", ErrorMessage = "Passwords do not match")]
+        public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

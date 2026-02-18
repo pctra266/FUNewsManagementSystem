@@ -305,6 +305,35 @@ namespace Presentation_API.Controllers
             }
         }
 
+        [HttpPost("odata/SystemAccountsFunctions/AdminChangePassword")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> AdminChangePassword([FromBody] AdminChangePasswordDto changePasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Verify that the account exists and the OLD password is correct
+                // We reuse the ChangePasswordAsync service method which validates the old password
+                var success = await _accountService.ChangePasswordAsync(changePasswordDto.AccountId,
+                    changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
+
+                if (!success)
+                {
+                    return BadRequest(new { message = "Incorrect current password or account not found." });
+                }
+
+                return Ok(new { message = "Password changed successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while changing the password", error = ex.Message });
+            }
+        }
+
         private bool TryGetUserId(out short userId)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
