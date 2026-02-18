@@ -27,6 +27,10 @@ document.addEventListener('submit', function (e) {
         return;
     }
 
+    if (e.defaultPrevented) {
+        return;
+    }
+
     showLoading();
 });
 
