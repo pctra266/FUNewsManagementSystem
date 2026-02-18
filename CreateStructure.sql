@@ -82,7 +82,9 @@ GO
 -- 6. Table: AuditLog
 CREATE TABLE [dbo].[AuditLog](
     [LogId] INT IDENTITY(1,1) NOT NULL,
-    [UserId] SMALLINT NOT NULL,
+    [UserId] SMALLINT NULL,
+    [UserName] NVARCHAR(100) NULL,
+    [UserEmail] NVARCHAR(100) NULL,
     [Action] NVARCHAR(50) NOT NULL,
     [EntityName] NVARCHAR(100) NOT NULL,
     [EntityId] NVARCHAR(50) NOT NULL,
@@ -137,6 +139,7 @@ GO
 
 ALTER TABLE [dbo].[AuditLog] WITH CHECK ADD CONSTRAINT [FK_AuditLog_SystemAccount] FOREIGN KEY([UserId])
 REFERENCES [dbo].[SystemAccount] ([AccountID])
+ON DELETE SET NULL
 GO
 ALTER TABLE [dbo].[AuditLog] CHECK CONSTRAINT [FK_AuditLog_SystemAccount]
 GO

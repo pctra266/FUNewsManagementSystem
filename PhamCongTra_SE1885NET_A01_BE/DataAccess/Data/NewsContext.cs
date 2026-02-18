@@ -130,6 +130,8 @@ public partial class NewsContext : DbContext
             entity.Property(e => e.Action).HasMaxLength(50);
             entity.Property(e => e.EntityName).HasMaxLength(100);
             entity.Property(e => e.EntityId).HasMaxLength(50);
+            entity.Property(e => e.UserName).HasMaxLength(100);
+            entity.Property(e => e.UserEmail).HasMaxLength(100);
             entity.Property(e => e.Timestamp).HasColumnType("datetime");
 
             entity.HasIndex(e => e.UserId, "IX_AuditLog_UserId");
@@ -138,7 +140,8 @@ public partial class NewsContext : DbContext
             entity.HasOne(d => d.User)
                 .WithMany()
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<NewsArticleImage>(entity =>

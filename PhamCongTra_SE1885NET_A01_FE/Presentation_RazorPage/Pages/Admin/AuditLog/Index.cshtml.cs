@@ -57,13 +57,13 @@ namespace Presentation_RazorPage.Pages.Admin.AuditLog
                 }
 
                 var filterQuery = filters.Any() ? $"$filter={string.Join(" and ", filters)}" : "";
-                var expandClause = "$expand=User($select=AccountName,AccountEmail)";
+                // var expandClause = "$expand=User($select=AccountName,AccountEmail)"; // No longer needed as we store snapshot
                 
                 // Add pagination
                 var skip = (CurrentPage - 1) * PageSize;
                 var paginationClause = $"$top={PageSize}&$skip={skip}&$count=true";
 
-                var query = $"?{filterQuery}{(filters.Any() ? "&" : "")}{expandClause}&{paginationClause}";
+                var query = $"?{filterQuery}{(filters.Any() ? "&" : "")}&$orderby=Timestamp desc&{paginationClause}";
 
                 // Fetch audit logs via OData
                 var logsResponse = await _apiService.GetODataAsync<JsonElement>($"/odata/AuditLogs{query}");
@@ -116,8 +116,8 @@ namespace Presentation_RazorPage.Pages.Admin.AuditLog
                 OldValues = jsonLog.TryGetProperty("OldValues", out var oldVal) ? oldVal.GetString() : null,
                 NewValues = jsonLog.TryGetProperty("NewValues", out var newVal) ? newVal.GetString() : null,
                 Timestamp = jsonLog.GetProperty("Timestamp").GetDateTime(),
-                UserName = jsonLog.TryGetProperty("User", out var user) && user.TryGetProperty("AccountName", out var name) ? name.GetString() ?? "Unknown" : "Unknown",
-                UserEmail = jsonLog.TryGetProperty("User", out var u) && u.TryGetProperty("AccountEmail", out var email) ? email.GetString() ?? "Unknown" : "Unknown"
+                UserName = jsonLog.TryGetProperty("UserName", out var name) ? name.GetString() ?? "Unknown" : "Unknown",
+                UserEmail = jsonLog.TryGetProperty("UserEmail", out var email) ? email.GetString() ?? "Unknown" : "Unknown"
             };
         }
     }

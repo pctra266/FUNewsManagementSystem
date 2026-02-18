@@ -11,10 +11,12 @@ namespace BussinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly JsonSerializerOptions _jsonOptions;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
-        public AuditService(IUnitOfWork unitOfWork)
+        public AuditService(IUnitOfWork unitOfWork, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
             _jsonOptions = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
@@ -22,13 +24,37 @@ namespace BussinessLogic.Services
             };
         }
 
-        public async Task LogAsync(short userId, string action, string entity, string entityId, object? oldVal, object? newVal)
+        public async Task LogAsync(short? userId, string action, string entity, string entityId, object? oldVal, object? newVal)
         {
             try
             {
+                string? userName = null;
+                string? userEmail = null;
+                short? dbUserId = userId;
+
+                if (userId == 0)
+                {
+                    // Admin account from config
+                    dbUserId = null;
+                    userName = "Administrator"; // Or from config if exist
+                    userEmail = _configuration["AdminAccount:AccountEmail"];
+                }
+                else if (userId.HasValue)
+                {
+                    // Existing user in DB
+                    var user = await _unitOfWork.AccountRepository.GetByIdAsync(userId.Value);
+                    if (user != null)
+                    {
+                        userName = user.AccountName;
+                        userEmail = user.AccountEmail;
+                    }
+                }
+
                 var log = new AuditLog
                 {
-                    UserId = userId,
+                    UserId = dbUserId,
+                    UserName = userName,
+                    UserEmail = userEmail,
                     Action = action,
                     EntityName = entity,
                     EntityId = entityId,
@@ -40,13 +66,10 @@ namespace BussinessLogic.Services
                 await _unitOfWork.AuditLogRepository.AddAsync(log);
                 await _unitOfWork.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Fail silently or log to file/console so we don't block the main operation if audit fails
-                // For now, re-throwing might block business flow, so we catch.
-                // Or better: ensure audit is critical? 
-                // Requirement says "Add Audit Logging". Usually it shouldn't crash the app.
-                Console.WriteLine("Failed to create audit log");
+                Console.WriteLine($"Failed to create audit log: {ex.Message}");
             }
         }
 
@@ -68,7 +91,7 @@ namespace BussinessLogic.Services
             }
 
             var logs = await query
-                .OrderByDescending(a => a.Timestamp)
+                .OrderBy(a => a.Timestamp)
                 .Select(a => new AuditLogDto
                 {
                     LogId = a.LogId,

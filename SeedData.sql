@@ -123,14 +123,14 @@ END
 GO
 
 -- 7. SEED DATA FOR AUDITLOG
-INSERT [dbo].[AuditLog] ([UserId], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
-VALUES (1, N'Create', N'NewsArticle', N'1', NULL, N'{"Title":"University FU Celebrates Success...","Status":1}', DATEADD(DAY, -10, GETDATE()))
-INSERT [dbo].[AuditLog] ([UserId], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
-VALUES (2, N'Update', N'NewsArticle', N'2', N'{"Status":0}', N'{"Status":1}', DATEADD(DAY, -5, GETDATE()))
-INSERT [dbo].[AuditLog] ([UserId], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
-VALUES (3, N'Create', N'Category', N'6', NULL, N'{"Name":"International Cooperation"}', DATEADD(DAY, -2, GETDATE()))
-INSERT [dbo].[AuditLog] ([UserId], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
-VALUES (1, N'Delete', N'Tag', N'99', N'{"TagName":"Legacy"}', NULL, DATEADD(HOUR, -5, GETDATE()))
-INSERT [dbo].[AuditLog] ([UserId], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
-VALUES (4, N'Update', N'NewsArticle', N'5', N'{"ViewCount":10}', N'{"ViewCount":150}', GETDATE())
+INSERT [dbo].[AuditLog] ([UserId], [UserName], [UserEmail], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
+VALUES (1, N'Emma William', N'EmmaWilliam@FUNewsManagement.org', N'Create', N'NewsArticle', N'1', NULL, N'{"Title":"University FU Celebrates Success...","Status":1}', DATEADD(DAY, -10, GETDATE()))
+INSERT [dbo].[AuditLog] ([UserId], [UserName], [UserEmail], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
+VALUES (2, N'Olivia James', N'OliviaJames@FUNewsManagement.org', N'Update', N'NewsArticle', N'2', N'{"Status":0}', N'{"Status":1}', DATEADD(DAY, -5, GETDATE()))
+INSERT [dbo].[AuditLog] ([UserId], [UserName], [UserEmail], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
+VALUES (3, N'Isabella David', N'IsabellaDavid@FUNewsManagement.org', N'Create', N'Category', N'6', NULL, N'{"Name":"International Cooperation"}', DATEADD(DAY, -2, GETDATE()))
+INSERT [dbo].[AuditLog] ([UserId], [UserName], [UserEmail], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
+VALUES (1, N'Emma William', N'EmmaWilliam@FUNewsManagement.org', N'Delete', N'Tag', N'99', N'{"TagName":"Legacy"}', NULL, DATEADD(HOUR, -5, GETDATE()))
+INSERT [dbo].[AuditLog] ([UserId], [UserName], [UserEmail], [Action], [EntityName], [EntityId], [OldValues], [NewValues], [Timestamp]) 
+VALUES (4, N'Michael Charlotte', N'MichaelCharlotte@FUNewsManagement.org', N'Update', N'NewsArticle', N'5', N'{"ViewCount":10}', N'{"ViewCount":150}', GETDATE())
 GO
