@@ -1,4 +1,5 @@
 using BusinessLogic.Services;
+using System.IO;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -37,10 +38,27 @@ namespace Presentation_RazorPage.Pages.Staff.NewsArticles
 
         public async Task<IActionResult> OnPostAsync(List<IFormFile> imageFiles)
         {
-           
+            // Server-side image validation (fallback when JavaScript is disabled)
+            if (imageFiles != null && imageFiles.Any())
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                const long maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+                foreach (var file in imageFiles.Where(f => f.Length > 0))
+                {
+                    var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                    if (!allowedExtensions.Contains(ext))
+                        ModelState.AddModelError(string.Empty,
+                            $"'{file.FileName}': Invalid file type. Only JPEG, PNG and GIF images are allowed.");
+                    else if (file.Length > maxFileSize)
+                        ModelState.AddModelError(string.Empty,
+                            $"'{file.FileName}': File size exceeds the 5 MB limit.");
+                }
+            }
 
             if (!ModelState.IsValid)
             {
+                await PopulateLookupsAsync();
                 return Page();
             }
 
