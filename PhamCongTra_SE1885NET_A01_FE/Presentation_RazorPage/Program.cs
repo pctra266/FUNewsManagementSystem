@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 
 // Add Named HttpClients with Polly Policies
 builder.Services.AddHttpClient("CoreClient", client =>

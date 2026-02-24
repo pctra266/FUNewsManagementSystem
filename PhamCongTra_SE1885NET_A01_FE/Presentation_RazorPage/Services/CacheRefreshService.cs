@@ -12,7 +12,22 @@ namespace Presentation_RazorPage.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<CacheRefreshService> _logger;
+
         private const string OfflineFilePath = "offline_data.json";
+        private const string TagsEndpoint = "/odata/Tags";
+        private const string CategoriesEndpoint = "/odata/CategoriesFunctions/Active";
+        private const string SystemAccountsEndpoint = "/odata/SystemAccounts";
+        private const string DashboardEndpoint = "/odata/Reports/Default.Dashboard()";
+        private const string NewsExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags,NewsArticleImages";
+        private const int PublicTrendingCount = 4;
+        private const int StaffTrendingCount = 5;
+        private static readonly string ActiveNewsEndpoint = $"/odata/NewsArticles/Default.GetActive()?{NewsExpandClause}";
+        private static readonly string PublicTrendingEndpoint = $"/odata/NewsArticles/Trending(top={PublicTrendingCount})";
+        private static readonly string StaffTrendingEndpoint = $"/odata/Reports/Default.Trending(top={StaffTrendingCount})";
+        private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+        {
+            WriteIndented = true
+        };
 
         public CacheRefreshService(IServiceProvider serviceProvider, IMemoryCache memoryCache, ILogger<CacheRefreshService> logger)
         {
@@ -23,8 +38,7 @@ namespace Presentation_RazorPage.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Initial delay to let app start
-            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -39,95 +53,110 @@ namespace Presentation_RazorPage.Services
                     _logger.LogError(ex, "Error refreshing cache");
                 }
 
-                // Wait 6 hours
                 await Task.Delay(TimeSpan.FromHours(6), stoppingToken);
             }
         }
 
         private async Task RefreshCacheAsync()
         {
-            // Create scope to resolve Scoped IApiService
-            using (var scope = _serviceProvider.CreateScope())
+            using var scope = _serviceProvider.CreateScope();
+            var apiService = scope.ServiceProvider.GetRequiredService<IApiService>();
+
+            try
             {
-                var apiService = scope.ServiceProvider.GetRequiredService<IApiService>();
+                _logger.LogInformation("Starting full cache warm-up...");
 
-                try
+                var categories = await apiService.GetAsync<CategoryModel>(CategoriesEndpoint);
+                SetCacheEntry(CategoriesEndpoint, categories);
+
+                var tags = await apiService.GetAsync<TagModel>(TagsEndpoint);
+                SetCacheEntry(TagsEndpoint, tags);
+
+                var activeArticles = await apiService.GetAsync<NewsArticleModel>(ActiveNewsEndpoint);
+                SetCacheEntry(ActiveNewsEndpoint, activeArticles);
+
+                var publicTrending = await apiService.GetAsync<NewsArticleModel>(PublicTrendingEndpoint);
+                SetCacheEntry(PublicTrendingEndpoint, publicTrending);
+
+                var staffTrending = await apiService.GetAsync<NewsArticleModel>(StaffTrendingEndpoint);
+                SetCacheEntry(StaffTrendingEndpoint, staffTrending);
+
+                var dashboard = await apiService.GetByIdAsync<DashboardStatisticsModel>(DashboardEndpoint);
+                SetCacheEntry(DashboardEndpoint, dashboard);
+
+                var systemAccounts = await apiService.GetAsync<SystemAccountModel>(SystemAccountsEndpoint);
+                SetCacheEntry(SystemAccountsEndpoint, systemAccounts);
+
+                var offlineData = new OfflineData
                 {
-                    // 1. Fetch Categories
-                    var categories = await apiService.GetAsync<CategoryModel>("/odata/Categories");
-                    if (categories != null)
-                    {
-                        _memoryCache.Set("OFFLINE_CACHE_/odata/Categories", categories);
-                    }
+                    Categories = categories ?? new(),
+                    NewsArticles = activeArticles ?? new(),
+                    Tags = tags ?? new(),
+                    TrendingArticles = publicTrending ?? new(),
+                    StaffTrendingArticles = staffTrending ?? new(),
+                    DashboardStats = dashboard,
+                    SystemAccounts = systemAccounts ?? new(),
+                    LastUpdated = DateTime.Now
+                };
 
-                    // 2. Fetch NewsArticles
-                    var articles = await apiService.GetAsync<NewsArticleModel>("/odata/NewsArticles");
-                    if (articles != null)
-                    {
-                        _memoryCache.Set("OFFLINE_CACHE_/odata/NewsArticles", articles);
-                    }
+                var json = JsonSerializer.Serialize(offlineData, JsonOptions);
+                await File.WriteAllTextAsync(OfflineFilePath, json);
+                _logger.LogInformation("Cache warm-up completed and saved to offline file.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "API unavailable during warm-up. Attempting to load from offline file.");
 
-                    // 3. Save to File
-                    if (categories != null && articles != null)
-                    {
-                        var offlineData = new OfflineData
-                        {
-                            Categories = categories,
-                            NewsArticles = articles,
-                            LastUpdated = DateTime.Now
-                        };
-
-                        var json = JsonSerializer.Serialize(offlineData);
-                        await File.WriteAllTextAsync(OfflineFilePath, json);
-                    }
-                }
-                catch (Exception ex)
+                if (!File.Exists(OfflineFilePath))
                 {
-                    _logger.LogError(ex, "API unavailable. Attempting to load from offline file.");
-
-                    if (File.Exists(OfflineFilePath))
-                    {
-                        var json = await File.ReadAllTextAsync(OfflineFilePath);
-                        var offlineData = JsonSerializer.Deserialize<OfflineData>(json);
-
-                        if (offlineData != null)
-                        {
-                            _memoryCache.Set("OFFLINE_CACHE_/odata/Categories", offlineData.Categories);
-                            _memoryCache.Set("OFFLINE_CACHE_/odata/NewsArticles", offlineData.NewsArticles);
-                            _logger.LogInformation("Loaded data from offline file. Last updated: {time}", offlineData.LastUpdated);
-                        }
-                    }
+                    return;
                 }
+
+                var json = await File.ReadAllTextAsync(OfflineFilePath);
+                var offlineData = JsonSerializer.Deserialize<OfflineData>(json);
+
+                if (offlineData == null)
+                {
+                    return;
+                }
+
+                SetCacheEntry(CategoriesEndpoint, offlineData.Categories);
+                SetCacheEntry(TagsEndpoint, offlineData.Tags);
+                SetCacheEntry(ActiveNewsEndpoint, offlineData.NewsArticles);
+                SetCacheEntry(PublicTrendingEndpoint, offlineData.TrendingArticles);
+                SetCacheEntry(StaffTrendingEndpoint, offlineData.StaffTrendingArticles);
+                if (offlineData.DashboardStats != null)
+                {
+                    SetCacheEntry(DashboardEndpoint, offlineData.DashboardStats);
+                }
+                SetCacheEntry(SystemAccountsEndpoint, offlineData.SystemAccounts);
+
+                _logger.LogInformation("Loaded cached payloads from offline file. Last updated: {time}", offlineData.LastUpdated);
             }
         }
-        
-        // Load data on startup if API is down? 
-        // We can check if Cache is empty and file exists, then load from file?
-        // But ExecuteAsync calls RefreshCacheAsync. If API fails, RefreshCacheAsync fails or returns null.
-        // We should add Logic to LoadFromFile if API fails.
-        // But let's keep it simple as per plan: "Fetch ... Save to MemoryCache AND generic JSON file".
-        // AND "Update GetAsync... catch -> Read from JSON file/Cache".
-        
-        // Wait, my ApiService implementation ONLY reads from MemoryCache.
-        // So I MUST populate MemoryCache FROM FILE if API fails.
-        
-        // Revised RefreshCacheAsync:
-        /*
-        try {
-           call API
-           update Cache
-           update File
-        } catch {
-           load File
-           update Cache
+
+        private static string BuildCacheKey(string endpoint) => $"OFFLINE_CACHE_{endpoint}";
+
+        private void SetCacheEntry(string endpoint, object? payload)
+        {
+            if (payload == null)
+            {
+                return;
+            }
+
+            _memoryCache.Set(BuildCacheKey(endpoint), payload);
         }
-        */
     }
 
     public class OfflineData
     {
         public List<CategoryModel> Categories { get; set; } = new();
         public List<NewsArticleModel> NewsArticles { get; set; } = new();
+        public List<TagModel> Tags { get; set; } = new();
+        public List<NewsArticleModel> TrendingArticles { get; set; } = new();
+        public List<NewsArticleModel> StaffTrendingArticles { get; set; } = new();
+        public DashboardStatisticsModel? DashboardStats { get; set; }
+        public List<SystemAccountModel> SystemAccounts { get; set; } = new();
         public DateTime LastUpdated { get; set; }
     }
 }
