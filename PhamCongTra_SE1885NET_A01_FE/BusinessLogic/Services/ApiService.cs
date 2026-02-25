@@ -33,31 +33,34 @@ namespace BusinessLogic.Services
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemoryCache _memoryCache;
+        private readonly ICacheKeyRegistry _cacheKeyRegistry;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public ApiService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
+        public ApiService(
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+            IMemoryCache memoryCache,
+            ICacheKeyRegistry cacheKeyRegistry)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _memoryCache = memoryCache;
-            
+            _cacheKeyRegistry = cacheKeyRegistry;
+
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-
-            
-            // _httpClient configuration moved to Program.cs
         }
 
         private HttpClient GetClient(string endpoint = null)
         {
             string name = DetermineClientName(endpoint);
             var client = _httpClientFactory.CreateClient(name);
-            
-            // Attach token if exists
+
             var context = _httpContextAccessor.HttpContext;
             if (context != null)
             {
@@ -76,24 +79,20 @@ namespace BusinessLogic.Services
 
             var lowerEndpoint = endpoint.ToLowerInvariant();
 
-            // AI API
             if (lowerEndpoint.Contains("/api/ai/") || lowerEndpoint.Contains("suggest-tags"))
             {
                 return "AIClient";
             }
 
-            // Analytics API
-            // Covers: /odata/NewsArticles/Default.ArticlesByCategory, ArticlesByAuthor, ArticlesByStatus, Trending
-            if (lowerEndpoint.Contains("articlesby") || 
-                lowerEndpoint.Contains("trending") || 
-                lowerEndpoint.Contains("dashboard") || 
+            if (lowerEndpoint.Contains("articlesby") ||
+                lowerEndpoint.Contains("trending") ||
+                lowerEndpoint.Contains("dashboard") ||
                 lowerEndpoint.Contains("export") ||
                 lowerEndpoint.Contains("recommend"))
             {
                 return "AnalyticsClient";
             }
 
-            // Default to Core API
             return "CoreClient";
         }
 
@@ -106,13 +105,13 @@ namespace BusinessLogic.Services
 
                 var client = GetClient("/api/Auth/login");
                 var response = await client.PostAsync("/api/Auth/login", content);
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
                     return JsonSerializer.Deserialize<LoginResponseModel>(responseContent, _jsonOptions);
                 }
-                
+
                 return null;
             }
             catch
@@ -123,8 +122,7 @@ namespace BusinessLogic.Services
 
         public async Task<List<T>?> GetAsync<T>(string endpoint)
         {
-            // 1. Cache-Aside Check
-            string cacheKey = $"OFFLINE_CACHE_{endpoint}";
+            var cacheKey = $"OFFLINE_CACHE_{endpoint}";
             if (_memoryCache.TryGetValue(cacheKey, out List<T>? cachedData))
             {
                 return cachedData;
@@ -134,15 +132,14 @@ namespace BusinessLogic.Services
             {
                 var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    
+
                     if (string.IsNullOrWhiteSpace(content)) return new List<T>();
 
                     List<T>? result = null;
-                    // More robust check for OData wrapper
                     using var doc = JsonDocument.Parse(content);
                     if (doc.RootElement.ValueKind == JsonValueKind.Object && doc.RootElement.TryGetProperty("value", out var valueProp))
                     {
@@ -151,21 +148,18 @@ namespace BusinessLogic.Services
                             result = JsonSerializer.Deserialize<List<T>>(valueProp.GetRawText(), _jsonOptions);
                         }
                     }
-                    
-                    if (result == null)
-                    {
-                        result = JsonSerializer.Deserialize<List<T>>(content, _jsonOptions);
-                    }
 
-                    // Store in Cache
+                    result ??= JsonSerializer.Deserialize<List<T>>(content, _jsonOptions);
+
                     if (result != null)
                     {
                         _memoryCache.Set(cacheKey, result, TimeSpan.FromHours(1));
+                        TrackCacheKey(endpoint, cacheKey);
                     }
 
                     return result;
                 }
-                
+
                 return null;
             }
             catch
@@ -176,8 +170,7 @@ namespace BusinessLogic.Services
 
         public async Task<ODataResponse<T>?> GetODataAsync<T>(string endpoint)
         {
-            // 1. Cache-Aside Check
-            string cacheKey = $"OFFLINE_CACHE_{endpoint}";
+            var cacheKey = $"OFFLINE_CACHE_{endpoint}";
             if (_memoryCache.TryGetValue(cacheKey, out ODataResponse<T>? cachedData))
             {
                 return cachedData;
@@ -194,11 +187,11 @@ namespace BusinessLogic.Services
                     if (string.IsNullOrWhiteSpace(content)) return new ODataResponse<T>();
 
                     var result = JsonSerializer.Deserialize<ODataResponse<T>>(content, _jsonOptions);
-                    
-                    // Store in Cache
+
                     if (result != null)
                     {
                         _memoryCache.Set(cacheKey, result, TimeSpan.FromHours(1));
+                        TrackCacheKey(endpoint, cacheKey);
                     }
 
                     return result;
@@ -214,35 +207,39 @@ namespace BusinessLogic.Services
 
         public async Task<T?> GetByIdAsync<T>(string endpoint, object id)
         {
-            string url = $"{endpoint}({id})";
-            string cacheKey = $"OFFLINE_CACHE_{url}";
+            var url = $"{endpoint}({id})";
+            var cacheKey = $"OFFLINE_CACHE_{url}";
             if (_memoryCache.TryGetValue(cacheKey, out T? cachedData)) return cachedData;
 
             try
             {
                 var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(url));
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var result = DeserializeODataResult<T>(content);
-                    if (result != null) _memoryCache.Set(cacheKey, result, TimeSpan.FromMinutes(30));
+                    if (result != null)
+                    {
+                        _memoryCache.Set(cacheKey, result, TimeSpan.FromMinutes(30));
+                        TrackCacheKey(url, cacheKey);
+                    }
                     return result;
                 }
-                
-                return default(T);
+
+                return default;
             }
             catch
             {
-                return default(T);
+                return default;
             }
         }
 
         public async Task<T?> GetByIdAsync<T>(string endpoint, object id, string query)
         {
-            string url = $"{endpoint}({id}){query}";
-            string cacheKey = $"OFFLINE_CACHE_{url}";
+            var url = $"{endpoint}({id}){query}";
+            var cacheKey = $"OFFLINE_CACHE_{url}";
             if (_memoryCache.TryGetValue(cacheKey, out T? cachedData)) return cachedData;
 
             try
@@ -254,52 +251,59 @@ namespace BusinessLogic.Services
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var result = DeserializeODataResult<T>(content);
-                    if (result != null) _memoryCache.Set(cacheKey, result, TimeSpan.FromMinutes(30));
+                    if (result != null)
+                    {
+                        _memoryCache.Set(cacheKey, result, TimeSpan.FromMinutes(30));
+                        TrackCacheKey(url, cacheKey);
+                    }
                     return result;
                 }
 
-                return default(T);
+                return default;
             }
-            catch (Exception)
+            catch
             {
-                return default(T);
+                return default;
             }
         }
 
         public async Task<T?> GetByIdAsync<T>(string endpoint)
         {
-            string cacheKey = $"OFFLINE_CACHE_{endpoint}";
+            var cacheKey = $"OFFLINE_CACHE_{endpoint}";
             if (_memoryCache.TryGetValue(cacheKey, out T? cachedData)) return cachedData;
 
             try
             {
                 var client = GetClient(endpoint);
-                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync($"{endpoint}"));
-                
+                var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
+
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var result = DeserializeODataResult<T>(content);
-                    if (result != null) _memoryCache.Set(cacheKey, result, TimeSpan.FromMinutes(30));
+                    if (result != null)
+                    {
+                        _memoryCache.Set(cacheKey, result, TimeSpan.FromMinutes(30));
+                        TrackCacheKey(endpoint, cacheKey);
+                    }
                     return result;
                 }
-                
-                return default(T);
+
+                return default;
             }
             catch
             {
-                return default(T);
+                return default;
             }
         }
 
         private T? DeserializeODataResult<T>(string content)
         {
-            if (string.IsNullOrWhiteSpace(content)) return default(T);
+            if (string.IsNullOrWhiteSpace(content)) return default;
 
             using var doc = JsonDocument.Parse(content);
             var root = doc.RootElement;
 
-            // If OData wraps the result in a "value" property (common for functions)
             if (root.TryGetProperty("value", out var valueProp))
             {
                 return JsonSerializer.Deserialize<T>(valueProp.GetRawText(), _jsonOptions);
@@ -313,25 +317,25 @@ namespace BusinessLogic.Services
             try
             {
                 var client = GetClient(endpoint);
-                var response = await SendRequestWithAuthRetryAsync(client, async () => 
+                var response = await SendRequestWithAuthRetryAsync(client, async () =>
                 {
                     var innerJson = JsonSerializer.Serialize(data, _jsonOptions);
                     var innerContent = new StringContent(innerJson, Encoding.UTF8, "application/json");
                     return await client.PostAsync(endpoint, innerContent);
                 });
-                
+
                 if (response.IsSuccessStatusCode)
                 {
-                    ClearCacheByEndpoint(endpoint); // Cache Invalidation
+                    ClearCacheByEndpoint(endpoint);
                     var responseContent = await response.Content.ReadAsStringAsync();
                     return JsonSerializer.Deserialize<T>(responseContent, _jsonOptions);
                 }
-                
-                return default(T);
+
+                return default;
             }
             catch
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -341,26 +345,26 @@ namespace BusinessLogic.Services
             {
                 var url = $"{endpoint}({id})";
                 var client = GetClient(endpoint);
-                
-                var response = await SendRequestWithAuthRetryAsync(client, async () => 
+
+                var response = await SendRequestWithAuthRetryAsync(client, async () =>
                 {
                     var innerJson = JsonSerializer.Serialize(data, _jsonOptions);
                     var innerContent = new StringContent(innerJson, Encoding.UTF8, "application/json");
                     return await client.PutAsync(url, innerContent);
                 });
-                
+
                 if (response.IsSuccessStatusCode)
                 {
-                    ClearCacheByEndpoint(endpoint, id); // Cache Invalidation
+                    ClearCacheByEndpoint(endpoint, id);
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    if (string.IsNullOrEmpty(responseContent)) return default(T); 
+                    if (string.IsNullOrEmpty(responseContent)) return default;
                     return JsonSerializer.Deserialize<T>(responseContent, _jsonOptions);
                 }
-                return default(T);
+                return default;
             }
             catch
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -372,7 +376,7 @@ namespace BusinessLogic.Services
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.DeleteAsync($"{endpoint}({id})"));
                 if (response.IsSuccessStatusCode)
                 {
-                    ClearCacheByEndpoint(endpoint, id); // Cache Invalidation
+                    ClearCacheByEndpoint(endpoint, id);
                     return true;
                 }
                 return false;
@@ -397,19 +401,69 @@ namespace BusinessLogic.Services
 
         private void ClearCacheByEndpoint(string endpoint, object? id = null)
         {
-            // Simple Invalidation: Clear the list and the specific item
-            _memoryCache.Remove($"OFFLINE_CACHE_{endpoint}");
+            ClearCacheGroup(endpoint);
+
             if (id != null)
             {
-                _memoryCache.Remove($"OFFLINE_CACHE_{endpoint}({id})");
+                ClearCacheGroup($"{endpoint}({id})");
             }
-            
-            // Also clear dashboard/trending as they might be affected
-            if (endpoint.Contains("NewsArticles"))
+
+            foreach (var related in GetRelatedEndpoints(endpoint))
             {
-                _memoryCache.Remove("OFFLINE_CACHE_/odata/NewsArticles/Trending(top=10)");
-                _memoryCache.Remove("OFFLINE_CACHE_/odata/NewsArticles/Default.Dashboard()");
+                ClearCacheGroup(related);
             }
+        }
+
+        private void ClearCacheGroup(string endpoint)
+        {
+            if (string.IsNullOrWhiteSpace(endpoint))
+            {
+                return;
+            }
+
+            var trackedKeys = _cacheKeyRegistry.ExtractKeys(endpoint);
+            foreach (var cacheKey in trackedKeys)
+            {
+                _memoryCache.Remove(cacheKey);
+            }
+
+            _memoryCache.Remove($"OFFLINE_CACHE_{endpoint}");
+        }
+
+        private IEnumerable<string> GetRelatedEndpoints(string endpoint)
+        {
+            if (endpoint.Contains("NewsArticles", StringComparison.OrdinalIgnoreCase))
+            {
+                yield return "/odata/NewsArticles";
+                yield return "/odata/NewsArticles/Default.GetActive()";
+                yield return "/odata/NewsArticles/Trending(top=4)";
+                yield return "/odata/NewsArticles/Trending(top=5)";
+                yield return "/odata/NewsArticles/Trending(top=10)";
+                yield return "/odata/Reports/Default.Trending(top=5)";
+                yield return "/odata/Reports/Default.Dashboard()";
+            }
+
+            if (endpoint.Contains("Categories", StringComparison.OrdinalIgnoreCase))
+            {
+                yield return "/odata/Categories";
+                yield return "/odata/CategoriesFunctions/Active";
+            }
+
+            if (endpoint.Contains("Tags", StringComparison.OrdinalIgnoreCase))
+            {
+                yield return "/odata/Tags";
+                yield return "/odata/TagsFunctions/Search";
+            }
+        }
+
+        private void TrackCacheKey(string endpoint, string cacheKey)
+        {
+            if (string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(cacheKey))
+            {
+                return;
+            }
+
+            _cacheKeyRegistry.Track(endpoint, cacheKey);
         }
 
         public async Task<string?> UploadImageAsync(string endpoint, Stream fileStream, string fileName)
@@ -418,17 +472,16 @@ namespace BusinessLogic.Services
             {
                 var content = new MultipartFormDataContent();
                 var fileContent = new StreamContent(fileStream);
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg"); // Adjust based on file type if needed, or let API handle validation
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
                 content.Add(fileContent, "file", fileName);
 
                 var client = GetClient(endpoint);
                 var response = await client.PostAsync(endpoint, content);
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                     // Check if response is JSON object with "url" property
-                    try 
+                    try
                     {
                         var json = JsonSerializer.Deserialize<JsonElement>(responseContent);
                         if (json.TryGetProperty("url", out var urlProperty))
@@ -438,11 +491,10 @@ namespace BusinessLogic.Services
                     }
                     catch
                     {
-                        // Fallback if plain string
                         return responseContent;
                     }
                 }
-                
+
                 return null;
             }
             catch
@@ -451,20 +503,18 @@ namespace BusinessLogic.Services
             }
         }
 
-
-
         public async Task<byte[]?> DownloadFileAsync(string endpoint)
         {
             try
             {
                 var client = GetClient(endpoint);
                 var response = await SendRequestWithAuthRetryAsync(client, () => client.GetAsync(endpoint));
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadAsByteArrayAsync();
                 }
-                
+
                 return null;
             }
             catch
@@ -495,14 +545,6 @@ namespace BusinessLogic.Services
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // We need to call refresh without Authorization header or with it? 
-                // Usually refresh endpoint allows anonymous or validation ofexpired token. 
-                // Existing client has expired token in header, which is fine.
-                
-                // Important: Avoid infinite loop if this call returns 401.
-                // We use a separate fresh client or ensure no interception for this specific call? 
-                // Since our retry logic is manual in methods, we are safe if we don't call retry here.
-                
                 var client = GetClient("/api/Auth/refresh");
                 var response = await client.PostAsync("/api/Auth/refresh", content);
 
@@ -513,21 +555,15 @@ namespace BusinessLogic.Services
 
                     if (newTokens != null)
                     {
-                        // Update session
                         context.Session.SetString("AuthToken", newTokens.Token);
                         context.Session.SetString("RefreshToken", newTokens.RefreshToken);
                         context.Session.SetString("TokenExpiresAt", newTokens.ExpiresAt.ToString("o"));
-                        
-                        // Update current client - Not needed as GetClient() reads from session
-                        // But need to ensure session is updated
-                        
                         return true;
                     }
                 }
             }
             catch
             {
-                // Log error
             }
 
             return false;
@@ -535,20 +571,16 @@ namespace BusinessLogic.Services
 
         private async Task<HttpResponseMessage> SendRequestWithAuthRetryAsync(HttpClient client, Func<Task<HttpResponseMessage>> requestFunc)
         {
-            // PROACTIVE REFRESH CHECK
             var context = _httpContextAccessor.HttpContext;
             if (context != null)
             {
                 var expiresAtStr = context.Session.GetString("TokenExpiresAt");
                 if (DateTime.TryParse(expiresAtStr, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime expiresAt))
                 {
-                    // Check if token expires in less than 5 minutes
                     if (expiresAt < DateTime.UtcNow.AddMinutes(5))
                     {
-                        // Try to refresh proactively
                         if (await RefreshTokenAsync())
                         {
-                            // Update client with new token
                             var newToken = context.Session.GetString("AuthToken");
                             if (!string.IsNullOrEmpty(newToken))
                             {
@@ -562,10 +594,8 @@ namespace BusinessLogic.Services
             var response = await requestFunc();
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                // Token might be expired, try to refresh
                 if (await RefreshTokenAsync())
                 {
-                    // Update the current client's token from session
                     var context2 = _httpContextAccessor.HttpContext;
                     if (context2 != null)
                     {
@@ -575,13 +605,11 @@ namespace BusinessLogic.Services
                             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                         }
                     }
-                    // Retry request
                     return await requestFunc();
                 }
             }
             return response;
         }
-
     }
 
     public class ODataResponse<T>

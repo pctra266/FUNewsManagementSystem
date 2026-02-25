@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheKeyRegistry, CacheKeyRegistry>();
 
 // Add Named HttpClients with Polly Policies
 builder.Services.AddHttpClient("CoreClient", client =>

@@ -11,6 +11,7 @@ namespace Presentation_RazorPage.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IMemoryCache _memoryCache;
+        private readonly ICacheKeyRegistry _cacheKeyRegistry;
         private readonly ILogger<CacheRefreshService> _logger;
 
         private const string OfflineFilePath = "offline_data.json";
@@ -29,10 +30,15 @@ namespace Presentation_RazorPage.Services
             WriteIndented = true
         };
 
-        public CacheRefreshService(IServiceProvider serviceProvider, IMemoryCache memoryCache, ILogger<CacheRefreshService> logger)
+        public CacheRefreshService(
+            IServiceProvider serviceProvider,
+            IMemoryCache memoryCache,
+            ICacheKeyRegistry cacheKeyRegistry,
+            ILogger<CacheRefreshService> logger)
         {
             _serviceProvider = serviceProvider;
             _memoryCache = memoryCache;
+            _cacheKeyRegistry = cacheKeyRegistry;
             _logger = logger;
         }
 
@@ -144,7 +150,9 @@ namespace Presentation_RazorPage.Services
                 return;
             }
 
-            _memoryCache.Set(BuildCacheKey(endpoint), payload);
+            var cacheKey = BuildCacheKey(endpoint);
+            _memoryCache.Set(cacheKey, payload);
+            _cacheKeyRegistry.Track(endpoint, cacheKey);
         }
     }
 
