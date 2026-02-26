@@ -3,7 +3,9 @@
 
 let isOffline = false;
 let checkInterval = null;
-const CHECK_INTERVAL_MS = 30000; // 30 seconds
+let isChecking = false;
+const CHECK_INTERVAL_MS = 3000; // 3 seconds
+const FETCH_TIMEOUT_MS = 2000; // 2 seconds
 
 const apiBaseUrl = (() => {
     const base = document.body?.dataset?.apiBase ?? '';
@@ -16,7 +18,12 @@ const apiBaseUrl = (() => {
 function initializeOfflineMode() {
     console.log('[Offline Mode] Initializing...');
 
-    // Initial check
+    // Initial check - Instant check based on browser state
+    if (!navigator.onLine) {
+        setOfflineMode(true);
+    }
+    
+    // Verify with API
     checkConnectivity();
 
     // Set up periodic checks
@@ -34,21 +41,36 @@ function initializeOfflineMode() {
  * Check API connectivity by pinging health endpoint
  */
 async function checkConnectivity() {
+    if (isChecking) return;
+    
     const healthUrl = apiBaseUrl
         ? `${apiBaseUrl}/api/health`
         : '/api/health';
+
+    isChecking = true;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
     try {
         const response = await fetch(healthUrl, {
             method: 'HEAD',
             cache: 'no-cache',
-            headers: { 'Cache-Control': 'no-cache' }
+            headers: { 'Cache-Control': 'no-cache' },
+            signal: controller.signal
         });
 
+        clearTimeout(timeoutId);
         setOfflineMode(!response.ok);
     } catch (error) {
-        console.warn('[Offline Mode] API unreachable:', error.message);
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            console.warn('[Offline Mode] API check timed out');
+        } else {
+            console.warn('[Offline Mode] API unreachable:', error.message);
+        }
         setOfflineMode(true);
+    } finally {
+        isChecking = false;
     }
 }
 
@@ -79,26 +101,20 @@ function setOfflineMode(offline) {
  */
 function updateOfflineBanner(show) {
     const banner = document.getElementById('offlineBanner');
-    if (!banner) {
-        console.warn('[Offline Mode] Banner element not found');
-        return;
-    }
+    if (!banner) return;
 
     if (show) {
+        // Instant show - no transition for immediate feedback
+        banner.style.transition = 'none';
         banner.style.display = 'block';
-        // Smooth fade in
-        banner.style.opacity = '0';
-        setTimeout(() => {
-            banner.style.transition = 'opacity 0.3s';
-            banner.style.opacity = '1';
-        }, 10);
+        banner.style.opacity = '1';
     } else {
-        // Smooth fade out
-        banner.style.transition = 'opacity 0.3s';
+        // Smooth fade out for recovery
+        banner.style.transition = 'opacity 0.2s ease-out';
         banner.style.opacity = '0';
         setTimeout(() => {
-            banner.style.display = 'none';
-        }, 300);
+            if (!isOffline) banner.style.display = 'none';
+        }, 200);
     }
 }
 

@@ -11,34 +11,28 @@ namespace Presentation_RazorPage.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IMemoryCache _memoryCache;
-        private readonly ICacheKeyRegistry _cacheKeyRegistry;
         private readonly ILogger<CacheRefreshService> _logger;
 
         private const string OfflineFilePath = "offline_data.json";
         private const string TagsEndpoint = "/odata/Tags";
         private const string CategoriesEndpoint = "/odata/CategoriesFunctions/Active";
         private const string SystemAccountsEndpoint = "/odata/SystemAccounts";
-        private const string DashboardEndpoint = "/odata/Reports/Default.Dashboard()";
+        private const string DashboardEndpoint = "/odata/NewsArticles/Default.Dashboard()";
         private const string NewsExpandClause = "$expand=Category($select=CategoryName),CreatedBy($select=AccountName),Tags,NewsArticleImages";
         private const int PublicTrendingCount = 4;
         private const int StaffTrendingCount = 5;
         private static readonly string ActiveNewsEndpoint = $"/odata/NewsArticles/Default.GetActive()?{NewsExpandClause}";
-        private static readonly string PublicTrendingEndpoint = $"/odata/NewsArticles/Trending(top={PublicTrendingCount})";
-        private static readonly string StaffTrendingEndpoint = $"/odata/Reports/Default.Trending(top={StaffTrendingCount})";
+        private static readonly string PublicTrendingEndpoint = $"/odata/NewsArticles/Default.Trending(top={PublicTrendingCount})";
+        private static readonly string StaffTrendingEndpoint = $"/odata/NewsArticles/Default.Trending(top={StaffTrendingCount})";
         private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
         {
             WriteIndented = true
         };
 
-        public CacheRefreshService(
-            IServiceProvider serviceProvider,
-            IMemoryCache memoryCache,
-            ICacheKeyRegistry cacheKeyRegistry,
-            ILogger<CacheRefreshService> logger)
+        public CacheRefreshService(IServiceProvider serviceProvider, IMemoryCache memoryCache, ILogger<CacheRefreshService> logger)
         {
             _serviceProvider = serviceProvider;
             _memoryCache = memoryCache;
-            _cacheKeyRegistry = cacheKeyRegistry;
             _logger = logger;
         }
 
@@ -150,9 +144,7 @@ namespace Presentation_RazorPage.Services
                 return;
             }
 
-            var cacheKey = BuildCacheKey(endpoint);
-            _memoryCache.Set(cacheKey, payload);
-            _cacheKeyRegistry.Track(endpoint, cacheKey);
+            _memoryCache.Set(BuildCacheKey(endpoint), payload);
         }
     }
 

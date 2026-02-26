@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json.Serialization;
+using System.Net;
 
 namespace BusinessLogic.Services
 {
@@ -98,26 +99,36 @@ namespace BusinessLogic.Services
 
         public async Task<LoginResponseModel?> LoginAsync(LoginViewModel loginModel)
         {
+            var json = JsonSerializer.Serialize(loginModel, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var client = GetClient("/api/Auth/login");
+
+            HttpResponseMessage response;
             try
             {
-                var json = JsonSerializer.Serialize(loginModel, _jsonOptions);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var client = GetClient("/api/Auth/login");
-                var response = await client.PostAsync("/api/Auth/login", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<LoginResponseModel>(responseContent, _jsonOptions);
-                }
-
-                return null;
+                response = await client.PostAsync("/api/Auth/login", content);
             }
-            catch
+            catch (HttpRequestException ex)
+            {
+                throw new HttpRequestException("Unable to reach the authentication API.", ex);
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<LoginResponseModel>(responseContent, _jsonOptions);
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadRequest ||
+                response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 return null;
             }
+
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(
+                $"Authentication API failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {errorContent}");
         }
 
         public async Task<List<T>?> GetAsync<T>(string endpoint)
@@ -439,8 +450,8 @@ namespace BusinessLogic.Services
                 yield return "/odata/NewsArticles/Trending(top=4)";
                 yield return "/odata/NewsArticles/Trending(top=5)";
                 yield return "/odata/NewsArticles/Trending(top=10)";
-                yield return "/odata/Reports/Default.Trending(top=5)";
-                yield return "/odata/Reports/Default.Dashboard()";
+                //yield return "/odata/Reports/Default.Trending(top=5)";
+                //yield return "/odata/Reports/Default.Dashboard()";
             }
 
             if (endpoint.Contains("Categories", StringComparison.OrdinalIgnoreCase))
@@ -579,6 +590,9 @@ namespace BusinessLogic.Services
                 {
                     if (expiresAt < DateTime.UtcNow.AddMinutes(5))
                     {
+                        Console.WriteLine("---------------------------");
+                        Console.WriteLine("-----------Go to here----------------");
+                        Console.WriteLine("---------------------------");
                         if (await RefreshTokenAsync())
                         {
                             var newToken = context.Session.GetString("AuthToken");

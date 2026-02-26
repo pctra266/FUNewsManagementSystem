@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using DataAccess.Models;
 using BusinessLogic.Services;
+using System.Net.Http;
 
 namespace Presentation_RazorPage.Pages
 {
@@ -35,37 +36,34 @@ namespace Presentation_RazorPage.Pages
             try
             {
                 var response = await _apiService.LoginAsync(LoginData);
-                
                 if (response != null && !string.IsNullOrEmpty(response.Token))
                 {
-                    // Store token and user info in session
                     HttpContext.Session.SetString("AuthToken", response.Token);
                     HttpContext.Session.SetString("RefreshToken", response.RefreshToken);
                     HttpContext.Session.SetString("UserName", response.Account.AccountName ?? "User");
                     HttpContext.Session.SetString("UserRole", response.Account.AccountRole?.ToString() ?? "Admin");
-                    HttpContext.Session.SetString("UserEmail", response.Account.AccountEmail ?? "");
+                    HttpContext.Session.SetString("UserEmail", response.Account.AccountEmail ?? string.Empty);
                     HttpContext.Session.SetInt32("UserId", response.Account.AccountId);
                     HttpContext.Session.SetString("TokenExpiresAt", response.ExpiresAt.ToString("o"));
 
-                    // Set auth token for API service - Removed as per refactor
-                    // _apiService.SetAuthToken(response.Token);
-
-                    // Redirect based on user role according to project requirements
                     return response.Account.AccountRole switch
                     {
-                        _ => RedirectToPage("/News/Index")            // Admin - go to account management
+                        _ => RedirectToPage("/News/Index")
                     };
                 }
-                else
-                {
-                    ErrorMessage = "Invalid email or password. Please try again.";
-                    ModelState.AddModelError(string.Empty, ErrorMessage);
-                }
+
+                ErrorMessage = "Invalid email or password. Please try again.";
+                return Page();
             }
-            catch (Exception ex)
+            catch (HttpRequestException)
             {
-                ErrorMessage = "An error occurred while logging in. Please try again later.";
-                ModelState.AddModelError(string.Empty, ErrorMessage);
+                ErrorMessage = "Authentication service is unavailable after multiple retries. Please try again later.";
+                return Page();
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "An unexpected error occurred while logging in. Please try again later.";
+                return Page();
             }
 
             return Page();

@@ -27,24 +27,26 @@ namespace Presentation_RazorPage.Pages.Staff
                 return RedirectToPage("/Login");
             }
 
-            if (userRole == "1")
+            var isStaffOrAdmin = userRole == "1" || string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
+            if (!isStaffOrAdmin)
             {
-                var stats = await _apiService.GetByIdAsync<DashboardStatisticsModel>("/odata/Reports/Default.Dashboard()");
-                if (stats != null)
-                {
-                    DashboardStats = stats;
-                }
-
-                var trending = await _apiService.GetAsync<NewsArticleModel>("/odata/Reports/Default.Trending(top=5)");
-                if (trending != null)
-                {
-                    TrendingArticles = trending;
-                }
-
-                return Page();
+                return RedirectToPage("/News/Index");
             }
 
-            return RedirectToPage("/News/Index");
+            var stats = await _apiService.GetByIdAsync<DashboardStatisticsModel>("/odata/NewsArticles/Default.Dashboard()");
+            if (stats != null)
+            {
+                DashboardStats = stats;
+            }
+
+            var trending = await _apiService.GetAsync<NewsArticleModel>("/odata/NewsArticles/Default.Trending(top=5)");
+            if (trending != null)
+            {
+                TrendingArticles = trending;
+                TrendingArticles.ForEach(article => article.HydrateMetadata());
+            }
+
+            return Page();
         }
 
         public async Task<IActionResult> OnGetExportAsync()
@@ -55,7 +57,7 @@ namespace Presentation_RazorPage.Pages.Staff
                 return RedirectToPage("/Login");
             }
 
-            var fileData = await _apiService.DownloadFileAsync("/odata/Reports/Default.Export()");
+            var fileData = await _apiService.DownloadFileAsync("/odata/NewsArticles/Default.Export()");
             if (fileData == null || fileData.Length == 0)
             {
                 TempData["ErrorMessage"] = "Failed to download report.";

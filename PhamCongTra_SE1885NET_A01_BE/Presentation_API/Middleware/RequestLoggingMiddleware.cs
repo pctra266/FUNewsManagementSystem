@@ -31,6 +31,11 @@ namespace Presentation_API.Middleware
             var path = context.Request.Path;
             var queryString = context.Request.QueryString.ToString();
 
+            // Check if this request should be logged
+            var shouldLog = !path.StartsWithSegments("/hub/notifications") && 
+                             !path.StartsWithSegments("/api/health") &&
+                             !path.StartsWithSegments("/api/notifications");
+
             try
             {
                 await _next(context);
@@ -41,36 +46,39 @@ namespace Presentation_API.Middleware
                 var statusCode = context.Response.StatusCode;
                 var elapsedMs = stopwatch.ElapsedMilliseconds;
 
-                // Console Logging
-                _logger.LogInformation(
-                    "Request: {Method} {Path}{QueryString} responded {StatusCode} in {Elapsed}ms",
-                    method, path, queryString, statusCode, elapsedMs);
-
-                // File Logging
-                try 
+                if (shouldLog)
                 {
-                    var logEntry = new
-                    {
-                        Timestamp = DateTime.UtcNow,
-                        Method = method,
-                        Path = path,
-                        QueryString = queryString,
-                        StatusCode = statusCode,
-                        DurationMs = elapsedMs
-                    };
+                    // Console Logging
+                    _logger.LogInformation(
+                        "Request: {Method} {Path}{QueryString} responded {StatusCode} in {Elapsed}ms",
+                        method, path, queryString, statusCode, elapsedMs);
 
-                    var jsonLine = JsonSerializer.Serialize(logEntry) + Environment.NewLine;
-                    var fileName = $"api_requests_{DateTime.UtcNow:yyyyMMdd}.json";
-                    var filePath = Path.Combine(_logDirectory, fileName);
-
-                    lock (_lock)
+                    // File Logging
+                    try 
                     {
-                        File.AppendAllText(filePath, jsonLine);
+                        var logEntry = new
+                        {
+                            Timestamp = DateTime.UtcNow,
+                            Method = method,
+                            Path = path,
+                            QueryString = queryString,
+                            StatusCode = statusCode,
+                            DurationMs = elapsedMs
+                        };
+
+                        var jsonLine = JsonSerializer.Serialize(logEntry) + Environment.NewLine;
+                        var fileName = $"api_requests_{DateTime.UtcNow:yyyyMMdd}.json";
+                        var filePath = Path.Combine(_logDirectory, fileName);
+
+                        lock (_lock)
+                        {
+                            File.AppendAllText(filePath, jsonLine);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to write API request log to file");
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to write API request log to file");
+                    }
                 }
             }
         }
