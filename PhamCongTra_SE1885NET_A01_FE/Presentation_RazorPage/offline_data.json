@@ -2452,17 +2452,17 @@
     },
     {
       "newsArticleId": "NEWS20260223073032",
-      "newsTitle": "phamcongtrahaha do ",
+      "newsTitle": "phamcongtrahaha do haha",
       "headline": "adfa",
       "createdDate": "2026-02-23T07:30:32.317+07:00",
       "newsContent": null,
       "newsSource": "abc",
       "categoryId": 4,
       "newsStatus": true,
-      "viewCount": 12,
+      "viewCount": 13,
       "createdById": 6,
       "updatedById": 6,
-      "modifiedDate": "2026-02-25T21:47:27.447+07:00",
+      "modifiedDate": "2026-02-25T22:25:36.273+07:00",
       "categoryName": "Alumni News",
       "createdByName": "John Editor",
       "updatedByName": null,
@@ -2707,5 +2707,5 @@
   "staffTrendingArticles": [],
   "dashboardStats": null,
   "systemAccounts": [],
-  "lastUpdated": "2026-02-25T22:25:31.7555957+07:00"
+  "lastUpdated": "2026-02-26T08:37:18.9033725+07:00"
 }
