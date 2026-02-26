@@ -123,6 +123,7 @@ namespace BussinessLogic.Services
                     new Claim(ClaimTypes.Role, roleValue)
                 }),
                 Expires = DateTime.UtcNow.AddHours(24),
+                //Expires = DateTime.UtcNow.AddSeconds(30),
                 Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

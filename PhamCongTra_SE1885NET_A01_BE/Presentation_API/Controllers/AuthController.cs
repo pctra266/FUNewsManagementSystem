@@ -38,7 +38,6 @@ namespace Presentation_API.Controllers
                     return Unauthorized(new { message = "Invalid email or password" });
                 }
 
-                // Get account details for response
                 SystemAccount? account = null;
                 var adminAccount = _authService.GetAdminAccount();
                 
@@ -68,6 +67,7 @@ namespace Presentation_API.Controllers
                         AccountRole = account.AccountRole
                     },
                     ExpiresAt = DateTime.UtcNow.AddHours(24)
+                    //ExpiresAt = DateTime.UtcNow.AddSeconds(30)
                 };
 
                 return Ok(response);
@@ -100,6 +100,7 @@ namespace Presentation_API.Controllers
                     Token = result.Value.AccessToken,
                     RefreshToken = result.Value.RefreshToken,
                     ExpiresAt = DateTime.UtcNow.AddHours(24)
+                    //ExpiresAt = DateTime.UtcNow.AddSeconds(30),
                 });
             }
             catch (Exception ex)

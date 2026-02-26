@@ -579,6 +579,9 @@ namespace BusinessLogic.Services
                 {
                     if (expiresAt < DateTime.UtcNow.AddMinutes(5))
                     {
+                        Console.WriteLine("---------------------------");
+                        Console.WriteLine("-----------Go to here----------------");
+                        Console.WriteLine("---------------------------");
                         if (await RefreshTokenAsync())
                         {
                             var newToken = context.Session.GetString("AuthToken");

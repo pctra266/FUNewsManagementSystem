@@ -60,8 +60,8 @@
       "createdById": 1,
       "updatedById": 1,
       "modifiedDate": "2024-05-05T00:00:00+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Emma William",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -115,8 +115,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-02-20T10:01:50.483+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -164,8 +164,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2025-06-16T10:01:51.26+07:00",
-      "categoryName": "Campus Safety",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -213,8 +213,8 @@
       "createdById": 10,
       "updatedById": 10,
       "modifiedDate": "2025-07-04T10:01:54.477+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Guest Writer",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -262,8 +262,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2025-04-05T10:01:56.27+07:00",
-      "categoryName": "Student Affairs",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -305,8 +305,8 @@
       "createdById": 1,
       "updatedById": 1,
       "modifiedDate": "2024-05-05T00:00:00+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Emma William",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -366,8 +366,8 @@
       "createdById": 3,
       "updatedById": 3,
       "modifiedDate": "2025-12-30T10:01:57.593+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Isabella David",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -415,8 +415,8 @@
       "createdById": 8,
       "updatedById": 8,
       "modifiedDate": "2025-12-13T10:01:58.403+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Robert Lecturer",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -464,8 +464,8 @@
       "createdById": 9,
       "updatedById": 9,
       "modifiedDate": "2026-01-06T10:02:00.75+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Pham Cong Tra",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -513,8 +513,8 @@
       "createdById": 9,
       "updatedById": 9,
       "modifiedDate": "2025-06-12T10:02:01.913+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Pham Cong Tra",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -562,8 +562,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-08-24T10:02:02.547+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -611,8 +611,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-11-23T10:02:03.81+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -660,8 +660,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-02-11T10:02:04.507+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -709,8 +709,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2024-05-05T00:00:00+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -764,8 +764,8 @@
       "createdById": 4,
       "updatedById": 4,
       "modifiedDate": "2025-10-02T10:02:05.517+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Michael Charlotte",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -813,8 +813,8 @@
       "createdById": 5,
       "updatedById": 5,
       "modifiedDate": "2025-04-04T10:02:06.867+07:00",
-      "categoryName": "Campus Safety",
-      "createdByName": "Steve Paris",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -862,8 +862,8 @@
       "createdById": 3,
       "updatedById": 3,
       "modifiedDate": "2025-12-07T10:02:07.607+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Isabella David",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -911,8 +911,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2025-06-12T10:02:11.29+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -960,8 +960,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-12-27T10:02:13.637+07:00",
-      "categoryName": "Student Affairs",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1009,8 +1009,8 @@
       "createdById": 4,
       "updatedById": 4,
       "modifiedDate": "2025-11-01T10:02:14.837+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Michael Charlotte",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1058,8 +1058,8 @@
       "createdById": 7,
       "updatedById": 7,
       "modifiedDate": "2025-12-01T10:02:15.66+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Sarah Staff",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1107,8 +1107,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2024-05-05T00:00:00+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1168,8 +1168,8 @@
       "createdById": 9,
       "updatedById": 9,
       "modifiedDate": "2025-08-04T10:02:17.297+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Pham Cong Tra",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1217,8 +1217,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2025-06-16T10:02:18.583+07:00",
-      "categoryName": "Student Affairs",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1266,8 +1266,8 @@
       "createdById": 9,
       "updatedById": 9,
       "modifiedDate": "2026-01-16T10:02:19.493+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Pham Cong Tra",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1315,8 +1315,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2025-03-06T10:02:21.273+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1364,8 +1364,8 @@
       "createdById": 8,
       "updatedById": 8,
       "modifiedDate": "2025-08-28T10:02:22.633+07:00",
-      "categoryName": "Student Affairs",
-      "createdByName": "Robert Lecturer",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1413,8 +1413,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-04-03T10:02:23.597+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1462,8 +1462,8 @@
       "createdById": 2,
       "updatedById": 4,
       "modifiedDate": "2026-02-09T11:15:12.67+07:00",
-      "categoryName": "Campus Safety",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1511,8 +1511,8 @@
       "createdById": 8,
       "updatedById": 8,
       "modifiedDate": "2025-04-22T10:02:26.47+07:00",
-      "categoryName": "Campus Safety",
-      "createdByName": "Robert Lecturer",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1560,8 +1560,8 @@
       "createdById": 8,
       "updatedById": 8,
       "modifiedDate": "2025-12-09T10:02:27.907+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Robert Lecturer",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1609,8 +1609,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2024-05-05T00:00:00+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1670,8 +1670,8 @@
       "createdById": 10,
       "updatedById": 10,
       "modifiedDate": "2025-09-12T10:02:30.867+07:00",
-      "categoryName": "Student Affairs",
-      "createdByName": "Guest Writer",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1719,8 +1719,8 @@
       "createdById": 5,
       "updatedById": 5,
       "modifiedDate": "2025-04-15T10:02:32.363+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Steve Paris",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1768,8 +1768,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2025-06-14T10:02:33.893+07:00",
-      "categoryName": "Student Affairs",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1817,8 +1817,8 @@
       "createdById": 8,
       "updatedById": 8,
       "modifiedDate": "2025-12-24T10:02:38.737+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Robert Lecturer",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1866,8 +1866,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-10-16T10:01:48.083+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1915,8 +1915,8 @@
       "createdById": 2,
       "updatedById": 2,
       "modifiedDate": "2025-08-27T10:01:48.41+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "Olivia James",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -1964,8 +1964,8 @@
       "createdById": 1,
       "updatedById": 1,
       "modifiedDate": "2025-11-19T10:01:48.74+07:00",
-      "categoryName": "Student Affairs",
-      "createdByName": "Emma William",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2013,8 +2013,8 @@
       "createdById": 7,
       "updatedById": 7,
       "modifiedDate": "2026-01-09T10:01:49.49+07:00",
-      "categoryName": "Capstone Project News",
-      "createdByName": "Sarah Staff",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2062,8 +2062,8 @@
       "createdById": 4,
       "updatedById": null,
       "modifiedDate": null,
-      "categoryName": "Student Affairs",
-      "createdByName": "Michael Charlotte",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2111,8 +2111,8 @@
       "createdById": 4,
       "updatedById": 6,
       "modifiedDate": "2026-02-14T08:25:06.963+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "Michael Charlotte",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2178,8 +2178,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2026-02-14T10:33:41.447+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2248,8 +2248,8 @@
       "createdById": 6,
       "updatedById": 6,
       "modifiedDate": "2026-02-18T11:10:37.117+07:00",
-      "categoryName": "Academic news",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2331,8 +2331,8 @@
       "createdById": 6,
       "updatedById": null,
       "modifiedDate": null,
-      "categoryName": "Academic news",
-      "createdByName": "John Editor",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2396,12 +2396,12 @@
       "newsSource": "abc",
       "categoryId": 4,
       "newsStatus": true,
-      "viewCount": 2,
+      "viewCount": 3,
       "createdById": 6,
       "updatedById": 6,
-      "modifiedDate": "2026-02-23T07:30:00.293+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "John Editor",
+      "modifiedDate": "2026-02-26T09:37:16.327+07:00",
+      "categoryName": null,
+      "createdByName": null,
       "updatedByName": null,
       "tags": [
         {
@@ -2430,81 +2430,6 @@
           "imageUrl": "https://localhost:7196/uploads/30181e1b-dd7d-401e-82a7-8ff9a3a93ff2.jpg",
           "caption": "StockCake-Vintage_Chess_Study-639124-medium.jpg",
           "createdDate": "2026-02-23T07:20:31.83+07:00"
-        }
-      ],
-      "category": {
-        "categoryId": 0,
-        "categoryName": "Alumni News",
-        "categoryDescription": "",
-        "parentCategoryId": null,
-        "isActive": null,
-        "parentCategoryName": null,
-        "articleCount": 0
-      },
-      "createdBy": {
-        "accountId": 0,
-        "accountName": "John Editor",
-        "accountEmail": null,
-        "accountRole": null,
-        "roleName": "Admin",
-        "articleCount": 0
-      }
-    },
-    {
-      "newsArticleId": "NEWS20260223073032",
-      "newsTitle": "phamcongtrahaha do haha",
-      "headline": "adfa",
-      "createdDate": "2026-02-23T07:30:32.317+07:00",
-      "newsContent": null,
-      "newsSource": "abc",
-      "categoryId": 4,
-      "newsStatus": true,
-      "viewCount": 14,
-      "createdById": 6,
-      "updatedById": 6,
-      "modifiedDate": "2026-02-25T22:25:36.273+07:00",
-      "categoryName": "Alumni News",
-      "createdByName": "John Editor",
-      "updatedByName": null,
-      "tags": [
-        {
-          "tagId": 1,
-          "tagName": "Education",
-          "note": "Education Note",
-          "articleCount": 0
-        },
-        {
-          "tagId": 2,
-          "tagName": "Technology",
-          "note": "Technology Note",
-          "articleCount": 0
-        },
-        {
-          "tagId": 10,
-          "tagName": "Scholarship",
-          "note": "Scholarship Opportunities",
-          "articleCount": 0
-        },
-        {
-          "tagId": 11,
-          "tagName": "Start-up",
-          "note": "Student Start-ups",
-          "articleCount": 0
-        },
-        {
-          "tagId": 12,
-          "tagName": "Sports",
-          "note": "Football and physical activities",
-          "articleCount": 0
-        }
-      ],
-      "newsArticleImages": [
-        {
-          "imageId": 1008,
-          "newsArticleId": "NEWS20260223073032",
-          "imageUrl": "https://localhost:7196/uploads/bfdd2f02-dcef-4baf-bb4a-b9a8c53ab657.png",
-          "caption": "StockCake-Vintage_Chess_Study-639124-medium.png",
-          "createdDate": "2026-02-23T07:40:53.337+07:00"
         }
       ],
       "category": {
@@ -2813,5 +2738,5 @@
   ],
   "dashboardStats": null,
   "systemAccounts": [],
-  "lastUpdated": "2026-02-26T09:11:09.234299+07:00"
+  "lastUpdated": "2026-02-26T09:41:41.8635357+07:00"
 }
