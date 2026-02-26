@@ -439,8 +439,8 @@ namespace BusinessLogic.Services
                 yield return "/odata/NewsArticles/Trending(top=4)";
                 yield return "/odata/NewsArticles/Trending(top=5)";
                 yield return "/odata/NewsArticles/Trending(top=10)";
-                yield return "/odata/Reports/Default.Trending(top=5)";
-                yield return "/odata/Reports/Default.Dashboard()";
+                //yield return "/odata/Reports/Default.Trending(top=5)";
+                //yield return "/odata/Reports/Default.Dashboard()";
             }
 
             if (endpoint.Contains("Categories", StringComparison.OrdinalIgnoreCase))
